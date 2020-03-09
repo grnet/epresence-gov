@@ -24,10 +24,12 @@ class GsisAuthenticationController extends Controller
     | This controller is responsible for authenticating users for the application via Gsis oAuth2 system
     */
 
+    // oAuth2 Server
     protected $server;
 
     public function __construct()
     {
+        // Instantiated gsis oAuth2 server
         $this->server = new GenericProvider([
             'clientId'                => config('services.gsis.clientId'),
             'clientSecret'            => config('services.gsis.clientSecret'),
@@ -39,14 +41,14 @@ class GsisAuthenticationController extends Controller
         ]);
     }
 
-    /**
+    /** This method redirects the user to the gsis login page
      * @return RedirectResponse|Redirector
      */
     public function login(){
         return $this->redirectToLoginForm();
     }
 
-    /**
+    /** This method redirects the user to the gsis login page with an activation token in the session
      * @param Request $request
      * @param $activation_token
      * @return RedirectResponse|Redirector
@@ -61,7 +63,7 @@ class GsisAuthenticationController extends Controller
         }
     }
 
-    /**
+    /** This method redirects the user to the gsis login page
      * @return RedirectResponse|Redirector
      */
     public function redirectToLoginForm(){
@@ -70,7 +72,9 @@ class GsisAuthenticationController extends Controller
         return redirect($authorizationUrl);
     }
 
-    /**
+    /** This method is responsible for sign a user in the application.
+     *  Also match an invited user with the signed user that came from Gsis oAuth2 endpoint,
+     *  this process acts as the registration process of the user
      * @param Request $request
      * @return RedirectResponse|Redirector
      */
