@@ -170,17 +170,12 @@ Route::get('users/{id}/edit', 'UsersExtraController@edit');
 
 
 Route::get('users/{id}/edit/emails', 'ExtraEmailsController@showManageEmailsFromAdmin');
-
 Route::post('users/{id}/emails/add_new','ExtraEmailsController@addExtraMailFromAdmin');
 Route::post('users/{id}/emails/deleteExtraEmail', 'ExtraEmailsController@deleteExtraMail');
 Route::post('users/{id}/emails/makePrimary', 'ExtraEmailsController@makePrimary');
 Route::post('users/{id}/emails/resend_extra_email_confirmation', 'ExtraEmailsController@resend_extra_email_confirmation');
-
 Route::get('users/{id}', 'UsersController@edit');
 Route::post('users/delete_user_image', 'UsersController@delete_user_image');
-
-Route::post('users/check_mail_properties','UsersController@check_mail_properties');
-
 Route::get('administrators', 'UsersController@administrators');
 Route::post('administrators/sendEmailToCoordinators', 'EmailsController@sendEmailToCoordinators');
 

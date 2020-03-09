@@ -594,38 +594,40 @@ class ConferencesController extends Controller
 
         $create_meeting_info = $zoom_client->create_meeting($create_parameters, $next_named_user_in_line->zoom_id);
 
-        $input['join_url'] = $create_meeting_info->join_url;
-        $input['start_url'] = $create_meeting_info->start_url;
-        $input['zoom_meeting_id'] = $create_meeting_info->id;
+        if($create_meeting_info !== false){
+            $input['join_url'] = $create_meeting_info->join_url;
+            $input['start_url'] = $create_meeting_info->start_url;
+            $input['zoom_meeting_id'] = $create_meeting_info->id;
 
-        // Create Scheduled Room ZOOM api calls end
+            // Create Scheduled Room ZOOM api calls end
 
-        //Create the conference in our db
+            //Create the conference in our db
 
-        $input['room_enabled'] = 1;
-        $input['instantActivation'] = 1;
-        $input['test'] = 1;
-        $conference = Conference::create($input);
-        $participant = Auth::user();
-        $conference->participants()->save($participant);
-        $zoom_api_response = $conference->assignParticipant($participant->id, "approve");
+            $input['room_enabled'] = 1;
+            $input['instantActivation'] = 1;
+            $input['test'] = 1;
+            $conference = Conference::create($input);
+            $participant = Auth::user();
+            $conference->participants()->save($participant);
+            $zoom_api_response = $conference->assignParticipant($participant->id, "approve");
 
-        $join_url = isset($zoom_api_response->join_url) ? $zoom_api_response->join_url : null;
-        $registrant_id = isset($zoom_api_response->registrant_id) ? $zoom_api_response->registrant_id : null;
+            $join_url = isset($zoom_api_response->join_url) ? $zoom_api_response->join_url : null;
+            $registrant_id = isset($zoom_api_response->registrant_id) ? $zoom_api_response->registrant_id : null;
 
-        DB::table('conference_user')->where('conference_id', $conference->id)->where('user_id', $participant->id)
-            ->update([
-                'device' => "Desktop-Mobile",
-                'join_url' => $join_url,
-                'registrant_id' => $registrant_id,
-                'enabled' => 1
-            ]);
+            DB::table('conference_user')->where('conference_id', $conference->id)->where('user_id', $participant->id)
+                ->update([
+                    'device' => "Desktop-Mobile",
+                    'join_url' => $join_url,
+                    'registrant_id' => $registrant_id,
+                    'enabled' => 1
+                ]);
 
-        Statistics::create(['conference_id' => $conference->id, 'institution_id' => $conference->institution_id, 'department_id' => $conference->department_id, 'active' => 1, 'created_at' => Carbon::now()]);
+            Statistics::create(['conference_id' => $conference->id, 'institution_id' => $conference->institution_id, 'department_id' => $conference->department_id, 'active' => 1, 'created_at' => Carbon::now()]);
+            event(new ConferenceCreated($conference, 'active'));
+            return redirect('test-conferences/' . $conference->id . '/edit')->with('storesSuccessfully', trans('controllers.conferenceSaved') . trans('controllers.click') . '<a href="#ParticipatsBody">' . trans('controllers.here') . '</a>' . trans('controllers.toAddParticipants'));
+        }
 
-        event(new ConferenceCreated($conference, 'active'));
-
-        return redirect('test-conferences/' . $conference->id . '/edit')->with('storesSuccessfully', trans('controllers.conferenceSaved') . trans('controllers.click') . '<a href="#ParticipatsBody">' . trans('controllers.here') . '</a>' . trans('controllers.toAddParticipants'));
+        return redirect($back_url);
     }
 
     /**

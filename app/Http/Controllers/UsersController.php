@@ -908,43 +908,7 @@ class UsersController extends Controller
     }
 
 
-    public function check_mail_properties(Request $request)
-    {
 
-        $input = $request->all();
-
-        $v = Validator::make($input, [
-            'mail' => 'email',
-        ]);
-
-        if ($v->fails()) {
-            return response()->json(["status" => "error", "message" => "email not valid"]);
-        } else {
-
-            $domain = explode("@", $input['mail'])[1];
-            $domain_parts_array = array_reverse(explode(".", $domain));
-            $string_to_check = "";
-            $matched = false;
-
-            foreach ($domain_parts_array as $key => $part) {
-
-
-                if ($key == 0)
-                    $string_to_check = $part;
-                else
-                    $string_to_check = $part . "." . $string_to_check;
-
-                //testAlex
-
-                $inst = Institution::where('shibboleth_domain', $string_to_check)->first();
-
-                if ($inst)
-                    $matched = true;
-
-            }
-        }
-        return response()->json(["status" => "success", "matched" => $matched]);
-    }
 
 
 }

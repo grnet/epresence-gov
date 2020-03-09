@@ -1014,33 +1014,26 @@
                     {!! Form::model($conference, array('url' => ['conferences/' . $conference->id], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form')) !!}
                     @include('conferences._form', ['apella_id'=>$conference->apella_id,'start_date' => $conference->getDate($conference->start), 'start_time' => $conference->getTime($conference->start), 'end_date' => $conference->getDate($conference->end), 'end_time' => $conference->getTime($conference->end), 'max_duration' => null, 'max_users' => null, 'max_h323' => null, 'max_vidyo_room' => null, 'invisible' => Form::getValueAttribute('invisible'), 'submitBtn' => trans('conferences.saveConference'), 'copyBtn' => '<a href="/conferences/'.$conference->id.'/copy"><button type="button" class="btn btn-warning btn-sm" id="TeleCopy" >'.trans('conferences.conferenceCopy').'</button></a>'])
                     {!! Form::close() !!}
-
                 </div>
             </div><!--/.box-->
-            <!-- Form Details -END -->
-
             <div class="small-gap"></div>
         @if($errors->isEmpty() || $errors->has('firstname') || $errors->has('lastname') || $errors->has('email') || $errors->has('institution_id') || $errors->has('department_id') || $errors->has('new_department') || $errors->has('new_institution')|| $errors->has('no_new_org') || $errors->has('state'))
-            <!-- SYMMETEXONTES START -->
-                <div id="ParticipatsTitle" class="box" style="padding:0px; background-color:transparent;">
+                <div id="ParticipatsTitle" class="box" style="padding:0; background-color:transparent;">
                     <h4>
                         {{trans('conferences.participantList')}}
                     </h4>
                 </div>
                 <div class="box" id="ParticipatsBody">
-
                     @if (session('error'))
                         <div class="alert alert-danger">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                             {{ session('error') }}
                         </div>
                     @endif
-
                     <div class="row well" id="addParticipantTable">
                         <h4>{{trans('conferences.addParticipants')}} <span class="glyphicon glyphicon-share-alt"></span>
                         </h4>
                         <hr>
-
                         <div class="row"> <!-- Row with search field and add button - START -->
                             <div class="col-md-12 col-sm-12 col-xs-12">
                                 <div class="input-group pull-left" style="width:400px">
@@ -1051,8 +1044,7 @@
                             </div>
                         </div> <!-- Row with search field and add button - END -->
                         @include('conferences.add_multiple_participants_row')
-                        <table style="margin-top:10px; width:100%" cellpadding="0" cellspacing="0" border="0"
-                               class="table table-hover table-striped table-bordered" id="UsersExample">
+                        <table style="margin-top:10px; width:100%" class="table table-hover table-striped table-bordered" id="UsersExample">
                             <thead>
                             <tr>
                                 <th>{{trans('conferences.fullName')}}</th>
@@ -1063,11 +1055,11 @@
                                 <th></th>
                             </tr>
                             </thead>
-                            <tfoot style="background-color: #b0b0b0">
+                            <tfoot style="background-color:#b0b0b0">
                             </tfoot>
                         </table>
                     </div>
-                    <!-- DATATABLES START -->
+                    <!-- DATA TABLES START -->
                     {!! Form::open(array('url' => 'conferences/sendParticipantEmail', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'sendParticipantEmail', 'role' => 'form')) !!}
                     <div class="small-gap"></div>
                     @if(count($conference->participants) == 0)
@@ -1079,20 +1071,18 @@
                     @endif
                     {!! Form::hidden('conference_id', $conference->id) !!}
                     <div class="small-gap"></div>
-                    <div class="row"> <!-- Row with search field and add button - START -->
+                    <div class="row">
                         <div class=" col-md-12 col-sm-12 col-xs-12" style="text-align:right">
                             <div>
                                 {!! Form::button('<span class="glyphicon glyphicon-envelope"></span> '.trans('conferences.sendInvite1'), ['class' => 'btn btn-primary', 'id' => 'SendParticipantsEmail', 'type' => 'submit', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => trans('conferences.sendInvite2'),'disabled'=>true]) !!}
                             </div>
                         </div>
-                    </div> <!-- Row with search field and add button - END -->
+                    </div>
                 {!! Form::close() !!}
-                <!-- DATATABLES END -->
-                </div><!--/.box-->
-                <!-- SYMMETEXONTES END -->
+                </div>
             @endif
             <div class="small-gap"></div>
-            <div id="ExitFromPageDiv" class="box" style="padding:0px; background-color:transparent;">
+            <div id="ExitFromPageDiv" class="box" style="padding:0; background-color:transparent;">
                 <button type="button" class="btn pull-right btn-default"
                         id="ExitFromPage"> {{trans('conferences.return')}}</button>
             </div>
@@ -1106,36 +1096,34 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class="modal-title" id="UserLabel">{{trans('conferences.createNewUser')}}</h4>
                     </div> <!-- .modal-header -->
-
                     <div class="small-gap"></div>
-
-                    @if($errors->isEmpty() == false && ($errors->has('firstname') || $errors->has('lastname') || $errors->has('email')  || $errors->has('institution_id') || $errors->has('department_id') || $errors->has('new_department') || $errors->has('new_institution') || $errors->has('no_new_org') || $errors->has('state')))
-                        <ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
+                    @if($errors->isEmpty() == false &&
+                        ($errors->has('firstname') ||
+                         $errors->has('lastname') ||
+                         $errors->has('email')  ||
+                         $errors->has('institution_id') ||
+                         $errors->has('department_id') ||
+                         $errors->has('new_department') ||
+                         $errors->has('new_institution') ||
+                         $errors->has('no_new_org') ||
+                         $errors->has('state'))
+                        )
+                        <ul class="alert alert-danger" style="margin:0 15px 10px 15px">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                             @foreach($errors->all() as $error)
                                 <li>{!! $error !!}</li>
                             @endforeach
                         </ul>
                     @endif
-
                     <div class="modal-body">
-                        <div class="alert alert-danger" id="matched_error_container">
-                            <strong>{{trans('users.email_matched_to_organisation')}} </strong>
-                        </div>
-                        <div class="alert alert-danger" id="not_matched_error_container">
-                            <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
-                        </div>
-
                         {!! Form::open(array('url' => 'users', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'CoordOrgForm', 'role' => 'form')) !!}
-
                         <div class="form-group">
                             {!! Form::label('FieldUserEmail', 'Email:', ['class' => 'control-label col-sm-4 ']) !!}
                             <div class="col-sm-8">
                                 {!! Form::text('email', null, ['class' => 'form-control', 'placeholder' => 'Email ('.trans('conferences.required').')', 'id' => 'FieldUserEmail']) !!}
-                                <div class="help-block with-errors" style="margin:0px;"></div>
+                                <div class="help-block with-errors" style="margin:0;"></div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             {!! Form::label('FieldUserState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
                             <div class="col-sm-8">
@@ -1149,22 +1137,13 @@
                                 </label>
                             </div>
                         </div>
-
-
-                        {!! Form::hidden('status', 1) !!}
-                        {!! Form::hidden('creator_id', Auth::user()->id) !!}
                         {!! Form::hidden('conference_id', $conference->id) !!}
                         {!! Form::hidden('specialUser', 'conferenceUser') !!}
-                        {!! Form::hidden('role', 'EndUser') !!}
                         {!! Form::hidden('from', URL::full()) !!}
-
                     </div> <!-- .modal-body -->
-
-                    <div class="modal-footer" style="margin-top:0px;">
-
+                    <div class="modal-footer" style="margin-top:0;">
                         {!! Form::submit(trans('conferences.saveUserAddParticipant'), ['class' => 'btn btn-primary', 'id' => 'UserSubmitBtnNew', 'name' => 'conferenceAddNewUser']) !!}
-                        <button type="button" id="UserModalButtonClose"
-                                class="btn btn-default">{{trans('conferences.cancel')}}</button>
+                        <button type="button" id="UserModalButtonClose" class="btn btn-default">{{trans('conferences.cancel')}}</button>
                     </div> <!-- .modal-footer -->
                 </div> <!-- .modal-content -->
                 {!! Form::close() !!}

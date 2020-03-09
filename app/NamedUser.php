@@ -9,11 +9,7 @@ class NamedUser extends Model
 {
     //This model refers to zoom api users
 
-    protected $fillable = [
-        'email',
-        'latest_used',
-        'type'
-    ];
+    protected $guarded = [];
 
 
     //Conferences made using this named user
