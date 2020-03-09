@@ -186,7 +186,7 @@ class AccountController extends Controller
                 ->subject($email->title);
         });
 
-        return redirect('auth/login');
+        return redirect('/');
     }
 
 

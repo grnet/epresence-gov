@@ -20,6 +20,7 @@ class CreateDownloadsTable extends Migration
             $table->text('description_el');
             $table->text('description_en');
             $table->string('file_path');
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

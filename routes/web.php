@@ -11,20 +11,9 @@
 |
 */
 
-Route::get('/gsis_callback','Auth\GsisAuthenticationController@callback');
-Route::get('/test_gsis_login','Auth\GsisAuthenticationController@testLogin');
-
-
-Route::get('/test_cred','Auth\GsisAuthenticationController@testCredentials');
 
 
 Route::get('/', function () {
-
-    // if(!session()->has('informed_for_new_version')){
-    //     session()->put('informed_for_new_version',true);
-    //     return view('new-version');
-    // }
-
     if(Auth::check() && !Auth::user()->confirmed)
         return redirect('account_activation');
     else
@@ -56,26 +45,12 @@ Route::get('/contact', function () {
     return view('contact');
 });
 
-//Route::get('/support', function () {
-//    return view('support');
-//});
-
 Route::get('/cookies','SupportPageController@show_cookies_page');
-
-
-
-//Route::get('/support/downloads','SupportPageController@index_downloads');
-
 Route::get('/support/{type?}','SupportPageController@index');
-
 Route::post('/support/downloads','SupportPageController@store_download');
-
 Route::post('/support/downloads/delete','SupportPageController@delete_download');
-
 Route::post('/support/downloads/get_download_details_ajax','SupportPageController@get_download_details_ajax');
-
 Route::patch('/support/downloads/update','SupportPageController@update_download');
-
 Route::post('contact', 'EmailsController@contact_email');
 
 //Demo room static page
@@ -83,17 +58,13 @@ Route::post('contact', 'EmailsController@contact_email');
 Route::get('demo-room', 'DemoRoomController@index');
 Route::get('join_demo_room','DemoRoomController@join_demo_room');
 Route::get('demo-room/manage','DemoRoomController@manage');
-
 Route::post('/demo_room/disconnectAll','DemoRoomController@disconnectAll');
 
 //Account Methods
 
 Route::post('store_new_sso_user', 'UsersExtraController@store_new_sso_user');
-
 Route::post('send_email_confirmation_link_create_user', 'UsersExtraController@send_email_confirmation_link_create_user');
-
 Route::post('send_email_confirmation_link', 'UsersExtraController@send_email_confirmation_link');
-
 Route::get('confirm_sso_email/{token}','UsersExtraController@confirm_sso_email');
 
 
@@ -105,58 +76,29 @@ Route::get('account','AccountController@showAccount');
 //Extra emails managed by user
 
 Route::get('account/emails','AccountController@showManageEmails');
-
 Route::post('account/emails/add_new','ExtraEmailsController@addExtraMail');
-
 Route::post('account/emails/deleteExtraEmail', 'ExtraEmailsController@deleteExtraMail');
-
 Route::post('account/emails/resend_extra_email_confirmation', 'ExtraEmailsController@resend_extra_email_confirmation');
-
 Route::post('account/emails/makePrimary', 'ExtraEmailsController@makePrimary');
-
-
 Route::patch('account/update_local','AccountController@UpdateLocalAccount');
-
 Route::patch('account/update_sso','AccountController@UpdateSsoAccount');
 
 // Account activation
 Route::get('account_activation', 'AccountController@accountActivation');
 
-//
-Route::get('emulate_sso_activation','AccountController@emulateSsoActivation');
-Route::get('emulate_new_sso','AccountController@emulateNewSso');
-
-
-
 Route::post('account_activation_local', 'AccountController@localAccountActivation');
 Route::post('account_activation_sso', 'AccountController@ssoAccountActivation');
-
-
 Route::post('account/delete_anonymize','AccountController@delete_anonymize');
-
 Route::get('request_role_change', 'AccountController@redirect_to_request_role_change');
 
 //Applications
 
-
 Route::post('users/request_role_change', 'ApplicationController@requestRoleChange');
-
-
-
-
 Route::post('applications/decline_application','ApplicationController@decline_application');
 Route::post('applications/accept_application','ApplicationController@accept_application');
-
 Route::get('administrators/applications', 'ApplicationController@index');
-
 Route::post('store_admin_application', 'ApplicationController@store_admin_application');
-
-
-
-
-
 Route::get('/email_activation/{token}', 'ExtraEmailsController@ConfirmExtraEmail');
-
 
 // Change Language
 Route::post('language/change_language', 'LanguageController@change_language');
@@ -181,42 +123,20 @@ Route::get('statistics/realtime/users_no_h323', 'StatisticsController@realtime_c
 Route::get('statistics/realtime/users_per_room', 'StatisticsController@realtime_users_per_room_refresh');
 Route::get('statistics/realtime/users_daily', 'StatisticsController@users_daily');
 
-
-//Auth
-//Route::controllers([
-//    'auth' => 'Auth\AuthController',
-//    // 'password' => 'Auth\PasswordController',
-//]);
+//Authentication Start
 
 
-//Auth::routes();
+Route::get('/gsis_callback','Auth\GsisAuthenticationController@callback');
+Route::get('/login','Auth\GsisAuthenticationController@login');
 
-$this->get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
-$this->post('auth/login', 'Auth\LoginController@login');
-//$this->post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('auth/login', 'Auth\LoginController@login');
 
-$this->get('auth/logout', 'Auth\LoginController@logout')->name('logout');
-
-// Registration Routes...
-$this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-$this->post('register', 'Auth\RegisterController@register');
-
-// Password Reset Routes...
-$this->get('password/email', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-$this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-$this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-$this->post('password/reset', 'Auth\ResetPasswordController@reset');
+Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 
 
-// Password reset link request routes...
-//Route::get('password/email', 'Auth\ResetPasswordController@getEmail');
-//Route::post('password/email', 'Auth\ResetPasswordController@postEmail');
-//
-//// Password reset routes...
-//Route::get('password/reset/{token}', 'Auth\ResetPasswordController@getReset');
-//Route::post('password/reset', 'Auth\ResetPasswordController@postReset');
-
+//Authentication End
 
 //Users
 Route::get('users', 'UsersController@index');
@@ -224,11 +144,8 @@ Route::get('users', 'UsersController@index');
 
 Route::patch('users/{id}/local', 'UsersExtraController@updateLocalUser');
 Route::patch('users/{id}/sso', 'UsersExtraController@updateSsoUser');
-
 Route::post('users/change_state_to_sso', 'UsersExtraController@changeStateToSso');
-
 Route::post('users/change_state_to_local', 'UsersExtraController@changeStateToLocal');
-
 Route::post('users/resend_activation_email', 'UsersExtraController@resend_activation_email');
 
 
@@ -255,10 +172,7 @@ Route::get('users/{id}/edit/emails', 'ExtraEmailsController@showManageEmailsFrom
 Route::post('users/{id}/emails/add_new','ExtraEmailsController@addExtraMailFromAdmin');
 Route::post('users/{id}/emails/deleteExtraEmail', 'ExtraEmailsController@deleteExtraMail');
 Route::post('users/{id}/emails/makePrimary', 'ExtraEmailsController@makePrimary');
-
 Route::post('users/{id}/emails/resend_extra_email_confirmation', 'ExtraEmailsController@resend_extra_email_confirmation');
-
-
 
 Route::get('users/{id}', 'UsersController@edit');
 Route::post('users/delete_user_image', 'UsersController@delete_user_image');
@@ -391,24 +305,10 @@ Route::get('settings', 'SettingsController@index');
 Route::post('settings', 'SettingsController@update_application_settings');
 Route::get('settings/notifyParticipants', 'SettingsController@notifyParticipants');
 
-// Shibboleth
 
-// Login Route (Shibboleth)
-
-Route::get('/login', 'ShibbolethController@create');
-Route::get('/login/{token}', 'ShibbolethController@activate');
 Route::get('/access_sso_login', 'ApplicationController@redirect_sso_login_to_account_application');
 Route::get('/access_local_login', 'ApplicationController@redirect_local_login_to_account_application');
 
-//Sso users need to create their account first and request role change after that
-
-Route::get('/sso_moderatorApplication', 'ShibbolethController@create');
-
-// Shibboleth IdP Callback
-
-Route::get('/secure/idp', 'ShibbolethController@idpAuthorize');
-Route::post('new_sso_account/sendConfirmationEmailSSO', 'UsersController@sendConfirmationEmailSSO');
-Route::get('/secure/activateAccount/{token}', 'ShibbolethController@activateAccount');
 
 //Calendar
 Route::get('calendar', function () {

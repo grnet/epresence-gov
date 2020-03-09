@@ -33,7 +33,6 @@ class CreateStatisticsTable extends Migration
             $table->bigInteger('duration')->nullable();
             $table->integer('users_no_desktop')->nullable();
             $table->integer('users_no_h323')->nullable();
-            $table->integer('users_no_v_room')->nullable();
             $table->boolean("active")->default(0);
             $table->timestamps();
         });

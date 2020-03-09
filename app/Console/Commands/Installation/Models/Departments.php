@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Installation\Models;
 
-use App\Jobs\Users\ResendAnonymizeMailJob;
+use App\Department;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class ResendAnonymizeMail extends Command
+class Departments extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'resend:anonymize_emails';
+    protected $signature = 'install:departments';
 
     /**
      * The console command description.
@@ -38,13 +40,10 @@ class ResendAnonymizeMail extends Command
      */
     public function handle()
     {
-        $emails_array = array (
-          //  'id' => 'email',
-        );
-
-        foreach($emails_array as $key=>$email){
-            ResendAnonymizeMailJob::dispatch($email,$key);
-        }
+        Schema::disableForeignKeyConstraints();
+        Db::table('departments')->truncate();
+        Department::create(["title" => "Γενικό Τμήμα","institution_id" => 1]);
+        Schema::enableForeignKeyConstraints();
 
     }
 }

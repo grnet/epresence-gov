@@ -21,6 +21,7 @@ class CreateDocumentsTable extends Migration
             $table->string('el_file')->nullable();
             $table->string('en_file_url')->nullable();
             $table->string('el_file_url')->nullable();
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

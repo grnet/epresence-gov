@@ -2,27 +2,8 @@
 
 namespace App\Console;
 
-use App\Console\Commands\calculateMaxConcurrentConferences;
-use App\Console\Commands\Migration\FixInvitedUsers;
-use App\Console\Commands\Migration\FixUsersWithMissingDepartment;
-use App\Console\Commands\Migration\FlipPersistentID;
-use App\Console\Commands\Migration\FlipPersistentIDPlain;
-use App\Console\Commands\Migration\MigrateApplications;
-use App\Console\Commands\Migration\MigrateCdrs;
-use App\Console\Commands\Migration\MigrateConferences;
-use App\Console\Commands\Migration\MigrateConferenceUser;
-use App\Console\Commands\Migration\MigrateDemoRoomCdrs;
-use App\Console\Commands\Migration\MigrateDemoRoomConnections;
-use App\Console\Commands\Migration\MigrateDemoRoomJoinUrls;
-use App\Console\Commands\Migration\MigrateDemoRoomStatisticsMonthly;
-use App\Console\Commands\Migration\MigrateExtraEmails;
-use App\Console\Commands\Migration\MigrateMonthlyStatistics;
-use App\Console\Commands\Migration\MigrateStatistics;
-use App\Console\Commands\Migration\MigrateUsers;
-use App\Console\Commands\Migration\MigrateUtilStatistics;
-use App\Console\Commands\recalculateServiceUsageTotals;
+
 use App\Console\Commands\UpdateNamedUsersSettings;
-use App\Console\Commands\UpdateUsersInstitution;
 use App\Jobs\Conferences\CloseConferences;
 use App\Jobs\Conferences\EnableConferences;
 use App\Jobs\Conferences\RemindUsersForClosingConferences;
@@ -39,11 +20,6 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 use App\Http\Controllers\StatisticsController;
-use DB;
-use Mail;
-use URL;
-use Cache;
-use Log;
 use App\Http\Controllers\DemoRoomController;
 
 class Kernel extends ConsoleKernel
@@ -55,32 +31,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\NotifyUsers::class,
-        \App\Console\Commands\MergeUsers::class,
-        \App\Console\Commands\GetUsersWithInvalidVidyoDisplayName::class,
-        \App\Console\Commands\UpdateUsersWithNoDepartment::class,
         UpdateNamedUsersSettings::class,
-        MigrateUsers::class,
-        MigrateExtraEmails::class,
-        MigrateConferences::class,
-        MigrateConferenceUser::class,
-        FixUsersWithMissingDepartment::class,
-        MigrateApplications::class,
-        MigrateCdrs::class,
-        MigrateDemoRoomCdrs::class,
-        MigrateDemoRoomConnections::class,
-        MigrateDemoRoomJoinUrls::class,
-        MigrateDemoRoomStatisticsMonthly::class,
-        MigrateUtilStatistics::class,
-        MigrateStatistics::class,
-        MigrateMonthlyStatistics::class,
-        FlipPersistentID::class,
-        recalculateServiceUsageTotals::class,
-        FixInvitedUsers::class,
-        FlipPersistentIDPlain::class,
-        UpdateUsersInstitution::class,
-        calculateMaxConcurrentConferences::class
-    ];
+        ];
 
     /**
      * Define the application's command schedule.

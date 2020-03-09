@@ -1,17 +1,47 @@
 <?php
 
-use Illuminate\Database\Seeder;
-use App\Language;
+namespace App\Console\Commands\Installation\Models;
 
-class LanguageListSeeder extends Seeder
+use App\Language;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+class Languages extends Command
 {
     /**
-     * Run the database seeds.
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'install:languages';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
      *
      * @return void
      */
-    public function run()
+    public function __construct()
     {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        Schema::disableForeignKeyConstraints();
+        Db::table('languages')->truncate();
         $language_codes_array = array(
             'en' => 'English',
             'aa' => 'Afar',
@@ -149,31 +179,16 @@ class LanguageListSeeder extends Seeder
             'zh' => 'Chinese',
             'zu' => 'Zulu',
         );
-
         $default_locale = config('app.fallback_locale');
-
         $locales = ["en","el"];
-
-
         foreach($language_codes_array as $key=>$language_name){
-
             $new_language = new Language;
             $new_language->code = $key;
             $new_language->name = $language_name;
-
-            if($key == $default_locale)
-                $new_language->primary = true;
-
-
-            if(in_array($key,$locales))
-                $new_language->active = true;
-
-
-
-
+            $new_language->primary = $key == $default_locale;
+            $new_language->active = in_array($key,$locales);
             $new_language->save();
         }
-
-
+        Schema::enableForeignKeyConstraints();
     }
 }

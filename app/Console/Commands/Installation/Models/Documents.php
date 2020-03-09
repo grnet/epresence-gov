@@ -1,13 +1,47 @@
 <?php
 
-use Illuminate\Database\Seeder;
+namespace App\Console\Commands\Installation\Models;
 
 use App\Document;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class DocumentSeeder extends Seeder
+class Documents extends Command
 {
-    public function run()
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'install:documents';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        Schema::disableForeignKeyConstraints();
+        Db::table('documents')->truncate();
 
         $new_document = new Document;
 
@@ -84,5 +118,6 @@ class DocumentSeeder extends Seeder
 
         $new_document->save();
 
+        Schema::enableForeignKeyConstraints();
     }
 }

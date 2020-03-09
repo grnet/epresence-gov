@@ -17,8 +17,6 @@ class CreateDepartmentsTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('title');
-            $table->string('slug')->nullable()->default("NoID");
-			$table->integer('status');
 			$table->integer('institution_id')->unsigned();
 			$table->timestamps();
 			
@@ -33,12 +31,10 @@ class CreateDepartmentsTable extends Migration
 		{
 			$table->integer('department_id')->unsigned();
 			$table->integer('user_id')->unsigned();
-			
 			$table->foreign('department_id')
 				  ->references('id')
 				  ->on('departments')
 				  ->onDelete('cascade');
-				  
 			$table->foreign('user_id')
 				  ->references('id')
 				  ->on('users')
@@ -55,21 +51,16 @@ class CreateDepartmentsTable extends Migration
      */
     public function down()
     {
-
         Schema::table('department_user', function(Blueprint $table)
         {
             $table->dropForeign(['department_id']);
             $table->dropForeign(['user_id']);
         });
-
         Schema::drop('department_user');
-
-
         Schema::table('departments', function(Blueprint $table)
         {
             $table->dropForeign(['institution_id']);
         });
-
         Schema::drop('departments');
     }
 }

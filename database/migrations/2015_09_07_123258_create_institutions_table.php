@@ -17,13 +17,6 @@ class CreateInstitutionsTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('title');
-			$table->string('slug')->nullable()->default("NoID");
-			$table->integer('status')->default(1);
-			$table->string('url')->nullable();
-			$table->string('shibboleth_domain')->nullable();
-			$table->string('contact_name')->nullable();
-			$table->string('contact_email')->nullable();
-			$table->string('contact_phone')->nullable();
 			$table->timestamps();
 		});
 		

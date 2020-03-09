@@ -9,12 +9,8 @@ class zoomNamedUsersSeeder extends Seeder
     public function run()
     {
         $zoom_client = new ZoomClient();
-
-
         //Delete current named user from zoom
-
         $named_users = NamedUser::all();
-
         foreach($named_users as $named_user){
             $parameters = [
                 "action"=>"delete"
@@ -23,13 +19,11 @@ class zoomNamedUsersSeeder extends Seeder
             //Delete user from zoom
             $zoom_client->delete_user($parameters,$named_user->zoom_id);
 
-
             //Delete user from our db
             $named_user->delete();
         }
 
         if(config('app.env') === "production" || config('app.env') === "prod"){
-
             for($i=1; $i<=50; $i++){
                 $parameters = [
                     "action"=>"custCreate",
@@ -42,11 +36,8 @@ class zoomNamedUsersSeeder extends Seeder
                 ];
 
                 $response = $zoom_client->create_user($parameters);
-
                 if(isset($response->id)){
-
                     NamedUser::create(["email"=>$parameters['user_info']['email'],"latest_used"=>0,"zoom_id"=>$response->id,"type"=>"conferences"]);
-
                     $add_user_to_group_params = [
                         "members"=>[
                             [
@@ -54,10 +45,8 @@ class zoomNamedUsersSeeder extends Seeder
                             ]
                         ]
                     ];
-
                     $zoom_client->add_user_to_group($add_user_to_group_params,config('services.zoom.h323_disabled_group_id'));
                 }
-
             }
 
             $parameters = [

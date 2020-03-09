@@ -19,8 +19,6 @@ class CreateStatisticsDailyTable extends Migration
             $table->integer('users_no_desktop')->nullable()->default(0);
             $table->integer('distinct_users_no_h323')->nullable()->default(0);
             $table->integer('users_no_h323')->nullable()->default(0);
-            $table->integer('distinct_users_no_v_room')->nullable()->default(0);
-            $table->integer('users_no_v_room')->nullable()->default(0);
             $table->integer('conferences_no')->nullable()->default(0);
             $table->timestamps();
         });

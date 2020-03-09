@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Installation\Models;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class Email extends Command
+class Emails extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'install:emails';
 
     /**
      * The console command description.
@@ -37,6 +39,11 @@ class Email extends Command
      */
     public function handle()
     {
-        //
+        //Emails seeder from sql file
+        Schema::disableForeignKeyConstraints();
+        Db::table('emails')->truncate();
+        DB::unprepared(file_get_contents(base_path('database/seeds/sql_files/emails.sql')));
+        Schema::enableForeignKeyConstraints();
+
     }
 }

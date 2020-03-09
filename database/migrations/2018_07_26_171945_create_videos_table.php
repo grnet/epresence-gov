@@ -18,6 +18,7 @@ class CreateVideosTable extends Migration
             $table->string('title_en');
             $table->string('title_el');
             $table->string('youtube_video_id');
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

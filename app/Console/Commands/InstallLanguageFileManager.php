@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use App\LanguageLine;
 use Illuminate\Console\Command;
 use App\Language;
-use DB;
-use Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class InstallLanguageFileManager extends Command
 {
@@ -102,16 +102,11 @@ class InstallLanguageFileManager extends Command
                                 'updated_at' => $now,
                             ]);
                         }
-
                 }
             }
-
             $this->info("Language file manager is installed!");
-
         } else {
-
             $this->error("Primary language code is invalid");
         }
-
     }
 }

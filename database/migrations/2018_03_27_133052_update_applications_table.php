@@ -48,11 +48,6 @@ class UpdateApplicationsTable extends Migration
                 ->onDelete('cascade');
             $table->timestamps();
         });
-
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('application');
-        });
     }
 
     /**

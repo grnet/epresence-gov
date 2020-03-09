@@ -1,14 +1,50 @@
 <?php
 
-use Illuminate\Database\Seeder;
+namespace App\Console\Commands\Installation\Models;
+
 use App\Video;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-
-class SupportVideoSeeder extends Seeder
+class Videos extends Command
 {
-    public function run()
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'install:videos';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
-         $new_video = new Video;
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+
+        Schema::disableForeignKeyConstraints();
+        Db::table('videos')->truncate();
+
+        $new_video = new Video;
 
         $new_video->title_en = "Institution Moderator application form (Greek Audio)";
         $new_video->title_el = "Αίτηση εκχώρησης δικαιωμάτων Συντονιστή Οργανισμού";
@@ -121,6 +157,8 @@ class SupportVideoSeeder extends Seeder
 
 
         $new_video->save();
+
+        Schema::enableForeignKeyConstraints();
 
     }
 }

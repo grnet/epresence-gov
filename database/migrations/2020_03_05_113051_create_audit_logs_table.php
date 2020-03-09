@@ -35,6 +35,6 @@ class CreateAuditLogsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('logs');
+        Schema::dropIfExists('audit_logs');
     }
 }

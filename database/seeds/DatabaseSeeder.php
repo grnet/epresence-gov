@@ -12,9 +12,13 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(zoomPresenceSqlSeeder::class);
-        $this->call(zoomNamedUsersSeeder::class);
+       // $this->call(zoomNamedUsersSeeder::class);
         $this->call(zoomPresenceDeptInstSeeder::class);
         $this->call(zoomPresenceUserSeeder::class);
-        $this->call(DailyStatisticsSeeder::class);
+        $this->call(ZoomDownloadsSeeder::class);
+        $this->call(LanguageListSeeder::class);
+        $this->call(SupportVideoSeeder::class);
+        $this->call(DocumentSeeder::class);
+
     }
 }

@@ -17,7 +17,7 @@ class CreateServiceUsageTable extends Migration
             $table->string("option");
             $table->integer("total_conferences");
             $table->integer("desktop_mobile");
-            $table->integer("vr_h323");
+            $table->integer("h323");
             $table->float("average_participants");
             $table->integer("euro_saved");
             $table->date("updated_at");

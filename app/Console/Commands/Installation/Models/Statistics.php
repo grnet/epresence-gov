@@ -1,17 +1,53 @@
 <?php
 
-use Illuminate\Database\Seeder;
+namespace App\Console\Commands\Installation\Models;
 
+use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class demoRoomHourlyStatisticsSeeder extends Seeder
+class Statistics extends Command
 {
     /**
-     * Run the database seeds.
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'install:statistics';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
      *
      * @return void
      */
-    public function run()
+    public function __construct()
     {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        Schema::disableForeignKeyConstraints();
+        Db::table('statistics_daily')->truncate();
+        Db::table('demo_room_statistics_hourly')->truncate();
+        DB::table('statistics_daily')->truncate();
+        for($i = 1; $i < 289; $i++){
+            DB::table('statistics_daily')->insert(['created_at'=>Carbon::now(),'updated_at'=>Carbon::now()]);
+        }
+
         DB::table('demo_room_statistics_hourly')->insert([
             ['hour' => '00:00:00', 'connections' => 0],
             ['hour' => '01:00:00', 'connections' => 0],
@@ -38,5 +74,6 @@ class demoRoomHourlyStatisticsSeeder extends Seeder
             ['hour' => '22:00:00', 'connections' => 0],
             ['hour' => '23:00:00', 'connections' => 0],
         ]);
+        Schema::enableForeignKeyConstraints();
     }
 }

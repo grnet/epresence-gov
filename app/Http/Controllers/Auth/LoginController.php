@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Log;
 
 class LoginController extends Controller
 {
@@ -42,7 +45,11 @@ class LoginController extends Controller
     }
 
 
-
+    /**
+     * @param Request $request
+     * @return RedirectResponse|void
+     * @throws ValidationException
+     */
     public function login(Request $request)
     {
         $this->validateLogin($request);
@@ -52,31 +59,25 @@ class LoginController extends Controller
         // the IP address of the client making these requests into this application.
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
+            $this->sendLockoutResponse($request);
         }
-
-        //Extra validations added
-        //to Handle sso and disabled users
-
-        if(User::where('email', $request->email)->count() == 0){
-            $errorMessage = trans('controllers.noUserEmail');
-        }elseif(User::where('email', $request->email)->first()->status == 0){
-            $errorMessage = trans('controllers.userEmailDeactivated');
-        }elseif(User::where('email', $request->email)->first()->state == 'sso'){
-            $errorMessage = trans('controllers.userMustLoginSso');
-        }
-
-        if(isset($errorMessage)){
-            throw ValidationException::withMessages([$errorMessage]);
-        }
-
-        //End custom validations
-
 
         if ($this->attemptLogin($request)) {
+            //Extra validations added
+            //to Handle sso and disabled users
+            $user = User::where('email', $request->email)->first();
+            if($user->status == 0){
+                $errorMessage = trans('controllers.userEmailDeactivated');
+            }elseif($user->state == 'sso' || !$user->hasRole("SuperAdmin")){
+                $errorMessage = trans('controllers.userMustLoginSso');
+            }
 
-            return $this->sendLoginResponse($request);
+            if(isset($errorMessage)){
+                Auth::logout();
+                throw ValidationException::withMessages([$errorMessage]);
+            }else{
+                return $this->sendLoginResponse($request);
+            }
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -87,6 +88,43 @@ class LoginController extends Controller
         return $this->sendFailedLoginResponse($request);
     }
 
+    /**
+     * Redirect the user after determining they are locked out.
+     *
+     * @param Request $request
+     * @return void
+     * @throws ValidationException
+     */
+    protected function sendLockoutResponse(Request $request)
+    {
+        $seconds = $this->limiter()->availableIn(
+            $this->throttleKey($request)
+        );
+
+        throw ValidationException::withMessages([
+            $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
+        ])->status(423);
+    }
+
+    /**
+     * Validate the user login request.
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function validateLogin(Request $request)
+    {
+        $this->validate($request, [
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt(
@@ -94,6 +132,10 @@ class LoginController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @throws ValidationException
+     */
     protected function sendFailedLoginResponse(Request $request)
     {
         throw ValidationException::withMessages([
@@ -102,6 +144,10 @@ class LoginController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
     protected function sendLoginResponse(Request $request)
     {
         $request->session()->regenerate();
@@ -111,7 +157,4 @@ class LoginController extends Controller
         return $this->authenticated($request, $this->guard()->user())
             ?: redirect()->intended($this->redirectPath());
     }
-
-
-
 }

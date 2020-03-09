@@ -18,13 +18,6 @@ class CreateStatisticsDailyMonthly extends Migration
             $table->date('month');
             $table->integer('max_desktop')->nullable()->default(0);
             $table->integer('max_h323')->nullable()->default(0);
-            $table->integer('max_vidyoRoom')->nullable()->default(0);
-            $table->integer('max_desktop_100')->nullable()->default(0);
-            $table->integer('max_desktop_70')->nullable()->default(0);
-            $table->integer('max_desktop_50')->nullable()->default(0);
-            $table->integer('max_h323_100')->nullable()->default(0);
-            $table->integer('max_h323_70')->nullable()->default(0);
-            $table->integer('max_h323_50')->nullable()->default(0);
             $table->timestamps();
         });
     }

@@ -1,18 +1,48 @@
 <?php
 
+namespace App\Console\Commands\Installation\Models;
+
 use App\Download;
-use Illuminate\Database\Seeder;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-
-
-class ZoomDownloadsSeeder extends Seeder
+class Downloads extends Command
 {
-    public function run()
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'install:downloads';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
     {
 
-
-
-
+        Schema::disableForeignKeyConstraints();
+        Db::table('downloads')->truncate();
 
         Download::create(
             [
@@ -22,7 +52,7 @@ class ZoomDownloadsSeeder extends Seeder
                 'description_el'=>'Zoom client για Windows',
                 'description_en'=>'Zoom client for Windows',
                 'file_path'=>'https://zoom.us/client/latest/ZoomInstaller.exe'
-                ]);
+            ]);
 
         Download::create(
             [
@@ -63,5 +93,8 @@ class ZoomDownloadsSeeder extends Seeder
                 'description_en'=>'Zoom client for Linux',
                 'file_path'=>'https://zoom.us/download'
             ]);
+
+        Schema::enableForeignKeyConstraints();
+
     }
 }

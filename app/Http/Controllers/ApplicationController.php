@@ -547,7 +547,7 @@ class ApplicationController extends Controller
     {
         if (!Auth::check()) {
             session()->put('redirect_to_account_to_apply', 1);
-            return redirect('/auth/login');
+            return redirect('/');
         } else {
             session()->put("pop_role_change", 1);
             return redirect('/account');

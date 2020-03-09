@@ -21,6 +21,7 @@ class CreateNotificationsTable extends Migration
             $table->text('en_message')->nullable();
             $table->text('el_message')->nullable();
             $table->string("type");
+            $table->string("name");
             $table->timestamps();
         });
     }

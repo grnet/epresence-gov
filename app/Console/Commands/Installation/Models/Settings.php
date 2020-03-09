@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Installation\Models;
 
-use App\Imports\PersistentIdImport;
 use Illuminate\Console\Command;
-use Excel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class matchPersistentIds extends Command
+class Settings extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'match:persistent_ids';
+    protected $signature = 'install:settings';
 
     /**
      * The console command description.
@@ -39,7 +39,12 @@ class matchPersistentIds extends Command
      */
     public function handle()
     {
-        Excel::import(new PersistentIdImport, 'persistent_ids/teipir-uniwa-epresence-formated.csv');
-        Excel::import(new PersistentIdImport, 'persistent_ids/teiath-uniwa-epresence-formated.csv');
+        //Settings
+        Schema::disableForeignKeyConstraints();
+        Db::table("settings")->truncate();
+        DB::unprepared(file_get_contents(base_path('database/seeds/sql_files/settings.sql')));
+        Schema::enableForeignKeyConstraints();
+
     }
+
 }

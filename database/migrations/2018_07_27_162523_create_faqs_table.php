@@ -20,6 +20,7 @@ class CreateFaqsTable extends Migration
             $table->text('el_answer');
             $table->text('en_answer');
             $table->boolean('active')->default(1);
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }
