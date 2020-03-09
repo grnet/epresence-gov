@@ -30,7 +30,6 @@ class UpdateApplicationsTable extends Migration
 
             //MANUALLY DELETE user_id column from database
 
-            $table->text('custom_values')->nullable();
             $table->integer('user_id')->unsigned()->nullable();
             $table->foreign('user_id')
                 ->references('id')

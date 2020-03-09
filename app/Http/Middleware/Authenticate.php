@@ -39,19 +39,16 @@ class Authenticate
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
             } else {
-                return redirect()->guest('auth/login');
+                return redirect()->guest('/');
             }
         }
 		
-		if ($request->user()->confirmed == 0 && !str_contains( Request::path(), 'users/'.$request->user()->id)){
+		if ($request->user()->confirmed == 0 && !str_contains(Request::path(), 'users/'.$request->user()->id)){
 			return redirect('account_activation');
 		}elseif($request->user()->status == 0){
 			$this->auth->logout();
-			return redirect('auth/login')->withErrors(trans('controllers.userEmailDeactivated'));
+			return redirect('/')->withErrors(trans('controllers.userEmailDeactivated'));
 		}
-
-
-
         return $next($request);
     }
 }

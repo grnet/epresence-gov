@@ -24,24 +24,7 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    {!! Form::label('FieldUserState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8">
-                        <label class="radio-inline">
-                            {!! Form::radio('state', 'local', 0, ['id' => 'FieldLocalState','class'=>'user_state_radio_button']) !!}
-                            {{trans('users.yes')}}
-                        </label>
-                        <label class="radio-inline">
-                            {!! Form::radio('state', 'sso', 0, ['id' => 'FieldSsoState','class'=>'user_state_radio_button']) !!}
-                            {{trans('users.no')}}
-                        </label>
-                    </div>
-                </div>
-                {!! Form::hidden('role', 'EndUser') !!}
                 {!! Form::hidden('from', URL::full()) !!}
-                {!! Form::hidden('status', 1) !!}
-
             </div> <!-- .modal-body -->
 
             <div class="modal-footer" style="margin-top:0;">

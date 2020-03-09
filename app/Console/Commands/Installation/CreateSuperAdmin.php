@@ -52,7 +52,6 @@ class CreateSuperAdmin extends Command
             "state"=>"local",
             "creator_id"=>null,
             "comment"=>"",
-            "custom_values"=>'{"institution":"","department":""}',
             "admin_comment"=>null,
             "confirmed"=>1,
             "activation_token"=>null,

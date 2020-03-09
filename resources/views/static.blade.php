@@ -227,7 +227,7 @@
                         <li @yield('support-active')><a href="/support">{{trans('site.support')}}</a></li>
                         <li @yield('contact-active')><a href="/contact">{{trans('site.contact')}}</a></li>
                         <li @yield('calendar-active')><a href="/calendar">{{trans('site.calendar')}}</a></li>
-                        <li><a href="/auth/login">{{trans('site.login')}}</a></li>
+                        <li><a href="/login">{{trans('site.login')}}</a></li>
                     @endif
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">

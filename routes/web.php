@@ -126,8 +126,9 @@ Route::get('statistics/realtime/users_daily', 'StatisticsController@users_daily'
 //Authentication Start
 
 
-Route::get('/gsis_callback','Auth\GsisAuthenticationController@callback');
+Route::get('/auth/callback','Auth\GsisAuthenticationController@callback');
 Route::get('/login','Auth\GsisAuthenticationController@login');
+Route::get('/register/{token}','Auth\GsisAuthenticationController@register');
 
 Route::get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('auth/login', 'Auth\LoginController@login');
@@ -139,8 +140,9 @@ Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 //Authentication End
 
 //Users
-Route::get('users', 'UsersController@index');
 
+Route::get('users', 'UsersController@index');
+Route::post('users', 'UsersController@store');
 
 Route::patch('users/{id}/local', 'UsersExtraController@updateLocalUser');
 Route::patch('users/{id}/sso', 'UsersExtraController@updateSsoUser');
@@ -182,7 +184,7 @@ Route::post('users/check_mail_properties','UsersController@check_mail_properties
 Route::get('administrators', 'UsersController@administrators');
 Route::post('administrators/sendEmailToCoordinators', 'EmailsController@sendEmailToCoordinators');
 
-Route::post('users', 'UsersController@store');
+
 
 Route::post('store_department_admin', 'UsersController@store_new_department_admin');
 Route::post('store_institution_admin', 'UsersController@store_new_institution_admin');

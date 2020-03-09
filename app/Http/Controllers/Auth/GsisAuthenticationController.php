@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
@@ -41,19 +43,39 @@ class GsisAuthenticationController extends Controller
      * @return RedirectResponse|Redirector
      */
     public function login(){
+        return $this->redirectToLoginForm();
+    }
+
+    /**
+     * @param Request $request
+     * @param $activation_token
+     * @return RedirectResponse|Redirector
+     */
+    public function register(Request $request,$activation_token){
+        $user = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
+        if($user){
+            session()->put("activation_token",$activation_token);
+            return $this->redirectToLoginForm();
+        }else{
+            return redirect('/')->with("error","invalid-token");
+        }
+    }
+
+    /**
+     * @return RedirectResponse|Redirector
+     */
+    public function redirectToLoginForm(){
         $authorizationUrl = $this->server->getAuthorizationUrl();
         session()->put("oauth2state",$this->server->getState());
         return redirect($authorizationUrl);
     }
-
 
     /**
      * @param Request $request
      * @return RedirectResponse|Redirector
      */
     public function callback(Request $request){
-        Log::info("Gsis oAuth2 callback: ".json_encode($request->all()));
-        if($request->has('code') && session()->has("oauth2state") && $request->has('state') && session()->get("oauth2state") == $request->get('state')){
+        if($request->has('code') && $request->has('state') && session()->has("oauth2state")  && session()->get("oauth2state") == $request->input('state')){
             try {
                 $accessToken = $this->server->getAccessToken('authorization_code', [
                     'code' => $request->get('code')
@@ -61,16 +83,40 @@ class GsisAuthenticationController extends Controller
                 $client = new Client(['headers' => ['Authorization' => 'Bearer '.$accessToken]]);
                 $response = $client->request('GET',config('services.gsis.urlResourceOwnerDetails'));
                 $parsedResponse = simplexml_load_string($response->getBody());
+                // Tax id of the user
                 $taxId = trim($parsedResponse->userinfo['taxid']);
                 $firstName = trim($parsedResponse->userinfo['firstname']);
                 $lastName = trim($parsedResponse->userinfo['lastname']);
-                Log::info("Tax id:".$taxId);
-                Log::info("First Name:".$firstName);
-                Log::info("Last Name:".$lastName);
+                $user = User::where("tax_id",$taxId)->first();
+
+                // User is already registered, checking if user is invited with a new email if so merge the two users, log him in and redirect him to homepage
+                if($user){
+                    if(session()->has("activation_token") && !empty(session()->get("activation_token"))){
+                        $activation_token = session()->pull("activation_token");
+                        $userOfToken = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
+                        if($userOfToken){
+                            $user->merge_user($userOfToken->id,true);
+                        }
+                    }
+                    Auth::login($user);
+                    return redirect('/');
+                }else{
+                // User is not registered checking is there is a valid activation token in the session, if so
+                // match authenticated user with the invited account
+                    if(session()->has("activation_token") && !empty(session()->get("activation_token"))){
+                        $activation_token = session()->pull("activation_token");
+                        $user = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
+                        if($user){
+                            $user->update(['firstname'=>$firstName,'lastname'=>$lastName,'tax_id'=>$taxId,'confirmed'=>true,'activation_token'=>null]);
+                            Auth::login($user);
+                            return redirect('/');
+                        }
+                    }
+                }
             } catch (IdentityProviderException $e) {
                 Log::error("GsisAuthenticationController callback IdentityProviderException:".$e->getMessage());
             }
-            return redirect('/');
         }
+        return redirect('/')->with("error","auth-error");
     }
 }

@@ -21,13 +21,13 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use SoapClient;
 use Response;
 use Auth;
 use Validator;
 use App\Email;
-use Mail;
-use URL;
 use Illuminate\Notifications\Notifiable;
 use Jenssegers\Agent\Agent;
 
@@ -49,7 +49,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password', 'firstname', 'lastname', 'telephone', 'persistent_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'application', 'apply_for', 'custom_values', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms'];
+    protected $fillable = ['email', 'password', 'firstname', 'lastname', 'telephone', 'tax_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'application', 'apply_for', 'custom_values', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -508,20 +508,10 @@ class User extends Model implements AuthenticatableContract,
     {
 
         $user = User::findOrFail($this->id);
-
-
-        if ($user->state == 'sso') {
-            $email = Email::where('name', 'userAccountEnableSso')->first();
-            $login_url = URL::to("login/" . $user->activation_token);
-            $email_view = 'emails.enable_account_sso';
-        } else {
-            $email = Email::where('name', 'userAccountEnable')->first();
-            $login_url = URL::to("auth/login");
-            $email_view = 'emails.enable_account_local';
-        }
-
+        $email = Email::where('name', 'userAccountEnableSso')->first();
+        $login_url = URL::to("register/" . $user->activation_token);
+        $email_view = 'emails.enable_account_sso';
         $creator = User::findOrFail($this->creator_id);
-
         $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
         Mail::send($email_view, $parameters, function ($message) use ($user, $email, $creator) {
             $message->from($email->sender_email, 'e:Presence')

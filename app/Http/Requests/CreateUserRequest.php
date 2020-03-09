@@ -29,27 +29,13 @@ class CreateUserRequest extends Request
 		switch($this->method()){
         case 'POST':{
             return [
-                'ip' => 'sometimes|required',
-                'extension_num' => 'sometimes|required',
-                'lastname' => 'required_with:application',
-				'firstname' => 'required_with:application',
-				'email' => 'required|email|unique:users,email|unique:users_extra_emails,email,0,confirmed',
-				'state' => 'required',
-				'telephone' => 'sometimes|required_with:application,AdminSubmitBtnNew',
-				'thumbnail' => 'image|max:300',
-				'institution_id' => 'sometimes|required_unless:role,EndUser',
-				'new_department' => 'required_if:department_id,other',
-				'new_institution' => 'required_if:institution_id,other',
-				'accept_terms' => 'sometimes|required|accepted',
-				'comment' => 'sometimes|required',
-				'role' => 'sometimes|required',
+                'email' => 'required|email|unique:users,email|unique:users_extra_emails,email,0,confirmed'
             ];
         }
         case 'PATCH':
         {
             return [
 				'ip' => 'sometimes|required',
-                'extension_num' => 'sometimes|required',
                 'lastname' => 'sometimes|required_if:confirmed,1',
 				'firstname' => 'sometimes|required_if:confirmed,1',
 				'email' => 'sometimes|required|email|unique:users,email,'.$this->id.'|unique:users_extra_emails,email,0,confirmed',
@@ -70,8 +56,6 @@ class CreateUserRequest extends Request
 
     public function messages()
     {
-
-
         return [
             'lastname.required_if' => trans('requests.lastnameRequired'),
             'firstname.required_if' => trans('requests.firstnameRequired'),

@@ -9,33 +9,24 @@ use App\Conference;
 use App\Institution;
 use App\Department;
 use App\Email;
-use App\Application;
-use App\Role;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Auth;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
-use Validator;
-use Gate;
-use DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cookie;
-use Mail;
-use URL;
-use Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
-use Excel;
-
-use Input;
-use File;
-use Session;
-use Log;
-
-use Illuminate\Routing\URLGenerator;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\File;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 class UsersController extends Controller
 {
@@ -198,40 +189,24 @@ class UsersController extends Controller
     public function store(Requests\CreateUserRequest $request)
     {
         $password = str_random(15);
-
         $input = $request->all();
         $input['created_at'] = Carbon::now();
         $input['updated_at'] = Carbon::now();
         $input['password'] = bcrypt($password);
-        $input['name'] = $input['email'];
         $input['status'] = 1;
-        if (Auth::check()) {
-            $input['creator_id'] = Auth::user()->id;
-        }
-
-        if ($input['state'] == 'sso') {
-            $input['activation_token'] = str_random(15);
-        }
-
-        $errors = array();
-
-        if (!empty($errors)) {
-            return redirect($input['from'])->with('role', $input['role'])->withErrors($errors)->withInput();
-        }
-
+        $input['state'] = 'sso';
+        $input['creator_id'] = request()->user()->id;
+        $input['activation_token'] = str_random(15);
         $user = User::create($input);
 
-        // Assign role to user
-        $user->assignRole($input['role']);
+        $user->institutions()->attach(1);
+        $user->departments()->attach(1);
 
-        // Attach institution and department to user
-        if (!empty($input['institution_id'])) {
-            $user->update_institution_department($input);
-        }
+        // Assign role to user
+        $user->assignRole('EndUser');
 
         // Send email to user for the new account
         $user->email_for_new_account($password);
-
 
         // Assign conferenceUser to conference
 
@@ -240,9 +215,7 @@ class UsersController extends Controller
             $conference->participants()->save($user);
             DB::table('conference_user')->where('conference_id', $conference->id)->where('user_id', $user->id)->update(['device' => 'Desktop-Mobile']);
         }
-
         return redirect($input['from'])->with('message', trans('controllers.userAddedActivationEmailSent'));
-
     }
 
     /**
@@ -254,10 +227,7 @@ class UsersController extends Controller
         //Validation logic
 
         $input = $request->all();
-
         $validator = Validator::make($input, [
-//            'dept_admin_lastname' => 'required',
-//            'dept_admin_firstname' => 'required',
             'dept_admin_email' => 'required|email',
             'dept_admin_state' => 'required',
             'dept_admin_telephone' => 'required',
@@ -266,8 +236,6 @@ class UsersController extends Controller
             'dept_admin_department_id' => 'required_unless:dept_admin_institution_id,other',
             'dept_admin_new_department' => 'required_if:dept_admin_department_id,other',
         ], [
-//            'dept_admin_lastname.required' => trans('requests.lastnameRequired'),
-//            'dept_admin_firstname.required' => trans('requests.firstnameRequired'),
             'dept_admin_state.required' => trans('requests.localSelectRequired'),
             'dept_admin_email.required' => trans('requests.emailRequired'),
             'dept_admin_email.email' => trans('requests.emailInvalid'),
