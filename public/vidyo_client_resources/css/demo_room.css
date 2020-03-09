@@ -1,0 +1,271 @@
+html, body{
+    background-color: #e5e5e5;
+    margin:0;
+    padding:0;
+    max-height:100% !important
+}
+.error-template {
+    padding: 40px 15px;
+
+}
+.mycontainer{
+
+    z-index:1;
+    position: relative;
+    width:100%;
+    height: 100%;
+    top: 15px;
+}
+.mycontainer2{
+    background-color: #e5e5e5;
+    text-align: center;
+    z-index:1;
+    position: absolute;
+    width:100%;
+    height: 20px;
+    top:20px;
+}
+.mycontainerrel{
+    background-color: #e5e5e5;
+    text-align: center;
+    z-index:-1;
+    position: relative;
+    width:100%;
+    height: 20px;
+    top:20px;
+}
+.mycontainer3 {
+
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+.videoWrapperSmall {
+    background-color: #e5e5e5;
+    width:100%;
+    height:1%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.videoWrapperFull {
+    background-color: #e5e5e5;
+    padding-top: 20px;
+    position: relative;
+    left: 0;
+    width:100%;
+    height:99%;
+    max-width: 100%;
+    max-height: 100%;
+}
+.notreadyPanel{
+
+    width: 685px;
+    margin: 20px auto;
+    padding: 5px;
+    background-color: #f7f7f7;
+    border-radius: 4px 3px 6px/2px 4px;
+    border: 2px solid #e3e2e2;
+}
+.videoWrapperNone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:1%;
+    max-width: 100%;
+    max-height: 100%;
+}
+.videoFull{
+    position: relative;
+    width:100%;
+    height:100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+img.center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+.buttons {
+    position: fixed;
+    width:100%;
+    height: 24px;
+    bottom: 0px;
+    padding-top: 3px;
+}
+@media (max-height: 850px) {
+    #whole {
+        height:90%;
+    }
+}
+
+@media (max-height: 500px) {
+    #whole {
+        height:85%;
+    }
+}
+
+@media (min-height: 850px) {
+    #whole {
+        height:95%;
+    }
+}
+
+
+#whole {
+    z-index:2;
+    top:0px;
+    width:100%;
+    position:absolute;
+}
+.sliderbar{
+    height:5px;
+    width:47%;
+    float:left;
+    margin:10px;
+}
+.options_menu{
+    overflow:scroll;
+    height:94%;
+    box-sizing: content-box;
+    background-color: #F7F7F7;
+    border-radius: 4px 3px 6px / 2px 4px;
+    border: 2px solid #DADADA;
+    font-family: "Avenir-LT-W01-45-Book","Arial",sans-serif;
+    padding:10px;
+    width:18.5%;
+    position:absolute;
+    left:5px;
+    display: none;
+    margin:5px;
+    top:4px;
+}
+.videotoolbar {
+    text-align: center;
+    visibility: hidden;
+    background-color: #2E2E2E;
+    width: 100%;
+    position: fixed;
+    height: 100%;
+}
+.progressbar {
+    margin: 10px;
+    padding: 10px;
+}
+.videotoolbarbutton{
+    background-color: #2E2E2E;
+    margin : 5px;
+    cursor: pointer;
+    border: 1px solid ;
+    border-radius: 3px;
+    height: 30px;
+    width: 40px;
+}
+
+.group_chat_c {
+    border: 1px solid ;
+    border-radius: 1px;
+    margin: 10px;
+    padding: 10px;
+    border-color: #d3d3d3;
+    max-height:400px;
+    overflow-y:scroll;
+    min-height:400px;    }
+
+.send_message{
+
+    resize: none;
+    overflow-y:scroll;
+    width : 100%;
+}
+
+.send_message_button{
+
+    float: right;
+    width : 70px;
+    background: none;
+    border: none;
+}
+.sidebarselect{
+    max-width: 70%;
+}
+.sidebaricons{
+    width:10%;
+    float:right;
+}
+
+.timer{
+    margin-bottom: 2px;
+    color:white;
+}
+.sidebarlist{
+    margin-left:0px;
+}
+
+ul li {
+    /* Bullet color */
+    color: #78B72D;
+    list-style-type: disc;
+}
+ul li span{
+    color : black;
+    font-size: 16px;
+}
+.ui-state-default, .ui-widget-content .ui-state-default {
+    height:13px;
+
+}
+
+.ui-slider-range {
+    background: #78B72D;
+}
+#goodbye {
+    display: none;
+}
+
+.chat_span{
+    background-image:url(/vidyo_client_resources/images/send_message_small2.png);
+    font-size: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    color:red;
+    width:40px;
+    height:35px;
+    vertical-align: middle;
+    font-weight:bold;
+}
+.chat_button {
+    width:40px;
+    height:35px;
+    border:none;
+    margin:2px;
+    padding:2px;
+    margin-left:10px;
+    background: none;
+}
+.private_chat_modals    {
+    display: none;
+}
+
+.h3 {
+    font-size: 24px;
+    font-weight: bold;
+}
+#js-progressbar-container {
+    position: relative;
+    width: 300px;
+    /*padding: 20px 5px 20px 5px; /* Space for progresbar-texts */
+    background-color: transparent;
+}
+#ready{
+    display:none;
+}
+
+#plgPermission{
+    display:none;
+}

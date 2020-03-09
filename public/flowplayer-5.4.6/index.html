@@ -1,0 +1,75 @@
+<!doctype html>
+
+<head>
+
+
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+    
+   <!-- player skin -->
+   <link rel="stylesheet" type="text/css" href="skin/minimalist.css">
+
+   <!-- site specific styling -->
+   <style type="text/css">
+   .flowplayer { width: 100%; }
+   </style>
+   
+   	<script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+
+   <!-- include flowplayer -->
+   <script type="text/javascript" src="flowplayer.min.js"></script>
+<script>
+$(document).ready(function() { 
+$("#myModal").draggable({
+    handle: ".modal-header"
+});
+});
+</script>
+
+
+</head>
+
+<body>
+
+   <!-- the player 
+   <div class="flowplayer" data-swf="flowplayer.swf" data-ratio="0.4167">
+      <video>
+         <source type="video/mp4" src="http://stream.flowplayer.org/bauhaus/624x260.mp4">
+      </video>
+   </div> -->
+<p>&nbsp;</p>
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Open CENTER modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="DemoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-vertical-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="DemoModalLabel">Διάλεξη Demo Flowplayer</h4>
+      </div>
+      <div class="modal-body" style="padding:0px">
+   <div class="flowplayer" data-swf="flowplayer.swf" data-ratio="0.4167">
+      <video>
+         <source type="video/mp4" src="http://stream.flowplayer.org/bauhaus/624x260.mp4">
+      </video>
+   </div>       
+      </div>
+       <div class="modal-footer">
+<button type="button" class="btn btn-default btn-sm">
+  <span class="glyphicon glyphicon-star"></span> </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+  
+
+
+</body>

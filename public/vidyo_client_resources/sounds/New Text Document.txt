@@ -1,0 +1,70 @@
+
+    var guestname = '<?php echo Auth::user()->firstname.' '.Auth::user()->lastname; ?>';
+    var room_url = 'http://grnet.sandboxga.vidyo.com/flex.html?roomdirect.html&key=JXFreG3RecMbppCetLZvZw46TQ';
+
+    var roompin = '4357';
+    var config = {
+
+        'guestname' : guestname ,
+        'roomurl' : room_url,
+        'roompin'  : roompin
+
+    }
+
+
+
+
+
+
+   <canvas id="meter" width="150" height="12" style="float:left; padding-left:10px;"></canvas>
+
+
+
+
+
+
+
+
+
+  $( document ).ready(function() {
+        var url = window.location.href;
+        var res = url.split("/");
+        if (res[4] !== 'demo-room') {
+            $.post("/conferences/conferenceUserLogin", {id: res[4]});
+        }
+        else{
+            canvasContext = document.getElementById( "meter" ).getContext("2d");
+
+            // monkeypatch Web Audio
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+            // grab an audio context
+            audioContext = new AudioContext();
+
+            // Attempt to get audio input
+            try {
+                // monkeypatch getUserMedia
+                navigator.getUserMedia =
+                        navigator.getUserMedia ||
+                        navigator.webkitGetUserMedia ||
+                        navigator.mediaDevices.getUserMedia;
+
+                // ask for an audio input
+                navigator.getUserMedia(
+                        {
+                            "audio": {
+                                "mandatory": {
+                                    "googEchoCancellation": "false",
+                                    "googAutoGainControl": "false",
+                                    "googNoiseSuppression": "false",
+                                    "googHighpassFilter": "false"
+                                },
+                                "optional": []
+                            },
+                        }, gotStream, didntGetStream);
+            } catch (e) {
+                alert('getUserMedia threw exception :' + e);
+            }
+
+        }
+    } );

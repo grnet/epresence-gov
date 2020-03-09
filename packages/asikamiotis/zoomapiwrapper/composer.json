@@ -1,0 +1,41 @@
+{
+    "name": "asikamiotis/zoomapiwrapper",
+    "description": "A wrapper around zoom restful api for laravel based on guzzle",
+    "keywords": [
+        "laravel",
+        "php",
+        "zoom-api",
+        "zoom",
+        "api",
+        "restful",
+        "guzzle"
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3@dev",
+        "laravel/framework": "5.5.*",
+        "firebase/php-jwt": "^5.0"
+    },
+    "authors": [
+        {
+            "name": "Alex Sikamiotis",
+            "email": "asikamiotis@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Asikamiotis\\ZoomApiWrapper\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Asikamiotis\\ZoomApiWrapper\\ZoomApiWrapperServiceProvider"
+            ],
+            "aliases": {
+                "ZoomClient": "Asikamiotis\\ZoomApiWrapper\\Facade\\ZoomClientFacade"
+            }
+        }
+    },
+
+    "minimum-stability": "dev"
+}

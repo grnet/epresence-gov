@@ -1,0 +1,23 @@
+{!! trans('emails.conference_canceled',
+["conference_title"=>$conference->title,
+"conference_date_start"=>$conference->getDate($conference->start),
+"conference_time_start"=>$conference->getTime($conference->start),
+"conference_date_end"=>$conference->getDate($conference->end),
+"conference_time_end"=>$conference->getTime($conference->end),
+"conference_creator_lastname"=>$conference->user->lastname,
+"conference_creator_firstname"=>$conference->user->firstname,
+"conference_creator_email"=>$conference->user->email,
+"conference_creator_telephone"=>$conference->user->telephone,
+],'el') !!}
+<hr/>
+{!! trans('emails.conference_canceled',
+["conference_title"=>$conference->title,
+"conference_date_start"=>$conference->getDate($conference->start),
+"conference_time_start"=>$conference->getTime($conference->start),
+"conference_date_end"=>$conference->getDate($conference->end),
+"conference_time_end"=>$conference->getTime($conference->end),
+"conference_creator_lastname"=>$conference->user->lastname,
+"conference_creator_firstname"=>$conference->user->firstname,
+"conference_creator_email"=>$conference->user->email,
+"conference_creator_telephone"=>$conference->user->telephone,
+],'en') !!}

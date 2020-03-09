@@ -1,0 +1,1 @@
+{!! trans('emails.user_deleted',["deleted_email"=>$deletedEmail]) !!}

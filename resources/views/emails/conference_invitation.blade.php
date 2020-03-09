@@ -1,0 +1,75 @@
+@if($user->confirmed == 0  && $user->state == 'sso')
+	{!!trans('emails.conference_invitation.unconfirmed_notification.sso',["activation_url"=>url('login/'.$user->activation_token)],'el')!!}
+@elseif($user->confirmed == 0  && $user->state == 'local')
+	{!!trans('emails.conference_invitation.unconfirmed_notification.local',["resend_confirmation_email_url"=>url('/get_activation_mail/'.$user->activation_token)],'el')!!}
+@endif
+{!!trans('emails.conference_invitation.intro_text',
+[
+"conference_title"=>$conference->title,
+"device"=>$device,
+"user_email"=>$user->email,
+"conference_date_start"=>$conference->getDate($conference->start),
+"conference_time_start"=>$conference->getTime($conference->start),
+"conference_date_end"=>$conference->getDate($conference->end),
+"conference_time_end"=>$conference->getTime($conference->end),
+"moderator_lastname"=>$moderator->lastname,
+"moderator_firstname"=>$moderator->firstname,
+"moderator_email"=>$moderator->email,
+"moderator_telephone"=>$moderator->telephone,
+],'el')!!}
+@if(!empty($conference->apella_id))
+	{!!trans('emails.conference_invitation.apella_notification',["apella_id"=>$conference->apella_id],'el')!!}
+@endif
+{!!trans('emails.conference_invitation.text',
+[
+"conferences_url"=>$conferences_url,
+"conference_pin"=>$conference->pin,
+"demo_room_url"=>url('/demo-room'),
+"participation_confirmation_link"=>$confirmation_link,
+"conference_title"=>$conference->title,
+"ical_start"=>$ical_start,
+"ical_end"=>$ical_end,
+"conference_description"=>$conference->desc,
+"support_url"=>$support_url
+],'el')!!}
+@if(!is_null($conference->desc))
+	{!!trans('emails.conference_invitation.moderators_comments',["conference_description"=>$conference->desc],'el')!!}
+@endif
+<hr>
+@if($user->confirmed == 0  && $user->state == 'sso')
+	{!!trans('emails.conference_invitation.unconfirmed_notification.sso',["activation_url"=>url('login/'.$user->activation_token)],'en')!!}
+@elseif($user->confirmed == 0  && $user->state == 'local')
+	{!!trans('emails.conference_invitation.unconfirmed_notification.local',["resend_confirmation_email_url"=>url('/get_activation_mail/'.$user->activation_token)],'en')!!}
+@endif
+{!!trans('emails.conference_invitation.intro_text',
+[
+"conference_title"=>$conference->title,
+"device"=>$device,
+"user_email"=>$user->email,
+"conference_date_start"=>$conference->getDate($conference->start),
+"conference_time_start"=>$conference->getTime($conference->start),
+"conference_date_end"=>$conference->getDate($conference->end),
+"conference_time_end"=>$conference->getTime($conference->end),
+"moderator_lastname"=>$moderator->lastname,
+"moderator_firstname"=>$moderator->firstname,
+"moderator_email"=>$moderator->email,
+"moderator_telephone"=>$moderator->telephone,
+],'en')!!}
+@if(!empty($conference->apella_id))
+	{!!trans('emails.conference_invitation.apella_notification',["apella_id"=>$conference->apella_id],'en')!!}
+@endif
+{!!trans('emails.conference_invitation.text',
+[
+"conferences_url"=>$conferences_url,
+"conference_pin"=>$conference->pin,
+"demo_room_url"=>url('/demo-room'),
+"participation_confirmation_link"=>$confirmation_link,
+"conference_title"=>$conference->title,
+"ical_start"=>$ical_start,
+"ical_end"=>$ical_end,
+"conference_description"=>$conference->descEn,
+"support_url"=>$support_url
+],'en')!!}
+@if(!is_null($conference->descEn))
+	{!!trans('emails.conference_invitation.moderators_comments',["conference_description"=>$conference->descEn],'en')!!}
+@endif
