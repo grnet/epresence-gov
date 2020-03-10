@@ -1536,14 +1536,14 @@ class ConferencesController extends Controller
         } else {
             $department = trans('controllers.notDefinedYet');
         }
-        $state = '<span style="display:none">' . $user->state . '</span>' . $user->state_string($user->state);
-        $status = '<span class="glyphicon ' . $user->status_icon($user->status) . '" aria-hidden="true"><span style="display:none">' . $user->status . '</span></span>' . $user->status_string($user->status);
+//        $state = '<span style="display:none">' . $user->state . '</span>' . $user->state_string($user->state);
+//        $status = '<span class="glyphicon ' . $user->status_icon($user->status) . '" aria-hidden="true"><span style="display:none">' . $user->status . '</span></span>' . $user->status_string($user->status);
         $button = '<button id="RowAddtoTele-' . $user->id . '" type="button" class="btn btn-success btn-sm btn-border" onclick="assignUserID(' . $user->id . ')">' . trans('conferences.adduser') . ' <span class="glyphicon glyphicon-share-alt"></span></button>';
         $json = array();
         $json['sEcho'] = 1;
         $json['iTotalRecords'] = 1;
         $json['iTotalDisplayRecords'] = 1;
-        $json['aaData'] = [[$name, $role, $institution, $department, $state, $button]];
+        $json['aaData'] = [[$name, $role, $institution, $department, $button]];
         return response()->json($json);
     }
 

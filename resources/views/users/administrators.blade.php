@@ -611,7 +611,7 @@
                         </ul>
                     </div>
                 @elseif (session('email_errors'))
-                    <ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
+                    <ul class="alert alert-danger" style="margin: 0 15px 10px 15px">
                         <strong>{{trans('users.emailNotSent')}}</strong>
                         @foreach(session('email_errors') as $error)
                             <li>{{ $error }}</li>
@@ -672,11 +672,8 @@
                         </div>
                     </div>
                 </div> <!-- Row with search field and add button - END -->
-
                 @include('users._advancedSearch', [])
-
                 @include('users._userTable', [])
-
             </div><!--/.box-->
         </div><!--/.container-->
 

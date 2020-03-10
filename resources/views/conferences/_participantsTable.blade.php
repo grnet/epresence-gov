@@ -7,7 +7,6 @@
 						@endif
                             <th class="cellPName hidden-xs sortingasc" id="sort_lastname">{{trans('conferences.fullName')}}</th>
 							<th class="cellPEmail sorting" id="sort_email">Email</th>
-							<th class="cellPState hidden-xs sorting" id="sort_state">{{trans('conferences.localUserTruncated')}}</th>
 							<th class="cellPDevice">{{trans('conferences.device')}}</th>
 						@if(str_contains( Request::path(), 'edit'))
                             <th class="center cellPSendEmail hidden-xs"><span class="glyphicon glyphicon-envelope" style="font-size:20px" data-toggle="tooltip" data-placement="top" title="{{trans('conferences.emailSentShort')}}"></span></th>
@@ -57,10 +56,9 @@
 							@endif
 								<td class="cellPName hidden-xs">{{ $participant->lastname }} {{ $participant->firstname }}</td>
 								<td class="cellPEmail">{{ $participant->email }}</td>
-								<td class="cellPState hidden-xs"><span style="display:none">{{ $participant->state }}</span> {{ $participant->state_string($participant->state) }}</td>
 								<td class="cellPDevice">
 								@if(str_contains( Request::path(), 'edit'))
-									<span style="display:none">participantDeviceIs{{ $participant->participantValues($conference->id)->device }}</span> {!! $conference->userConferenceDevice($participant) !!}
+									{{$participant->participantValues($conference->id)->device}}
 								@elseif(str_contains( Request::path(), 'manage') || str_contains( Request::path(), 'details'))
 								   <span id="device-{{$participant->id}}">{{ $participant->participantValues($conference->id)->device }}</span>
 								@endif

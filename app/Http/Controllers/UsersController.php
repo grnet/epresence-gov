@@ -16,6 +16,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
@@ -54,7 +55,7 @@ class UsersController extends Controller
 
     /**
      * @param Request $request
-     * @return Factory|RedirectResponse|Redirector|View
+     * @return Factory|RedirectResponse|Redirector|View|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function index(Request $request)
     {
@@ -99,11 +100,10 @@ class UsersController extends Controller
 
     /**
      * @param Request $request
-     * @return Factory|View
+     * @return Factory|View|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function administrators(Request $request)
     {
-
         if (!is_null(Session::get('previous_url'))) {
             Session::forget('previous_url');
         }
@@ -164,9 +164,7 @@ class UsersController extends Controller
 
         } else {
             //Handle export
-
             return Excel::download(new UsersExport($users_default), 'moderators-export-' . Carbon::now()->toDateString() . '.xlsx', 'Xlsx');
-
         }
     }
 
@@ -411,9 +409,12 @@ class UsersController extends Controller
         return back()->with('message', trans('controllers.userAddedActivationEmailSent'));
     }
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function store_new_institution_admin(Request $request)
     {
-
         //Validation logic
 
         $input = $request->all();
@@ -442,27 +443,19 @@ class UsersController extends Controller
         ]);
 
         $validator->after(function ($validator) use ($input) {
-
             //Manually check if there is a user using this email already to form the invitation link
-
            // $auth_user_institution = Auth::user()->institutions()->first();
 
             $user_using_this_email = User::where('email', $input['inst_admin_email'])->first();
             $user_using_this_email_as_confirmed_extra = ExtraEmail::where('email', $input['inst_admin_email'])->where('confirmed', 1)->first();
-
             if (isset($user_using_this_email) || isset($user_using_this_email_as_confirmed_extra)) {
-
                     $validator->errors()->add('email', trans('controllers.emailInUse'));
-
               } else {
-
                 $user_using_this_email_as_unconfirmed_extra = ExtraEmail::where('email', $input['inst_admin_email'])->where('confirmed', 0)->first();
-
                 if ($user_using_this_email_as_unconfirmed_extra) {
                     $validator->errors()->add('email', trans('requests.emailInUseByUnconfirmedExtra'));
                 }
             }
-
         });
 
 
@@ -476,7 +469,7 @@ class UsersController extends Controller
 
         $input['created_at'] = Carbon::now();
         $input['updated_at'] = Carbon::now();
-        $input['password'] = bcrypt($password);
+        $input['password'] = Hash::make($password);
         $input['name'] = $input['inst_admin_email'];
 
         $input['firstname'] = $input['inst_admin_firstname'];
@@ -493,11 +486,7 @@ class UsersController extends Controller
         $input['status'] = 1;
         $input['creator_id'] = Auth::user()->id;
 
-
-        if ($input['state'] == 'sso') {
-            $input['activation_token'] = str_random(15);
-        }
-
+        $input['activation_token'] = str_random(15);
         $user = User::create($input);
 
         // Assign role to user
@@ -518,8 +507,6 @@ class UsersController extends Controller
                 // Create other department
                 Department::create(['title' => 'Άλλο', 'slug' => 'other', 'institution_id' => $new_institution->id]);
             }
-
-
 
         if (!empty($input['new_department']) && $input['department_id'] == "other") {
             $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $input['institution_id']]);

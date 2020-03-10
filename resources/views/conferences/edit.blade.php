@@ -377,11 +377,7 @@
             });
 
 
-            $("[id^=selectPDevice]").select2({
-                containerCssClass: "select2-container-sm",
-                dropdownCssClass: "tpx-select2-drop",
-                minimumResultsForSearch: Infinity
-            });
+
 
             $("[id^=openParticipantDetails]").on("click", function () {
                 var user = $(this).attr('id').split('-').pop(-1);
@@ -402,30 +398,6 @@
                 if (state.text == 0) return "<span class='glyphicon glyphicon-ban-circle'></span>";
             }
 
-            $('[id^=selectPDevice]').on('change', function () {
-                var row = $(this).closest('tr');
-                var nRow = row[0];
-                var user = $(this).attr('id').split('-').pop(-1);
-                $.post("/conferences/userConferenceDeviceAssign", {
-                    user_id: user,
-                    conference_id: {{ $conference->id }},
-                    device: $(this).val()
-                })
-                    .done(function (data) {
-                        obj = JSON.parse(data);
-                        var oldvalue = obj.oldValue;
-                        if (obj.status == 'error') {
-                            alert("" + obj.data);
-                            location.reload(true);
-                        } else if (obj.status == 'success') {
-                            alert("" + obj.data);
-                        }
-                        //$(".select2-search, .select2-focusser").remove();
-                    })
-                    .fail(function (xhr, textStatus, errorThrown) {
-                        alert(xhr.responseText);
-                    });
-            });
 
             // Sort table
 
@@ -552,7 +524,6 @@
                     {"sClass": "cellRole"},
                     {"sClass": "cellOrg hidden-xs"},
                     {"sClass": "cellDepart hidden-xs"},
-                    {"sClass": "cellStatus"},
                     {"sClass": "cellButton"}
                 ]
             });
@@ -683,7 +654,6 @@
                         {"sClass": "cellRole"},
                         {"sClass": "cellOrg hidden-xs"},
                         {"sClass": "cellDepart hidden-xs"},
-                        {"sClass": "cellStatus"},
                         {"sClass": "cellButton"}
                     ]
                 });
@@ -1051,7 +1021,6 @@
                                 <th>{{trans('conferences.userType')}}</th>
                                 <th>{{trans('conferences.institution')}}</th>
                                 <th>{{trans('conferences.department')}}</th>
-                                <th>{{trans('conferences.localUser')}}</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -1122,19 +1091,6 @@
                             <div class="col-sm-8">
                                 {!! Form::text('email', null, ['class' => 'form-control', 'placeholder' => 'Email ('.trans('conferences.required').')', 'id' => 'FieldUserEmail']) !!}
                                 <div class="help-block with-errors" style="margin:0;"></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            {!! Form::label('FieldUserState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                            <div class="col-sm-8">
-                                <label class="radio-inline">
-                                    {!! Form::radio('state', 'local', 0, ['id' => 'FieldLocalState','class'=>'user_state_radio_button']) !!}
-                                    {{trans('users.yes')}}
-                                </label>
-                                <label class="radio-inline">
-                                    {!! Form::radio('state', 'sso', 0, ['id' => 'FieldSsoState','class'=>'user_state_radio_button']) !!}
-                                    {{trans('users.no')}}
-                                </label>
                             </div>
                         </div>
                         {!! Form::hidden('conference_id', $conference->id) !!}

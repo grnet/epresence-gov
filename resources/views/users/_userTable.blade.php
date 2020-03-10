@@ -5,7 +5,6 @@
         <th class="cellDetails"></th>
         <th class="cellName sortingasc" id="sort_lastname">{{trans('users.fullName')}}</th>
         <th class="cellRole">{{trans('users.role')}}</th>
-        <th class="cellState sorting hidden-xs" id="sort_state">{{trans('users.localUserShort')}}</th>
         <th class="cellOrg hidden-xs">{{trans('users.institution')}}</th>
         <th class="cellDepart hidden-xs">{{trans('users.department')}}</th>
         <th class="cellStatus sorting" id="sort_status">{{trans('users.status')}}</th>
@@ -28,18 +27,9 @@
                 </td>
                 <td class="cellName sorting main_table">{{ $user->lastname }} {{ $user->firstname }}</td>
                 <td class="cellRole main_table">{{ trans($user->roles->first()->label) }}</td>
-                <td class="cellState hidden-xs main_table">{{ $user->state_string($user->state) }}</td>
-                @if($user->institutions->count() > 0 && $user->institutions->first()->slug == 'other')
-                    <td class="cellOrg hidden-xs main_table">{{ $user->institutions->first()->title or trans('users.notDefinedYet') }}
-                        ({{ ($user->customValues()['institution']) }})
-                    </td>
-                    <td class="cellDepart hidden-xs main_table">{{ $user->departments->first()->title or trans('users.notDefinedYet') }}
-                        ({{ ($user->customValues()['department']) }})
-                    </td>
-                @else
-                    <td class="cellOrg hidden-xs  main_table">{{ $user->institutions->first()->title  or trans('users.notDefinedYet')}}</td>
-                    <td class="cellDepart hidden-xs  main_table">{{ $user->departments->first()->title  or trans('users.notDefinedYet')}}</td>
-                @endif
+                <td class="cellOrg hidden-xs  main_table">{{ $user->institutions->first()->title  or trans('users.notDefinedYet')}}</td>
+                <td class="cellDepart hidden-xs  main_table">{{ $user->departments->first()->title  or trans('users.notDefinedYet')}}</td>
+
                     <td id="cellStatus-{{ $user->id }}" class="cellStatus main_table"><span
                                 class="glyphicon {{ $user->status_icon($user->status) }}" aria-hidden="true"><span
                                     style="display:none">{{ $user->status }}</span></span>{{ $user->status_string($user->status) }}
@@ -132,15 +122,10 @@
                                     <strong>{{trans('users.telephone')}}:</strong> {{ $user->telephone }}<br/>
                                     <strong>{{trans('users.role')}}:</strong> {{ trans($user->roles->first()->label) }}
                                     <br/>
-                                    @if($user->institutions->count() > 0 && $user->institutions->first()->slug == 'other')
-                                        <strong>{{trans('users.institution')}}:</strong> {{ $user->institutions->first()->title }} ({{ ($user->customValues()['institution']) }})<br/>
-                                        <strong>{{trans('users.department')}}:</strong> {{ $user->departments->first()->title }} ({{ ($user->customValues()['department']) }})<br/>
-                                    @else
                                         <strong>{{trans('users.institution')}}:</strong> {{ $user->institutions->first()->title or trans('users.notDefinedYet') }}
                                         <br/>
                                         <strong>{{trans('users.department')}}:</strong> {{ $user->departments->first()->title or trans('users.notDefinedYet') }}
                                         <br/>
-                                    @endif
                                         <strong>{{trans('site.termsAcceptanceAdmin')}}:</strong>@if(!empty($user->accepted_terms)) {{ Carbon\Carbon::parse($user->accepted_terms)->toDateTimeString()}} @else {!! trans('users.no') !!} @endif
                                 </td>
                             </tr>

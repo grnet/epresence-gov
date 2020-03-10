@@ -41,7 +41,7 @@
             // Delete user image
             $("#deleteMyUserImage").click(function (event) {
                 event.preventDefault();
-                $.post("/users/delete_user_image", {id: <?php echo $user->id; ?> })
+                $.post("/users/delete_user_image", {id: {{$user->id}} })
                     .done(function (data) {
                         obj = JSON.parse(data);
                         if (obj.status === 'success') {
@@ -50,63 +50,6 @@
                         }
                     });
             });
-
-            @if($user->state == 'local')
-
-                    organization_select_field.select2({placeholder: "{!!trans('site.selectInstitution')!!}"});
-
-                    // FieldUserOrg On change
-                    organization_select_field.change(function () {
-
-
-                        var user_dep = {{$department->id}};
-                        if (organization_select_field.val() === "other") {
-
-                            new_org_container.show();
-                            dep_container.hide();
-                            new_dep_container.show();
-                            new_custom_department_field.show();
-                            department_select_field.val('other');
-
-                        } else if (organization_select_field.val() !== "other" && parseInt(organization_select_field.val()) !== {{ $user->institutions()->first()->id or null }}) {
-
-                            new_org_container.hide();
-                            new_dep_container.hide();
-                            dep_container.show();
-                            department_select_field.select2().load("/institutions/departments/" + organization_select_field.val(),function(){
-                                department_select_field.select2("val", "");
-                            });
-
-                        } else if (parseInt(organization_select_field.val()) === {{ $institution->id or null }}) {
-
-                            if (user_dep == {{$user->institutions()->first()->otherDepartment()->id}}) {
-                                new_org_container.hide();
-                                new_dep_container.show();
-                                new_custom_department_field.show();
-                                dep_container.show();
-                            } else {
-                                new_org_container.hide();
-                                new_dep_container.hide();
-                                dep_container.show();
-                                department_select_field.select2().load("/institutions/departments/" + organization_select_field.val(),function(){
-
-                                    @if($department)
-                                    @if($department->slug=="other")
-                                    department_select_field.val('other');
-                                    @else
-                                    department_select_field.val({{$department->id}});
-                                    @endif
-                                    @else
-                                    department_select_field.select2("val", "");
-                                    @endif
-
-                                });
-                            }
-                        }
-                    }).trigger("change");
-
-                 @endif
-
             department_select_field.select2({placeholder: "{!!trans('site.selectInstitutionFirst')!!}"});
 
             // UserDepart On change
@@ -226,11 +169,7 @@
             $("#RoleChangeRequest").click(function () {
                 $("#RequestRoleChangeModal").modal("show");
             });
-
-
             @if($errors->any())
-
-
             @if($errors->has('delete_account_confirmation_email') || $errors->has('confirmation_email_not_matched'))
             $("#DeleteAccountModal").modal("show");
             @elseif($errors->has('application_comment') || $errors->has('accept_terms') || $errors->has('application_role') || $errors->has('application_telephone'))
@@ -266,28 +205,6 @@
         .box-padding {
             padding: 20px 30px;
         }
-
-        .equalheightCol {
-            margin-bottom: -99999px;
-            padding-bottom: 99999px;
-        }
-
-        .equalheightRow {
-            overflow: hidden;
-        }
-
-        .loginButtonRow {
-            display: table;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .loginButtonCell {
-            display: table-cell;
-            vertical-align: middle;
-            white-space: normal;
-        }
-
         .account_h{
            color:#777;
             font-weight:bold;
@@ -307,33 +224,9 @@
             min-width: 10px;
             max-width: 10px;
         }
-
-        /* DATA TABLES ΓΙΑ ΙΣΤΟΡΙΚΟ */
-        .cellDesc {
-            width: 670px !important;
-        }
-
-        .cellStartDate {
-            width: 90px !important;
-            text-align: center;
-        }
-
-        .cellStartTime {
-            width: 90px !important;
-            text-align: center;
-        }
-
-        .cellEndTime {
-            width: 80px !important;
-            text-align: center;
-        }
-
         .disabled_button{
             cursor: not-allowed;
         }
-
-
-
         @if(!$canBeDeleted)
             #DeleteAccountButton{
              cursor: not-allowed;
@@ -346,11 +239,9 @@
     <![endif]-->
 
 @endsection
-
 @section('account-active')
     class = "active"
 @endsection
-
 @section('content')
 
     <section id="OLogarismosMou">

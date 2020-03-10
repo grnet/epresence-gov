@@ -49,21 +49,6 @@
                         <div class="help-block with-errors" style="margin:0px;"></div>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    {!! Form::label('FieldDepartmentAdminState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8">
-                        <label class="radio-inline">
-                            {!! Form::radio('dept_admin_state', 'local', 0, ['id' => 'FieldDepartmentAdminLocalState','class'=>'user_state_radio_button_dept']) !!}
-                            {{trans('users.yes')}}
-                        </label>
-                        <label class="radio-inline">
-                            {!! Form::radio('dept_admin_state', 'sso', 0, ['id' => 'FieldDepartmentAdminSsoState','class'=>'user_state_radio_button_dept']) !!}
-                            {{trans('users.no')}}
-                        </label>
-                    </div>
-                </div>
-
                 <div class="form-group">
                     {!! Form::label('FieldAdminRoleStatic', trans('users.role').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8 form-control-static">
@@ -79,7 +64,7 @@
                     <div class="form-group">
                         {!! Form::label('FieldDepartmentAdminOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
-                            {!! Form::select('dept_admin_institution_id', ['' => ''] + App\Institution::whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], null, ['id' => 'FieldDepartmentAdminOrg', 'style' => 'width: 100%'])!!}
+                            {!! Form::select('dept_admin_institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminOrg', 'style' => 'width: 100%'])!!}
                         </div>
                     </div>
 
@@ -107,12 +92,12 @@
                     <div class="col-sm-8">
                         @if(Auth::user()->hasRole('SuperAdmin'))
                          @if(Input::old('dept_admin_institution_id') && Input::old('dept_admin_institution_id')!== 'other' )
-                                 {!! Form::select('dept_admin_department_id',['' => ''] + App\Department::where('institution_id', Input::old('dept_admin_institution_id'))->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')] , null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
+                                 {!! Form::select('dept_admin_department_id',['' => ''] + App\Department::where('institution_id', Input::old('dept_admin_institution_id'))->orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                              @else
                                 {!! Form::select('dept_admin_department_id',['' => ''] , null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                          @endif
                         @else
-                        {!! Form::select('dept_admin_department_id', ['' => ''] + App\Department::where('institution_id', Auth::user()->institutions->first()->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
+                        {!! Form::select('dept_admin_department_id', ['' => ''] + App\Department::where('institution_id', Auth::user()->institutions->first()->id)->orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                         @endif
                     </div>
                 </div>
@@ -125,9 +110,7 @@
                              style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
                     </div>
                 </div>
-
                 {!! Form::hidden('from', URL::full()) !!}
-
                 <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('users.save'), ['class' => 'btn btn-primary', 'id' => 'AdminSubmitBtnNew', 'name' => 'AdminSubmitBtnNew']) !!}
                     <button type="button" data-dismiss="modal" aria-hidden="true"

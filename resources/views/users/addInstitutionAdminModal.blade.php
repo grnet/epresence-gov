@@ -15,7 +15,6 @@
                     <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
                 </div>
                 {!! Form::open(array('url' => 'store_institution_admin', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'addNewInstitutionAdminForm', 'role' => 'form')) !!}
-
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminSurname', trans('users.surname').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
@@ -23,7 +22,6 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
-
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminName', trans('users.name').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
@@ -38,26 +36,11 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
-
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminPhone', trans('users.telephone').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
                         {!! Form::text('inst_admin_telephone', null, ['class' => 'form-control', 'placeholder' => trans('users.telephoneRequired'), 'id' => 'FieldInstitutionAdminPhone']) !!}
                         <div class="help-block with-errors" style="margin:0"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {!! Form::label('FieldInstitutionAdminState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8">
-                        <label class="radio-inline">
-                            {!! Form::radio('inst_admin_state', 'local', 0, ['id' => 'FieldInstitutionAdminLocalState','class'=>'user_state_radio_button_inst']) !!}
-                            {{trans('users.yes')}}
-                        </label>
-                        <label class="radio-inline">
-                            {!! Form::radio('inst_admin_state', 'sso', 0, ['id' => 'FieldInstitutionAdminSsoState','class'=>'user_state_radio_button_inst']) !!}
-                            {{trans('users.no')}}
-                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -66,16 +49,15 @@
                         {{trans('users.institutionModerator')}}
                     </div>
                 </div>
-                <h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span
+                <h4 style="padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span
                             class="glyphicon glyphicon-wrench"></span> {{trans('users.manageConferencesFor')}}:</h4>
 
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
-                        {!! Form::select('inst_admin_institution_id', ['' => ''] + App\Institution::whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], null, ['id' => 'FieldInstitutionAdminOrg', 'style' => 'width: 100%'])!!}
+                        {!! Form::select('inst_admin_institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldInstitutionAdminOrg', 'style' => 'width: 100%'])!!}
                     </div>
                 </div>
-
                 <div class="form-group" id="InstitutionAdminOrgNewContainer">
                     {!! Form::label('InstitutionAdminOrgNewField', trans('users.newInstitution').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
@@ -83,18 +65,16 @@
                         <div class="help-block with-errors" style="margin:0px;"></div>
                     </div>
                 </div>
-
                 <div class="form-group" id="InstitutionAdminDepartContainer">
                     {!! Form::label('FieldInstitutionAdminDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
                         @if(Input::old('inst_admin_institution_id') && Input::old('inst_admin_institution_id')!== 'other' )
-                            {!! Form::select('inst_admin_department_id',['' => ''] + App\Department::where('institution_id', Input::old('inst_admin_institution_id'))->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')] , null, ['id' => 'FieldInstitutionAdminDepart', 'style' => 'width: 100%'])!!}
+                            {!! Form::select('inst_admin_department_id',['' => ''] + App\Department::where('institution_id',Input::old('inst_admin_institution_id'))->orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldInstitutionAdminDepart', 'style' => 'width: 100%'])!!}
                         @else
                             {!! Form::select('inst_admin_department_id', ['' => ''], null, ['id' => 'FieldInstitutionAdminDepart', 'style' => 'width: 100%'])!!}
                         @endif
                     </div>
                 </div>
-
                 <div class="form-group" id="InstitutionAdminDepNewContainer">
                     {!! Form::label('InstitutionAdminDepNewField', trans('users.newDepartment').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
@@ -103,11 +83,8 @@
                              style="margin:0px;">{{ trans('users.newDeptWarning') }}</div>
                     </div>
                 </div>
-
-
                 {!! Form::hidden('from', URL::full()) !!}
-
-                <div class="modal-footer" style="margin-top:0px;">
+                <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('users.save'), ['class' => 'btn btn-primary', 'id' => 'AdminSubmitBtnNew', 'name' => 'AdminSubmitBtnNew']) !!}
                     <button type="button" data-dismiss="modal" aria-hidden="true"
                             class="btn btn-default">{{trans('users.cancel')}}</button>

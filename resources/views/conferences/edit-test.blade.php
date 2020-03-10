@@ -1120,9 +1120,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class="modal-title" id="UserLabel">{{trans('conferences.createNewUser')}}</h4>
                     </div> <!-- .modal-header -->
-
                     <div class="small-gap"></div>
-
                     @if($errors->isEmpty() == false && ($errors->has('firstname') || $errors->has('lastname') || $errors->has('email')  || $errors->has('institution_id') || $errors->has('department_id') || $errors->has('new_department') || $errors->has('new_institution') || $errors->has('no_new_org') || $errors->has('state')))
                         <ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -1131,7 +1129,6 @@
                             @endforeach
                         </ul>
                     @endif
-
                     <div class="modal-body">
                         <div class="alert alert-danger" id="matched_error_container">
                             <strong>{{trans('users.email_matched_to_organisation')}} </strong>
@@ -1139,9 +1136,7 @@
                         <div class="alert alert-danger" id="not_matched_error_container">
                             <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
                         </div>
-
                         {!! Form::open(array('url' => 'users', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'CoordOrgForm', 'role' => 'form')) !!}
-
                         <div class="form-group">
                             {!! Form::label('FieldUserEmail', 'Email:', ['class' => 'control-label col-sm-4 ']) !!}
                             <div class="col-sm-8">
@@ -1149,29 +1144,9 @@
                                 <div class="help-block with-errors" style="margin:0px;"></div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            {!! Form::label('FieldUserState', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                            <div class="col-sm-8">
-                                <label class="radio-inline">
-                                    {!! Form::radio('state', 'local', 0, ['id' => 'FieldLocalState','class'=>'user_state_radio_button']) !!}
-                                    {{trans('users.yes')}}
-                                </label>
-                                <label class="radio-inline">
-                                    {!! Form::radio('state', 'sso', 0, ['id' => 'FieldSsoState','class'=>'user_state_radio_button']) !!}
-                                    {{trans('users.no')}}
-                                </label>
-                            </div>
-                        </div>
-
-
-                        {!! Form::hidden('status', 1) !!}
-                        {!! Form::hidden('creator_id', Auth::user()->id) !!}
                         {!! Form::hidden('conference_id', $conference->id) !!}
                         {!! Form::hidden('specialUser', 'conferenceUser') !!}
-                        {!! Form::hidden('role', 'EndUser') !!}
                         {!! Form::hidden('from', URL::full()) !!}
-
                     </div> <!-- .modal-body -->
 
                     <div class="modal-footer" style="margin-top:0px;">
