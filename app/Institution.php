@@ -8,13 +8,10 @@ class Institution extends Model
 {
     protected $fillable = [
 		'title',
-		'slug',
-		'status',
-		'url',
-		'shibboleth_domain',
-		'contact_name',
-		'contact_email',
-		'contact_phone'
+		'category',
+		'type',
+		'ws_id',
+		'api_code'
 	];
 	
 	/**

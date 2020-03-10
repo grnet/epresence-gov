@@ -3,18 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Domain;
-use Gate;
-use Auth;
 use App\Institution;
 use App\Department;
-use App\Conference;
 use Carbon\Carbon;
-use Request;
-use Input;
-use Log;
-
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Input;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use Illuminate\View\View;
 
 class InstitutionsController extends Controller
 {
@@ -45,45 +41,29 @@ class InstitutionsController extends Controller
 		
 		return redirect("/institutions/".$id."/edit");
 	}
-	
-	public function create()
-	{
-		if (Gate::denies('view_institutions')) {
-            abort(403);
-        }
-		
-		return view('institutions.create');
-	}
-	
+
+    /**
+     * @param Requests\CreateInstitutionRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
 	public function store(Requests\CreateInstitutionRequest $request)
 	{
 		if (Gate::denies('view_institutions')) {
             abort(403);
         }
-		
 		$input = $request->all();
 		$input['created_at'] = Carbon::now();
 		$input['updated_at'] = Carbon::now();
-        $input['slug'] = 'NoID';
-
 		if(isset($input['add_new'])){
-
 			$institution = Institution::create($input);
-
-			if(!empty($institution->shibboleth_domain)){
-                $domain = new Domain;
-                $domain->institution_id = $institution->id;
-                $domain->name = $institution->shibboleth_domain;
-                $domain->save();
-			}
-
-			Department::create(['title' => trans('controllers.administration'), 'slug' => 'admin', 'institution_id' => $institution->id, 'created_at' => $input['created_at'], 'updated_at' => $input['updated_at']]);
-			Department::create(['title' => trans('controllers.other'), 'slug' => 'other', 'institution_id' => $institution->id, 'created_at' => $input['created_at'], 'updated_at' => $input['updated_at']]);
 		}
-		
 		return redirect('institutions')->with('storesSuccessfully', trans('controllers.newInstitutionSaved'));
 	}
-	
+
+    /**
+     * @param $id
+     * @return Factory|View
+     */
 	public function edit($id)
 	{
 		if (Gate::denies('view_institutions')) {
@@ -92,9 +72,11 @@ class InstitutionsController extends Controller
 		
 		$institution = Institution::findOrFail($id);
 		return view('institutions.edit', compact('institution'));
-		
 	}
-	
+
+    /**
+     * @param $id
+     */
 	public function delete($id)
 	{
 		if (Gate::denies('view_institutions')) {
@@ -117,20 +99,21 @@ class InstitutionsController extends Controller
 		}
 		echo json_encode($results);
 	}
-	
+
+    /**Updates The institution
+     * @param Requests\CreateInstitutionRequest $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
 	public function update(Requests\CreateInstitutionRequest $request, $id)
 	{
 		if (Gate::denies('view_institutions')) {
             abort(403);
         }
-		
 		$institution = Institution::findOrFail($id);
 		$input = $request->all();
-		
 		$input['updated_at'] = Carbon::now();
-		
 		$institution->update($input);
-		
 		return redirect('institutions')->with('storesSuccessfully', trans('controllers.changesSaved'));;
 	}
 
@@ -183,32 +166,34 @@ class InstitutionsController extends Controller
         $html .= '<option value="other">'.trans('controllers.other').'</option>';
         return $html;
     }
-	
-	public function loadDepartmentTable($id) {
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+	public function loadDepartmentTable($id) {
         $institution = Institution::findOrFail($id);
 		$departments = $institution->departments()->where('slug', '<>', 'other')->orderBy('title')->get();
-		
 		$json = array();
 		$json['aaData'] = array();
-		
 		foreach($departments as $department) {
 			$button = '<button id="RowBtnDelete-'.$department->id.'" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span></button>';
 			$json['aaData'][] = [$department->title, $institution->title, $button];
 		}
-
 		$json['sEcho'] = 10;
 		$json['iTotalRecords'] = $departments->count();
 		$json['iTotalDisplayRecords'] = $departments->count();
-
 		return response()->json($json);
 	}
-	
+
+    /**
+     * @param $id
+     * @return mixed
+     */
 	public function adminDepartmentFromID($id)
 	{
 		$institution = Institution::findOrFail($id);
 		$adminDepartment = $institution->departments()->where('slug', 'admin')->first();
-		
 		return $adminDepartment;
 	}
 	

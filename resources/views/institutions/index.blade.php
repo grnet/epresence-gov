@@ -395,7 +395,6 @@
 					<div class="modal-body">
 					<div class="alert alert-info" role="alert" id="OrgModalMessage">{{trans('deptinst.saveSuccess')}} </div>
 						{!! Form::open(array('url' => 'institutions', 'method' => 'post', 'class' => 'form-horizontal')) !!}
-						
 							<div class="form-group">
 								{!! Form::label('title', trans('deptinst.description').':', ['class' => 'control-label col-sm-4 ']) !!}
                                 <div class="col-sm-8">
@@ -403,42 +402,30 @@
                                     <div class="help-block with-errors" style="margin:0px;"></div>
                                 </div>
                             </div>
-                        
-                            <div class="form-group" style="display:none;">
-								{!! Form::label('slug', trans('deptinst.instId').':', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-									{!! Form::text('slug', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.instIdLatin')]) !!}
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-								{!! Form::label('shibboleth_domain', 'Shibboleth domain:', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-									{!! Form::text('shibboleth_domain', null, ['class' => 'form-control', 'placeholder' => 'Shibboleth Home Organization']) !!}
-                                </div>
-                            </div>
-                        
-                        <h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc; "><span class="glyphicon glyphicon-user"></span> {{trans('deptinst.contactDetails')}}</h4>                       
-                            <div class="form-group">
-								{!! Form::label('contact_name', trans('deptinst.fullName').':', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-                                    {!! Form::text('contact_name', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.fullName')]) !!}
-                                </div>
-                            </div>                          
-
-                            <div class="form-group">
-								{!! Form::label('contact_email', 'Email:', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-									{!! Form::text('contact_email', null, ['class' => 'form-control', 'placeholder' => 'email', 'type' => 'email']) !!}
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-								{!! Form::label('contact_phone', trans('deptinst.phone').':', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-                                    {!! Form::text('contact_phone', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.phone')]) !!}
-                                </div>
-                            </div>
+						<div class="form-group">
+							{!! Form::label('category', 'Category:', ['class' => 'control-label col-sm-4']) !!}
+							<div class="col-sm-8">
+								{!! Form::text('category', null, ['class' => 'form-control', 'placeholder' => 'Category', 'type' => 'text']) !!}
+							</div>
+						</div>
+						<div class="form-group">
+							{!! Form::label('type', 'Type:', ['class' => 'control-label col-sm-4']) !!}
+							<div class="col-sm-8">
+								{!! Form::text('type', null, ['class' => 'form-control', 'placeholder' => 'Type', 'type' => 'text']) !!}
+							</div>
+						</div>
+						<div class="form-group">
+							{!! Form::label('ws_id', 'Webservice Id:', ['class' => 'control-label col-sm-4']) !!}
+							<div class="col-sm-8">
+								{!! Form::text('ws_id', null, ['class' => 'form-control', 'placeholder' => 'Webservice Id', 'type' => 'text']) !!}
+							</div>
+						</div>
+						<div class="form-group">
+							{!! Form::label('api_code', 'Api Code:', ['class' => 'control-label col-sm-4']) !!}
+							<div class="col-sm-8">
+								{!! Form::text('api_code', null, ['class' => 'form-control', 'placeholder' => 'Api Code', 'type' => 'text']) !!}
+							</div>
+						</div>
 					</div> <!-- .modal-body -->
 					<div class="modal-footer">
 						<div class="form-group">

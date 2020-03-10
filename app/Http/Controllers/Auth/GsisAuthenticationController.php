@@ -100,7 +100,7 @@ class GsisAuthenticationController extends Controller
                         $userOfToken = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
                         if($userOfToken){
                             //Give the user the invited roles if they are higher than the current role
-                            //toDo define what need to be done here - role upgrading ? what about the institution - department
+                            //toDo define what needs to be done here - role upgrading ? what about the institution - department
 //                            $currentRole = $user->roles()->first();
 //                            $tokenUserRole = $userOfToken->roles()->first();
 //                            if($currentRole->id > $tokenUserRole->id){

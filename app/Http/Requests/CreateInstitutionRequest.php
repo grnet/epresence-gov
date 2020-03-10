@@ -28,15 +28,15 @@ class CreateInstitutionRequest extends Request
             case 'POST': {
                 return [
                     'title' => 'required|not_in:Άλλο|unique:institutions,title',
-                    'contact_email' => 'nullable|email',
-                    'shibboleth_domain' => 'nullable|unique:institutions,shibboleth_domain'
+                    'ws_id' => 'nullable|integer',
+                    'api_code' => 'nullable|integer'
                 ];
             }
             case 'PATCH': {
                 return [
                     'title' => 'required|not_in:Άλλο|unique:institutions,title,'.$this->id,
-                    'contact_email' => 'nullable|email',
-                    'shibboleth_domain' => 'nullable|unique:institutions,shibboleth_domain,'.$this->id
+                    'ws_id' => 'nullable|integer',
+                    'api_code' => 'nullable|integer'
                 ];
             }
         }
@@ -47,10 +47,6 @@ class CreateInstitutionRequest extends Request
             'title.unique' => trans('requests.InstitutionTitleUnique'),
             'title.required' => trans('requests.descriptionRequired'),
             'title.not_in' => trans('requests.descriptionNotOther'),
-            'slug.not_in' => trans('requests.idNotOther'),
-			'url.url' => trans('requests.webAddressFormat'),
-			'contact_email.email' => trans('requests.emailFormat'),
-			'shibboleth_domain.unique' => trans('requests.shibbolethDomainUnique')
         ];
     }
 }

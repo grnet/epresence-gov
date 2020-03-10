@@ -55,11 +55,9 @@
                         {{trans('users.departmentModerator')}}
                     </div>
                 </div>
-
                 <h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span
                             class="glyphicon glyphicon-wrench"></span> {{trans('users.manageConferencesFor')}}
                     :</h4>
-
                 @if(Auth::user()->hasRole('SuperAdmin'))
                     <div class="form-group">
                         {!! Form::label('FieldDepartmentAdminOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
@@ -91,7 +89,6 @@
                         @endif
                     </div>
                 </div>
-
                 <div class="form-group" id="DepartmentAdminDepNewContainer">
                     {!! Form::label('DepartmentAdminDepNewField', trans('users.newDepartment').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
@@ -100,9 +97,7 @@
                              style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
                     </div>
                 </div>
-
                 {!! Form::hidden('from', URL::full()) !!}
-
                 <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('users.save'), ['class' => 'btn btn-primary', 'id' => 'AdminSubmitBtnNew', 'name' => 'AdminSubmitBtnNew']) !!}
                     <button type="button" data-dismiss="modal" aria-hidden="true"
