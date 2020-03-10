@@ -17,7 +17,11 @@ class CreateInstitutionsTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('title');
-			$table->timestamps();
+            $table->string('category')->nullable();
+            $table->string('type')->nullable();
+            $table->integer('ws_id')->nullable();
+            $table->integer('api_code')->nullable();
+            $table->timestamps();
 		});
 		
 		//Table for connecting user to institution (get role of user `from role_user` table)

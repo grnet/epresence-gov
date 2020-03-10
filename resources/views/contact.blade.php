@@ -65,8 +65,6 @@
         <!--      <a class="prev" href="#main-slider" data-slide="prev"><i class="fa fa-chevron-left"></i></a>
               <a class="next" href="#main-slider" data-slide="next"><i class="fa fa-chevron-right"></i></a> -->
     </section><!--/#main-slider-->
-
-
     <section id="Index">
         <div class="container">
             <div class="box first" style="padding: 30px 50px">

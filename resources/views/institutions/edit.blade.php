@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="/select2/select2_locale_el.js"></script>
     <link rel="stylesheet" href="/select2/select2-small.css">
 
-	<!-- checkbox --> 
+	<!-- checkbox -->
 	<script src="/bootstrap-checkbox-x/checkbox-x.js" type="text/javascript"></script>
 	<link rel="stylesheet" href="/bootstrap-checkbox-x/checkbox-x.css">
 
@@ -19,21 +19,21 @@
     <script src="/summernote/summernote.min.js"></script>
 	<script src="/summernote/summernote-el-GR.js"></script>
 
-	<link rel="stylesheet" href="/css/font-awesome.css">    
+	<link rel="stylesheet" href="/css/font-awesome.css">
 
 	<!-- bootstrap date-picker    -->
 	<script type="text/javascript" src="/bootstrap-datepicker-master/bootstrap-datepicker.js"></script>
-    <script type="text/javascript" src="/bootstrap-datepicker-master/bootstrap-datepicker.el.js"></script>   
+    <script type="text/javascript" src="/bootstrap-datepicker-master/bootstrap-datepicker.el.js"></script>
 	<link href="/bootstrap-datepicker-master/datepicker3.css" rel="stylesheet">
 
 	<!-- bootstrap clock-picker    -->
-    <script type="text/javascript" src="/clock-picker/clockpicker.js"></script>  
+    <script type="text/javascript" src="/clock-picker/clockpicker.js"></script>
     <link href="/clock-picker/clockpicker.css" rel="stylesheet">
-    
-        
+
+
     <link href="/css/main.css" rel="stylesheet">
 	<link href="/css/eDatatables.css" rel="stylesheet">
-    
+
 
 
    	<script type="text/javascript" src="/datatables/jquery.dataTables.js"></script>
@@ -41,7 +41,7 @@
 	<script type="text/javascript" src="/datatables/date-eu.js"></script>
 
 	<link href="/datatables/dataTables.bootstrap.css" rel="stylesheet">
-	 
+
 @endsection
 @section('extra-css')
 <style>
@@ -53,7 +53,7 @@
 			display:none;
 			width: 0px;
 			}
-			
+
 		table#example td {
 			white-space: nowrap !important;
 			overflow: hidden !important;
@@ -62,12 +62,12 @@
 			width: 10px;
 			min-width:10px;
 			max-width: 10px;
-			} 
+			}
 
 
 		.cellPName {
 			width: 300px !important;
-		}	
+		}
 		.cellPRole {
 			width: 120px !important;
 		}
@@ -87,14 +87,14 @@
 			width: 85px !important;
 		}
 		.cellPButton {
-			padding: 3px !important; 
+			padding: 3px !important;
 			width: 50px !important;
 			min-width:50px !important;
 			max-width:50px !important;
 		}
 		tfoot {
 			display: table-header-group;
-		}			
+		}
 
 		.datepicker {
 			padding:0px;
@@ -109,11 +109,11 @@
 			width: 10px;
 			min-width:10px;
 			max-width: 10px;
-			} 
+			}
 
 		.cellName {
 			width: 255px !important;
-		}	
+		}
 		.cellRole {
 			width: 80px !important;
 		}
@@ -133,11 +133,11 @@
 			width: 80px !important;
 		}
 		.cellButton {
-			padding: 3px !important; 
+			padding: 3px !important;
 			width: 50px !important;
 			min-width:50px !important;
 			max-width:50px !important;
-		}		
+		}
 /* CLASSES FOR USERS DATATABLE END */
 </style>
 @endsection
@@ -151,11 +151,11 @@
         <div class="container">
             <div class="box first" style="margin-top:100px">
 				<div class="small-gap"></div>
-				
+
 				<h3>{{trans('deptinst.editInstitution')}}</h3>
-				
+
 				<div class="small-gap"></div>
-			
+
 				@if ($errors->any())
 						<ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
 							<strong>{{trans('deptinst.changesNotSaved')}}</strong>
@@ -165,7 +165,7 @@
 						</ul>
 					@endif
 				{!! Form::model($institution, array('url' => ['institutions/' . $institution->id], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form')) !!}
-						
+
 							<div class="form-group">
 								{!! Form::label('title', trans('deptinst.description').':', ['class' => 'control-label col-sm-2 ']) !!}
                                 <div class="col-sm-4">
@@ -173,28 +173,8 @@
                                     <div class="help-block with-errors" style="margin:0px;"></div>
                                 </div>
                             </div>
-                        
-                            <div class="form-group" style="display:none;">
-								{!! Form::label('slug', trans('deptinst.instId').':', ['class' => 'control-label col-sm-2 ']) !!}
-                                <div class="col-sm-4">
-									{!! Form::text('slug', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.description')]) !!}
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-								{!! Form::label('shibboleth_domain', 'Shibboleth domain:', ['class' => 'control-label col-sm-2 ']) !!}
-                                <div class="col-sm-4">
-									{!! Form::text('shibboleth_domain', null, ['class' => 'form-control', 'placeholder' => 'Shibboleth Home Organization']) !!}
-                                </div>
-                            </div>
-                        
-							<h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc;"><span class="glyphicon glyphicon-user"></span> {{trans('deptinst.contactDetails')}}</h4>                       
-                            <div class="form-group">
-								{!! Form::label('contact_name', trans('deptinst.fullName').':', ['class' => 'control-label col-sm-2 ']) !!}
-                                <div class="col-sm-4">
-                                    {!! Form::text('contact_name', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.fullName')]) !!}
-                                </div>
-                            </div>                          
+
+
 
                             <div class="form-group">
 								{!! Form::label('contact_email', 'Email:', ['class' => 'control-label col-sm-2 ']) !!}
@@ -202,15 +182,10 @@
 									{!! Form::text('contact_email', null, ['class' => 'form-control', 'placeholder' => 'email', 'type' => 'email']) !!}
                                 </div>
                             </div>
-                            
-                            <div class="form-group">
-								{!! Form::label('contact_phone', trans('deptinst.phone').':', ['class' => 'control-label col-sm-2 ']) !!}
-                                <div class="col-sm-4">
-                                    {!! Form::text('contact_phone', null, ['class' => 'form-control', 'placeholder' => trans('deptinst.phone')]) !!}
-                                </div>
-                            </div> 						
-							
-							
+
+
+
+
 						<div class="row">
 								<div class="col-sm-12">
 									<span class="pull-right">      
@@ -222,10 +197,10 @@
 									</span>
 								</div>
 							</div>
-                        
-				{!! Form::close() !!} 
 
-				</div>                        
+				{!! Form::close() !!}
+
+				</div>
             </div><!--/.box-->
 <!-- Form Details -END -->
 @endsection

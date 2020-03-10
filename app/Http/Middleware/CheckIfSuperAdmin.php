@@ -21,7 +21,7 @@ class CheckIfSuperAdmin
             if ($request->ajax() || $request->wantsJson()) {
                 return response(trans('backpack::base.unauthorized'), 401);
             } else {
-                return redirect()->guest('/auth/login');
+                return redirect()->guest('/');
             }
         }else{
 

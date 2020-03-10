@@ -99,6 +99,13 @@ class GsisAuthenticationController extends Controller
                         $activation_token = session()->pull("activation_token");
                         $userOfToken = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
                         if($userOfToken){
+                            //Give the user the invited roles if they are higher than the current role
+                            //toDo define what need to be done here - role upgrading ? what about the institution - department
+//                            $currentRole = $user->roles()->first();
+//                            $tokenUserRole = $userOfToken->roles()->first();
+//                            if($currentRole->id > $tokenUserRole->id){
+//                                $user->roles()->sync($userOfToken->roles()->pluck('id')->toArray());
+//                            }
                             $user->merge_user($userOfToken->id,true);
                         }
                     }

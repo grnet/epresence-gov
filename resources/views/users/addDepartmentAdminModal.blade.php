@@ -67,15 +67,6 @@
                             {!! Form::select('dept_admin_institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminOrg', 'style' => 'width: 100%'])!!}
                         </div>
                     </div>
-
-                    <div class="form-group" id="DepartmentAdminOrgNewContainer">
-                        {!! Form::label('DepartmentAdminOrgNewField', trans('users.newInstitution').':', ['class' => 'control-label col-sm-4']) !!}
-                        <div class="col-sm-8">
-                            {!! Form::text('dept_admin_new_institution', null, ['class' => 'form-control', 'placeholder' => trans('users.enterInstitution'), 'id' => 'DepartmentAdminOrgNewField']) !!}
-                            <div class="help-block with-errors" style="margin:0px;"></div>
-                        </div>
-                    </div>
-
                 @elseif(Auth::user()->hasRole('InstitutionAdministrator'))
                     <div class="form-group">
                         {!! Form::label('FieldAdminOrgStatic', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
@@ -83,7 +74,6 @@
                             {{ Auth::user()->institutions->first()->title }}
                         </div>
                     </div>
-
                     {!! Form::hidden('dept_admin_institution_id', Auth::user()->institutions->first()->id) !!}
                 @endif
 
@@ -92,12 +82,12 @@
                     <div class="col-sm-8">
                         @if(Auth::user()->hasRole('SuperAdmin'))
                          @if(Input::old('dept_admin_institution_id') && Input::old('dept_admin_institution_id')!== 'other' )
-                                 {!! Form::select('dept_admin_department_id',['' => ''] + App\Department::where('institution_id', Input::old('dept_admin_institution_id'))->orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
+                                 {!! Form::select('dept_admin_department_id',['' => ''] + App\Department::where('institution_id', Input::old('dept_admin_institution_id'))->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')] , null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                              @else
                                 {!! Form::select('dept_admin_department_id',['' => ''] , null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                          @endif
                         @else
-                        {!! Form::select('dept_admin_department_id', ['' => ''] + App\Department::where('institution_id', Auth::user()->institutions->first()->id)->orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
+                        {!! Form::select('dept_admin_department_id', ['' => ''] + App\Department::where('institution_id', Auth::user()->institutions->first()->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], null, ['id' => 'FieldDepartmentAdminDepart', 'style' => 'width: 100%'])!!}
                         @endif
                     </div>
                 </div>
@@ -110,7 +100,9 @@
                              style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
                     </div>
                 </div>
+
                 {!! Form::hidden('from', URL::full()) !!}
+
                 <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('users.save'), ['class' => 'btn btn-primary', 'id' => 'AdminSubmitBtnNew', 'name' => 'AdminSubmitBtnNew']) !!}
                     <button type="button" data-dismiss="modal" aria-hidden="true"

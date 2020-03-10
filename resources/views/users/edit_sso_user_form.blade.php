@@ -77,16 +77,6 @@
         <div class="help-block with-errors" style="margin:0;"></div>
     </div>
 </div>
-<div class="form-group">
-    {!! Form::label('FieldUseStatus', trans('users.localUserShort').':', ['class' => 'control-label col-sm-2']) !!}
-    <div class="col-sm-4 form-control-static">
-        @if($user->state ==  'local')
-            {{trans('users.yes')}}
-        @else
-            {{trans('users.no')}}
-        @endif
-    </div>
-</div>
 <div class="form-group has-success">
     {!! Form::label('FieldUserStatus', trans('users.active').':', ['class' => 'control-label col-sm-2']) !!}
     <div class="col-sm-8">
@@ -94,7 +84,6 @@
         {!! Form::checkbox('status', str_is($user->status, 1), null, ['id' => 'FieldUserStatus', 'data-toggle' => 'checkbox-x', 'data-size' => 'lg', 'data-three-state' => 'false']) !!}
     </div>
 </div>
-
 <!-- Role -->
 
 @if(($auth_user->hasRole('SuperAdmin')) && !$user->hasRole('SuperAdmin'))
@@ -120,41 +109,24 @@
         </div>
     </div>
 @endif
-
-
 <div class="form-group">
     {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-2']) !!}
     <div class="col-sm-8 form-control-static">
-        @if($institution->slug == 'other')
-            {{ $institution->title }} ({{ $user->customValues()['institution'] }})
-        @else
             {{ $institution->title }}
-        @endif
     </div>
 </div>
-
-
 <!-- Department -->
 @if(!$user->hasRole('SuperAdmin'))
-
     <div class="form-group" id="DepContainer">
         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-2']) !!}
         <div class="col-sm-4">
-            @if($department->slug == 'other')
-                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], 'other', ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-            @else
-                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-            @endif
+                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
         </div>
     </div>
     <div class="form-group" id="NewDepContainer">
         {!! Form::label('FieldUserDepartNew', trans('users.newDepartment').':', ['class' => 'control-label col-sm-2']) !!}
         <div class="col-sm-4">
-            @if($department->slug == 'other')
-                {!! Form::text('new_department', $user->customValues()['department'], ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
-            @else
                 {!! Form::text('new_department', null, ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
-            @endif
                 <div id="newDepDiv" class="help-block with-errors newdep alert alert-warning"
                      style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
         </div>
@@ -163,16 +135,10 @@
     <div class="form-group">
         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-2']) !!}
         <div class="col-sm-4 form-control-static">
-            @if($department->slug == 'other')
-                {{ $department->title }} ({{ $user->customValues()['department'] }})
-            @else
                 {{ $department->title }}
-            @endif
         </div>
     </div>
 @endif
-
-
 <!-- Comments -->
 <div class="form-group" id="FieldCoordDepartDepartFormGroup">
     {!! Form::label('FieldCoordDepartComment', trans('users.description').':', ['class' => 'control-label col-sm-2']) !!}
@@ -180,7 +146,6 @@
         {!! Form::textarea('comment', null, ['class' => 'form-control', 'id' => 'FieldCoordDepartComment', 'rows' => '3', 'readonly'])!!}
     </div>
 </div>
-
 <!-- Admin Comment -->
 <div class="form-group" id="FieldCoordDepartDepartFormGroup">
     {!! Form::label('FieldCoordDepartAdminComment', trans('users.comments').':', ['class' => 'control-label col-sm-2']) !!}
@@ -188,7 +153,6 @@
         {!! Form::textarea('admin_comment', null, ['class' => 'form-control', 'placeholder' => trans('users.moderatorComments'), 'rows' => '3', 'id' => 'FieldCoordDepartAdminComment'])!!}
     </div>
 </div>
-
 <div class="row">
     <div class="col-sm-12">
 		<span class="pull-right">

@@ -376,12 +376,8 @@
                         </span>
 					</div>
 				</div> <!-- Row with search field and add button - END -->
-
 				@include('institutions._advancedSearch', [])
-    
-                @include('institutions._institutionTable', [])  
-
-
+                @include('institutions._institutionTable', [])
 <!-- DATATABLES END -->
 
             </div><!--/.box-->

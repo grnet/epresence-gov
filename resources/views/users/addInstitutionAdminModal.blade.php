@@ -15,6 +15,7 @@
                     <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
                 </div>
                 {!! Form::open(array('url' => 'store_institution_admin', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'addNewInstitutionAdminForm', 'role' => 'form')) !!}
+
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminSurname', trans('users.surname').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
@@ -22,6 +23,7 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
+
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminName', trans('users.name').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
@@ -36,6 +38,7 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
+
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminPhone', trans('users.telephone').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">
@@ -43,26 +46,19 @@
                         <div class="help-block with-errors" style="margin:0"></div>
                     </div>
                 </div>
+
                 <div class="form-group">
                     {!! Form::label('FieldAdminRoleStatic', trans('users.role').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8 form-control-static">
                         {{trans('users.institutionModerator')}}
                     </div>
                 </div>
-                <h4 style="padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span
+                <h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span
                             class="glyphicon glyphicon-wrench"></span> {{trans('users.manageConferencesFor')}}:</h4>
-
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
                         {!! Form::select('inst_admin_institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), null, ['id' => 'FieldInstitutionAdminOrg', 'style' => 'width: 100%'])!!}
-                    </div>
-                </div>
-                <div class="form-group" id="InstitutionAdminOrgNewContainer">
-                    {!! Form::label('InstitutionAdminOrgNewField', trans('users.newInstitution').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8">
-                        {!! Form::text('inst_admin_new_institution', null, ['class' => 'form-control', 'placeholder' => trans('users.enterInstitution'), 'id' => 'InstitutionAdminOrgNewField']) !!}
-                        <div class="help-block with-errors" style="margin:0px;"></div>
                     </div>
                 </div>
                 <div class="form-group" id="InstitutionAdminDepartContainer">
@@ -84,7 +80,7 @@
                     </div>
                 </div>
                 {!! Form::hidden('from', URL::full()) !!}
-                <div class="modal-footer" style="margin-top:0;">
+                <div class="modal-footer" style="margin-top:0px;">
                     {!! Form::submit(trans('users.save'), ['class' => 'btn btn-primary', 'id' => 'AdminSubmitBtnNew', 'name' => 'AdminSubmitBtnNew']) !!}
                     <button type="button" data-dismiss="modal" aria-hidden="true"
                             class="btn btn-default">{{trans('users.cancel')}}</button>

@@ -3,25 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Role;
-use Illuminate\Http\Request;
-
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Auth;
-use Hash;
-use File;
-use Log;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
 use App\Email;
-use Validator;
-use App\Conference;
 use App\Institution;
 use App\Department;
 use Carbon\Carbon;
 use App\ExtraEmail;
 use App\Application;
 use App\User;
-use DB;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 
 class AccountController extends Controller
@@ -33,22 +30,19 @@ class AccountController extends Controller
     }
 
 
+    /**
+     * @return Factory|View
+     */
     public function showAccount()
     {
         $user = Auth::user();
-
         $extra_emails['sso'] = $user->extra_emails_sso()->toArray();
         $extra_emails['custom'] = $user->extra_emails_custom()->toArray();
-
         $institution = $user->institutions()->first();
         $department = $user->departments()->first();
         $role = $user->roles()->first();
-
         $canBeDeleted = $user->HasFutureAdminConferences();
         $canRequestRoleChange = Application::where('user_id', $user->id)->where('app_state', 'new')->count() > 0 || (!$user->hasRole('DepartmentAdministrator') && !$user->hasRole('EndUser')) ? false : true;
-
-
-
         if(session()->has("pop_role_change")){
             $pop_role_change = true;
             session()->forget("pop_role_change");
@@ -56,8 +50,6 @@ class AccountController extends Controller
         else{
             $pop_role_change = false;
         }
-
-
         return view('account',
             [
                 'user' => $user,
@@ -72,19 +64,16 @@ class AccountController extends Controller
     }
 
 
+    /**
+     * @return Factory|View
+     */
     public function showManageEmails(){
-
-
        $user = Auth::user();
-
        if($user->state=="sso") {
-
            $primary_email = $user->email;
            $extra_emails['sso'] = $user->extra_emails_sso()->toArray();
            $extra_emails['custom'] = $user->extra_emails_custom()->toArray();
-
            $slots_remaining = 3 - (count($extra_emails['sso']) + count($extra_emails['custom']));
-
            return view('manage_account_emails',
                [
                    'user' => $user,
@@ -98,33 +87,26 @@ class AccountController extends Controller
     }
 
 
-
+    /**
+     * @param Requests\DeleteMyAccountRequest $request
+     * @return RedirectResponse|Redirector
+     */
     public function delete_anonymize(Requests\DeleteMyAccountRequest $request)
     {
-
         $input = $request->all();
-
         $user = Auth::user();
-
         if ($input['delete_account_confirmation_email'] !== $user->email) {
             $errors['confirmation_email_not_matched'] = trans('requests.confirmationMailNotMatched');
             return back()->withErrors($errors);
         }
-
         session()->flash('account_deleted_error',trans('account.account_deleted'));
         Auth::logout();
-
         $deleted_email = $user->email;
-
         $future_conferences = $user->futureConferences();
-
         foreach ($future_conferences as $conf) {
-
             $coordinator = User::find($conf->user_id);
-
             $parameters['conference'] = $conf;
             $parameters['deleted_user'] = $user;
-
             $email = Email::where('name', 'participantDeletedCoordinatorsSelf')->first();
 
             if($coordinator->status == 1){
@@ -190,6 +172,10 @@ class AccountController extends Controller
     }
 
 
+    /**
+     * @param Requests\UpdateLocalAccountRequest $request
+     * @return RedirectResponse
+     */
     public function UpdateLocalAccount(Requests\UpdateLocalAccountRequest $request)
     {
 
@@ -281,29 +267,17 @@ class AccountController extends Controller
     }
 
 
+    /**
+     * @param Requests\UpdateSsoAccountRequest $request
+     * @return RedirectResponse
+     */
     public function UpdateSsoAccount(Requests\UpdateSsoAccountRequest $request)
     {
-
-
         //Update account details method called by from account page by the user himself
-
         // State input values
-
         $input = $request->all();
         $user = Auth::user();
-
-    
-        Log::info("User:");
-        Log::info(json_encode($user));
-        Log::info(json_encode($user->institutions));
-        Log::info(json_encode($user->departments));
-        Log::info("Update sso account request (looking for missing department bug):");
-        Log::info(json_encode($request->all()));
-
-
         $institution = $user->institutions()->first();
-        $department = $user->departments()->first();
-
         // Handle user image (thumbnail)
         if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
@@ -321,25 +295,21 @@ class AccountController extends Controller
         //every sso user can change department except SuperAdmins
 
         if (isset($input['department_id'])) {
-
-            $user->departments()->detach($department->id);
-
             if (!empty($input['new_department']) && $input['department_id'] == "other") {
-                $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $institution->id]);
+                $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
                 $input['department_id'] = $new_department->id;
             }
-
-            $user->departments()->attach($input['department_id']);
+            $user->departments()->sync([$input['department_id']]);
         }
-
         $user->update(array_except($input, ['password']));
-
         $message = trans('controllers.changesSaved');
-
         return back()->with('message', $message);
     }
 
 
+    /**
+     * @return Factory|RedirectResponse|Redirector|View
+     */
     public function accountActivation()
     {
         if (!Auth::check()) {
@@ -576,7 +546,7 @@ class AccountController extends Controller
 
         if (!empty($input['new_department']) && $input['department_id'] == "other") {
 
-            $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $institution->id]);
+            $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
             $input['department_id'] = $new_department->id;
         }
 

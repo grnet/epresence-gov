@@ -31,13 +31,9 @@ class InstitutionsController extends Controller
 		
 		// Limit
 		$limit = Input::get('limit') ?: 10;
-		
-		$institutions_default = Institution::where('slug', '!=', 'other');
-		
+		$institutions_default = Institution::select();
 		$institutions_default = Institution::advancedSearch($institutions_default, Input::all());
-		
 		$institutions = $institutions_default->paginate($limit);
-		
 		return view('institutions.index', compact('institutions'));
 	}
 	
@@ -137,47 +133,55 @@ class InstitutionsController extends Controller
 		
 		return redirect('institutions')->with('storesSuccessfully', trans('controllers.changesSaved'));;
 	}
-	
+
+    /**
+     * @param $id
+     * @param null $department_id
+     * @return string
+     */
 	public function listDepartments($id, $department_id = null)
 	{
-
-
         $institution = Institution::findOrFail($id);
-
-		$departments = $institution->departments()->where('slug', '<>', 'other')->orderBy('title')->get();
-
-		echo '<option value=""></option>';
+		$departments = $institution->departments()->orderBy('title')->get();
+		$html = '<option value=""></option>';
 		foreach($departments as $department){
-			echo '<option value="'.$department->id.'">'.$department->title.'</option>';
+            $html .= '<option value="'.$department->id.'">'.$department->title.'</option>';
 		}
-
-		echo '<option value="other">'.trans('controllers.other').'</option>';
+        $html .= '<option value="other">'.trans('controllers.other').'</option>';
+		return $html;
 	}
 
+
+    /**
+     * @param $id
+     * @param null $department_id
+     * @return string
+     */
     public function listDepartmentsWrealOther($id, $department_id = null)
     {
         $institution = Institution::findOrFail($id);
         $departments = $institution->departments()->orderBy('title')->get();
-
-        echo '<option value=""></option>';
+        $html = '<option value=""></option>';
         foreach($departments as $department){
-            echo '<option value="'.$department->id.'">'.$department->title.'</option>';
+            $html .= '<option value="'.$department->id.'">'.$department->title.'</option>';
         }
+        return $html;
     }
 
+
+    /**
+     * @return string
+     */
     public function listDepartmentsOtherOrg()
     {
-
         $institution = Institution::where("slug","other")->first();
-
         $departments = $institution->departments()->where('slug', '<>', 'other')->orderBy('title')->get();
-
-        echo '<option value=""></option>';
+        $html = '<option value=""></option>';
         foreach($departments as $department){
-            echo '<option value="'.$department->id.'">'.$department->title.'</option>';
+            $html .= '<option value="'.$department->id.'">'.$department->title.'</option>';
         }
-
-        echo '<option value="other">'.trans('controllers.other').'</option>';
+        $html .= '<option value="other">'.trans('controllers.other').'</option>';
+        return $html;
     }
 	
 	public function loadDepartmentTable($id) {

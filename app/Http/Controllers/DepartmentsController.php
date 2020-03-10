@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use App\Department;
 use App\Institution;
 use App\Conference;
@@ -19,25 +19,24 @@ class DepartmentsController extends Controller
 	{
     $this->middleware('auth');
 	}
-	
+
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index($id)
 	{
-		
 		if (Gate::denies('view_institutions')) {
             abort(403);
         }
-		
 		// Limit
 		$limit = Input::get('limit') ?: 10;
 		
 		$institution = Institution::findOrFail($id);
-		
 		if ($institution->departments->count() == 0) {
             abort(404);
         }
-		
-		$departments_default = Department::where('institution_id', $id)->where('slug', '!=', 'other');
-		
+		$departments_default = Department::where('institution_id', $id);
 		$departments_default = Institution::advancedSearch($departments_default, Input::all());
 		
 		$departments = $departments_default->paginate($limit);

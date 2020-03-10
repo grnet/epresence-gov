@@ -8,10 +8,7 @@
             </div> <!-- .modal-header -->
             <div class="modal-body">
                 {!! Form::open(array('url' => ['account/update_sso'], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form', 'files' => true)) !!}
-
-
                 {!! Form::hidden('role', $role->name) !!}
-
                 @if ($errors->any() && (!$errors->has('delete_account_confirmation_email') && !$errors->has('confirmation_email_not_matched')  && !$errors->has('application_comment')  && !$errors->has('accept_terms') && !$errors->has('application_role') && !$errors->has('application_telephone') ))
                     <div class="alert alert-danger">
                         <ul>
@@ -44,15 +41,6 @@
                         {{ $user->email }}
                         <div class="alert alert-warning help-block"
                              role="alert">{!!trans('users.ExtraEmailsWarningPersonal')!!}</div>
-                    </div>
-                </div>
-
-                {{--Extra email section end--}}
-
-                <div class="form-group">
-                    {!! Form::label('FieldUseStatus', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8 form-control-static">
-                        {{ $user->state_string($user->state) }}
                     </div>
                 </div>
                 <div class="form-group">
@@ -100,11 +88,7 @@
                 <div class="form-group">
                     {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8 form-control-static">
-                        @if($institution->slug == 'other')
-                            {{ $institution->title }} ({{ $user->customValues()['institution'] }})
-                        @else
                             {{ $institution->title }}
-                        @endif
                     </div>
                 </div>
 
@@ -114,23 +98,15 @@
 
                 @if(!$user->hasRole('SuperAdmin'))
                     <div class="form-group" id="DepContainer">
-                        {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
+                        {!! Form::label('FieldUserDepart', trans('users.department').':'.$department->title, ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
-                            @if($department->slug == 'other')
-                                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], 'other', ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-                            @else
-                                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-                            @endif
+                         {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
                         </div>
                     </div>
                     <div class="form-group" id="NewDepContainer">
                         {!! Form::label('FieldUserDepartNew', trans('users.newDepartment').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
-                            @if($department->slug == 'other')
-                                {!! Form::text('new_department', $user->customValues()['department'], ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
-                            @else
-                                {!! Form::text('new_department', null, ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
-                            @endif
+                            {!! Form::text('new_department', null, ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
                                 <div id="newDepDiv" class="help-block with-errors newdep alert alert-warning"
                                      style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
                         </div>
@@ -139,18 +115,10 @@
                     <div class="form-group">
                         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($department->slug == 'other')
-                                {{ $department->title }} ({{ $user->customValues()['department'] }})
-                            @else
-                                {{ $department->title }}
-                            @endif
+                            {{ $department->title }}
                         </div>
                     </div>
                 @endif
-
-                {{--Department section end--}}
-
-
                 <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('site.save'), ['class' => 'btn btn-primary', 'id' => 'UserSubmitBtnNew', 'name' => 'add_new']) !!}
                     <button type="button" id="UserModalButtonClose"

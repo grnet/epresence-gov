@@ -227,7 +227,6 @@ class UsersController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'dept_admin_email' => 'required|email',
-            'dept_admin_state' => 'required',
             'dept_admin_telephone' => 'required',
             'dept_admin_institution_id' => 'required',
             'dept_admin_new_institution' => 'required_if:dept_admin_institution_id,other',
@@ -252,16 +251,10 @@ class UsersController extends Controller
 
             $user_using_this_email = User::where('email', $input['dept_admin_email'])->first();
             $user_using_this_email_as_confirmed_extra = ExtraEmail::where('email', $input['dept_admin_email'])->where('confirmed', 1)->first();
-
             if (isset($user_using_this_email) || isset($user_using_this_email_as_confirmed_extra)) {
-
-
                 if ($user_using_this_email) {
-
                     $user_inst = $user_using_this_email->institutions()->first();
-
                     if ($user_inst && $user_inst->id == $auth_user_institution->id) {
-
                         if (!$user_using_this_email->hasRole("DepartmentAdministrator") && !$user_using_this_email->hasRole("InstitutionAdministrator"))
                             $validator->errors()->add('email', trans('requests.emailNotUniqueForInstitutionAdmin', ['user_id' => $user_using_this_email->id]));
                         else
@@ -271,20 +264,13 @@ class UsersController extends Controller
                             else
                             $validator->errors()->add('email', trans('requests.emailNotUniqueAlreadyInstitutionAdmin', ['user_id' => $user_using_this_email->id]));
                         }
-
-
                     } else {
                         $validator->errors()->add('email', trans('requests.emailNotUniqueForInstitutionOtherInstitution'));
                     }
-
                 }
-
                 if ($user_using_this_email_as_confirmed_extra) {
-
                     $user_inst = $user_using_this_email_as_confirmed_extra->user->institutions()->first();
-
                     if ($user_inst && $user_inst->id == $auth_user_institution->id) {
-
                         if (!$user_using_this_email_as_confirmed_extra->user->hasRole("DepartmentAdministrator") && !$user_using_this_email_as_confirmed_extra->user->hasRole("InstitutionAdministrator"))
                             $validator->errors()->add('email', trans('requests.emailNotUniqueForInstitutionAdmin', ['user_id' => $user_using_this_email_as_confirmed_extra->user_id]));
                         else
@@ -300,13 +286,10 @@ class UsersController extends Controller
                 }
             } else {
                 $user_using_this_email_as_unconfirmed_extra = ExtraEmail::where('email', $input['dept_admin_email'])->where('confirmed', 0)->first();
-
                 if ($user_using_this_email_as_unconfirmed_extra) {
                     $validator->errors()->add('email', trans('requests.emailInUseByUnconfirmedExtra'));
                 }
-
             }
-
         });
 
 
@@ -327,7 +310,7 @@ class UsersController extends Controller
         $input['lastname'] = $input['dept_admin_lastname'];
         $input['email'] = $input['dept_admin_email'];
         $input['telephone'] = $input['dept_admin_telephone'];
-        $input['state'] = $input['dept_admin_state'];
+        $input['state'] = 'sso';
         $input['institution_id'] = $input['dept_admin_institution_id'];
         $input['new_institution'] = isset($input['dept_admin_new_institution']) ? $input['dept_admin_new_institution'] : null ;
         $input['department_id'] = $input['dept_admin_department_id'];
@@ -351,37 +334,14 @@ class UsersController extends Controller
         //Handle institution as InstitutionAdministrator
 
         if (Auth::user()->hasRole('InstitutionAdministrator')) {
-
             //Only department administrations are created here
-
             $input['institution_id'] = Auth::user()->institutions()->first()->id;
-
-        //Handle institution as SuperAdmin
-
-        } else {
-
-            //Department & Institution administrators created here
-
-            if (!empty($input['new_institution']) && $input['institution_id'] == "other") {
-
-                $input['department_id'] = "other";
-
-                $new_institution = Institution::create(['title' => $input['new_institution'], 'slug' => 'noID']);
-                $input['institution_id'] = $new_institution->id;
-
-                // Create admin department
-                Department::create(['title' => 'Διοίκηση', 'slug' => 'admin', 'institution_id' => $new_institution->id]);
-                // Create other department
-                Department::create(['title' => 'Άλλο', 'slug' => 'other', 'institution_id' => $new_institution->id]);
-            }
-
         }
 
         if (!empty($input['new_department']) && $input['department_id'] == "other") {
-            $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $input['institution_id']]);
+            $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $input['institution_id']]);
             $input['department_id'] = $new_department->id;
         }
-
 
         $user->institutions()->attach($input['institution_id']);
         $user->departments()->attach($input['department_id']);
@@ -423,7 +383,6 @@ class UsersController extends Controller
 //            'inst_admin_lastname' => 'required',
 //            'inst_admin_firstname' => 'required',
             'inst_admin_email' => 'required|email',
-            'inst_admin_state' => 'required',
             'inst_admin_telephone' => 'required',
             'inst_admin_institution_id' => 'required',
             'inst_admin_new_institution' => 'required_if:inst_admin_institution_id,other',
@@ -471,21 +430,16 @@ class UsersController extends Controller
         $input['updated_at'] = Carbon::now();
         $input['password'] = Hash::make($password);
         $input['name'] = $input['inst_admin_email'];
-
         $input['firstname'] = $input['inst_admin_firstname'];
         $input['lastname'] = $input['inst_admin_lastname'];
         $input['email'] = $input['inst_admin_email'];
         $input['telephone'] = $input['inst_admin_telephone'];
-        $input['state'] = $input['inst_admin_state'];
+        $input['state'] = "sso";
         $input['institution_id'] = $input['inst_admin_institution_id'];
-        $input['new_institution'] = $input['inst_admin_new_institution'];
         $input['department_id'] = $input['inst_admin_department_id'];
         $input['new_department'] = $input['inst_admin_new_department'];
-        
-        
         $input['status'] = 1;
         $input['creator_id'] = Auth::user()->id;
-
         $input['activation_token'] = str_random(15);
         $user = User::create($input);
 
@@ -493,9 +447,9 @@ class UsersController extends Controller
 
         $user->assignRole("InstitutionAdministrator");
 
-        //Department & Institution administrators created here
+        //Institution administrators created here
 
-            if (!empty($input['new_institution']) && $input['institution_id'] == "other") {
+          if(!empty($input['new_institution']) && $input['institution_id'] == "other") {
 
                 $input['department_id'] = "other";
 
@@ -506,9 +460,9 @@ class UsersController extends Controller
                 Department::create(['title' => 'Διοίκηση', 'slug' => 'admin', 'institution_id' => $new_institution->id]);
                 // Create other department
                 Department::create(['title' => 'Άλλο', 'slug' => 'other', 'institution_id' => $new_institution->id]);
-            }
+         }
 
-        if (!empty($input['new_department']) && $input['department_id'] == "other") {
+        if (!empty($input['new_department'])) {
             $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $input['institution_id']]);
             $input['department_id'] = $new_department->id;
         }
