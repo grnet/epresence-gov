@@ -112,6 +112,7 @@ class GsisAuthenticationController extends Controller
                         $user = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
                         if($user){
                             $user->update(['firstname'=>$firstName,'lastname'=>$lastName,'tax_id'=>$taxId,'confirmed'=>true,'activation_token'=>null]);
+                            $user->create_join_urls();
                             Auth::login($user);
                             return redirect('/');
                         }
