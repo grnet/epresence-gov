@@ -292,12 +292,12 @@
                         <hr>
                         <p>{{trans('site.accessText2')}}</p>
                         <p>{{trans('site.accessText3')}}</p>
-                        <div class="gap"></div>
-                        <h2 class="orange"> {{trans('site.moderatorAccess')}} </h2>
-                        <hr>
-                        <p>{{trans('site.moderatorText1')}} <a data-toggle="modal" href="#CoordDepart"
-                                                               id="CoordDepartLink">{{trans('site.moderatorText2')}}</a>. {{trans('site.moderatorText3')}}
-                        </p>
+{{--                        <div class="gap"></div>--}}
+{{--                        <h2 class="orange"> {{trans('site.moderatorAccess')}} </h2>--}}
+{{--                        <hr>--}}
+{{--                        <p>{{trans('site.moderatorText1')}} <a data-toggle="modal" href="#CoordDepart"--}}
+{{--                                                               id="CoordDepartLink">{{trans('site.moderatorText2')}}</a>. {{trans('site.moderatorText3')}}--}}
+{{--                        </p>--}}
                     </div>
                 </div><!--/.row-->
             </div><!--/.box-->
@@ -406,7 +406,7 @@
                                 <div class="form-group">
                                     {!! Form::label('FieldCoordDepartOrg', trans('site.institution').':', ['class' => 'control-label col-sm-4 ']) !!}
                                     <div class="col-sm-8">
-                                        {!! Form::select('institution_id', ['' => ''] + App\Institution::whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('site.other')], null, ['id' => 'FieldCoordDepartOrg', 'style' => 'width: 100%'])!!}
+                                        {!! Form::select('institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('site.other')], null, ['id' => 'FieldCoordDepartOrg', 'style' => 'width: 100%'])!!}
                                     </div>
                                 </div>
 
