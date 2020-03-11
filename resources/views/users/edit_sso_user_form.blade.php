@@ -62,7 +62,7 @@
         </div>
     @endforeach
 </div>
-@if(Auth::user()->hasRole('SuperAdmin'))
+@if($auth_user->hasRole('SuperAdmin'))
 <div class="col-sm-12" style="margin-top:20px; margin-bottom:20px;">
     <div class="col-sm-4 col-sm-push-2" style="padding:0; margin:0;">
         <a href="/users/{{$user->id}}/edit/emails">{{trans('users.email_management')}}</a>
@@ -111,16 +111,21 @@
 @endif
 <div class="form-group">
     {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-2']) !!}
-    <div class="col-sm-8 form-control-static">
+    @if($auth_user->hasRole('SuperAdmin'))
+        <div class="col-sm-4">
+        {!! Form::select('institution_id', ['' => ''] + App\Institution::pluck("title","id")->toArray(), $institution->id, ['id' => 'FieldUserOrg', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+        </div>
+    @else
+    <div class="col-sm-4 form-control-static">
             {{ $institution->title }}
+        <input type="hidden" name="institution_id" value="$institution->id">
     </div>
+     @endif
 </div>
-<!-- Department -->
-@if(!$user->hasRole('SuperAdmin'))
-    <div class="form-group" id="DepContainer">
+    <div class="form-group">
         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-2']) !!}
         <div class="col-sm-4">
-                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
+                {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', old('institution_id',$institution->id))->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
         </div>
     </div>
     <div class="form-group" id="NewDepContainer">
@@ -131,14 +136,6 @@
                      style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
         </div>
     </div>
-@else
-    <div class="form-group">
-        {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-2']) !!}
-        <div class="col-sm-4 form-control-static">
-                {{ $department->title }}
-        </div>
-    </div>
-@endif
 <!-- Comments -->
 <div class="form-group" id="FieldCoordDepartDepartFormGroup">
     {!! Form::label('FieldCoordDepartComment', trans('users.description').':', ['class' => 'control-label col-sm-2']) !!}

@@ -90,6 +90,7 @@
                     <div class="col-sm-8 form-control-static">
                             {{ $institution->title }}
                     </div>
+                    <input type="hidden" name="institution_id" value="{{$institution->id}}">
                 </div>
 
                 {{--Institution section end--}}

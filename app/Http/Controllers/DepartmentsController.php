@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Department;
 use App\Institution;
-use App\Conference;
 use Carbon\Carbon;
 use Illuminate\View\View;
-use Request;
-use Input;
-
+use Illuminate\Support\Facades\Input;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 class DepartmentsController extends Controller
 {
@@ -34,16 +31,13 @@ class DepartmentsController extends Controller
         }
 		// Limit
 		$limit = Input::get('limit') ?: 10;
-		
 		$institution = Institution::findOrFail($id);
 		if ($institution->departments->count() == 0) {
             abort(404);
         }
 		$departments_default = Department::where('institution_id', $id);
 		$departments_default = Institution::advancedSearch($departments_default, Input::all());
-		
 		$departments = $departments_default->paginate($limit);
-		
 		return view('departments.index', compact('departments'));
 	}
 
@@ -53,10 +47,7 @@ class DepartmentsController extends Controller
      */
 	public function show($id)
 	{
-		$department = Department::findOrFail($id);
-		
-		// Session::put('previous_url', URL::previous());
-		
+		Department::findOrFail($id);
 		return redirect("/departments/".$id."/edit");
 	}
 
@@ -86,6 +77,7 @@ class DepartmentsController extends Controller
 
     /**
      * @param $id
+     * @return JsonResponse
      */
 	public function delete($id)
 	{
@@ -107,7 +99,7 @@ class DepartmentsController extends Controller
 					'data' => trans('controllers.departmentDeleted')
 				);
 		}
-		echo json_encode($results);
+		return response()->json($results);
 	}
 
     /**
@@ -119,11 +111,8 @@ class DepartmentsController extends Controller
 	{
 		$department = Department::findOrFail($id);
 		$input = $request->all();
-		
 		$input['updated_at'] = Carbon::now();
-		
 		$department->update($input);
-		
 		return redirect("/institutions/".$department->institution_id."/departments")->with('storesSuccessfully', trans('controllers.changesSaved'));
 	}
 }

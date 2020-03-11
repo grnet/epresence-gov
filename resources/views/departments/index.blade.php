@@ -35,7 +35,6 @@
 		});
 			
 		$("#searchDepartment").select2({allowClear: true, placeholder: "{!!trans('deptinst.selectInstitution')!!}"});
-				  		
 			$("[id^=openDepartmentDetails]").on("click", function() {
 				var user = $(this).attr('id').split('-').pop(-1);
 				if($("#departmentDetails-"+user).hasClass("out")) {
@@ -54,13 +53,12 @@
 				var nRow = row[0];
 				var department = $(this).attr('id').split('-').pop(-1);
 				var r = confirm("{!!trans('deptinst.qDeleteDepartment')!!}");
-					if (r == true) {
+					if (r === true) {
 						$.get( "/departments/delete/"+department )
-						.done(function(data2) {
-							obj2 = JSON.parse(data2);
-							if(obj2.status == 'error'){
-								alert(obj2.data);
-							}else if(obj2.status == 'success'){
+						.done(function(data) {
+							if(data.status === 'error'){
+								alert(data.data);
+							}else if(data.status === 'success'){
 								nRow.remove();
 								return false;
 							}
@@ -226,7 +224,7 @@
 		table thead .sorting:before {
 			font-family: 'Glyphicons Halflings';
 			content: "\e150";
-			padding: 0px 2px;
+			padding: 0 2px;
 			font-size: 0.8em;
 			color: #52b6ec;
 		}
@@ -234,7 +232,7 @@
 		table thead .sortingasc:before {
 			font-family: 'Glyphicons Halflings';
 			content: "\e155";
-			padding: 0px 2px;
+			padding: 0 2px;
 			font-size: 0.8em;
 			color: #52b6ec;
 		}
@@ -242,7 +240,7 @@
 		table thead .sortingdesc:before {
 			font-family: 'Glyphicons Halflings';
 			content: "\e156";
-			padding: 0px 2px;
+			padding: 0 2px;
 			font-size: 0.8em;
 			color: #52b6ec;
 		}
@@ -261,7 +259,7 @@
 	</style>
 @endsection
 
-@section('departments-active')
+@section('institutions-active')
 	class = "active"
 @endsection
 
@@ -272,16 +270,13 @@
             <div class="box first" style="margin-top:100px">
 				<h4><a href="{{ Session::get('previous_url') }}"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{trans('deptinst.backInstList')}}"></span></a> {{trans('deptinst.institutionDepts')}}: {{ $departments->first()->institution->title }}</h4>
 				<hr/>
-
 				<div class="small-gap"></div>
-				
 				@if (session('storesSuccessfully'))
 					<div class="alert alert-info" role="alert" style="margin: 0px 15px 10px 15px">
 					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 						{!! session('storesSuccessfully') !!}
 					</div>
 				@endif
-				
 				@if ($errors->any())
 					<ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
 						<strong>{{trans('deptinst.departmentNotSaved')}}</strong>
@@ -290,9 +285,7 @@
 						@endforeach
 						</ul>
 				@endif
-                
 <!-- DATATABLES START -->
-
 				<div class="row"> <!-- Row with search field and add button - START -->
 					<div class="col-xs-12">
                         <span class="pull-left" style="width:110px">

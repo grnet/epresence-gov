@@ -42,84 +42,42 @@
 
         $(document).ready(function () {
 
-            var new_org_container = $("#NewOrgContainer");
-            var new_dep_container = $("#NewDepContainer");
-
-
-            var dep_container = $("#DepContainer");
-
-
-            var department_select_field = $("#FieldUserDepart");
-
-            var new_custom_department_field = $("#FieldUserDepartNew");
-
-            var organization_select_field = $("#FieldUserOrg");
-
-
-            $('[data-toggle="tooltip"]').tooltip();
-
-
-            department_select_field.select2({placeholder: "{!!trans('site.selectDepartment')!!}"});
-
-            organization_select_field.select2({placeholder: "{!!trans('site.selectInstitution')!!}"});
-
-
-			@if($user->state == 'local')
-
-            organization_select_field.select2({placeholder: "{!!trans('site.selectInstitution')!!}"});
-
-            // FieldUserOrg On change
-            organization_select_field.change(function () {
-
-				@if($department)
-                var user_dep = {{$department->id}};
-                @else
-                var user_dep = null;
-				@endif
-
-                if (organization_select_field.val() === "other") {
-
-					new_org_container.show();
-                    dep_container.hide();
-                    new_dep_container.show();
-                    new_custom_department_field.show();
-
-                    department_select_field.val('other');
-
-                } else if (organization_select_field.val() !== "other" && parseInt(organization_select_field.val()) !== {{ $institution->id or null }}) {
-
-					new_org_container.hide();
-                    new_dep_container.hide();
-                    dep_container.show();
-                    department_select_field.select2().load("/institutions/departments/" + organization_select_field.val(),function(){
-                        department_select_field.select2({placeholder: "{!!trans('site.selectDepartment')!!}",val:""});
-                    });
-
-                } else if (parseInt(organization_select_field.val()) === {{ $institution->id or null }}) {
-
-                        new_org_container.hide();
-                        new_dep_container.hide();
-                        dep_container.show();
-
-                        department_select_field.select2().load("/institutions/departments/" + organization_select_field.val(),function(){
-
-							@if($department)
-                            department_select_field.val({{$department->id}});
-							@else
-                           // department_select_field.select2("val","");
-                            department_select_field.select2({placeholder: "{!!trans('site.selectDepartment')!!}",val:""});
-							@endif
-
-                        });
-                }
-            }).trigger("change");
-
+            let new_dep_container = $("#NewDepContainer");
+			let department_select_field = $("#FieldUserDepart");
+			let new_custom_department_field = $("#FieldUserDepartNew");
+			department_select_field.select2({placeholder: "{!!trans('site.selectDepartment')!!}"});
+			@if($auth_user->hasRole('SuperAdmin'))
+			let organization_select_field = $("#FieldUserOrg");
+			organization_select_field.select2({placeholder: "{!!trans('site.selectInstitution')!!}"});
+			organization_select_field.select2({
+				allowClear: true,
+				placeholder: "{!!trans('users.selectInstitutionRequired')!!}"
+			}).on("change", function () {
+				update_ia_inst_selection_ui(true);
+			});
+			update_ia_inst_selection_ui(false);
+			function update_ia_inst_selection_ui(load_departments){
+				if(organization_select_field.val() > 0) {
+					if(load_departments){
+						department_select_field.select2("data", null, {allowClear: true}).load("/institutions/departments/" + organization_select_field.val());
+					}
+				}
+				else {
+					 function_clear_inst_admin_selections();
+				}
+			}
+			function function_clear_inst_admin_selections(){
+				organization_select_field.select2("data", null, {allowClear: true});
+				department_select_field.html('<option value=""></option>');
+				department_select_field.select2("data", null, {allowClear: true});
+				department_select_field.select2({
+					allowClear: true,
+					placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
+				});
+			}
 			@endif
-
-
-            // UserDepart On change
+			// UserDepart On change
             department_select_field.on("change", function () {
-
                 if (department_select_field.val() === "other") {
                     new_dep_container.show();
                     new_custom_department_field.show();
@@ -132,20 +90,12 @@
                     new_custom_department_field.hide();
                 }
             }).trigger("change");
-
-
-
+			$('[data-toggle="tooltip"]').tooltip();
             $("#FieldUserStatusAlert").hide();
-
             $("#FieldUserRole").select2();
-
-
             // Activate user account
-
             $('#FieldUserStatus').on("change", function(evt) {
-
-                CurrentFieldStatus = $('#FieldUserStatus').val();
-
+				let  CurrentFieldStatus = $('#FieldUserStatus').val();
                 if (parseInt(CurrentFieldStatus) === 0) {
                     $("#FieldUserStatusAlert").hide();
                 }
@@ -153,39 +103,9 @@
                     $("#FieldUserStatusAlert").show();
                     $("#FieldUserStatusMessage").text("{!!trans('users.activationSelected')!!}: ");
                 }
-
             });
-
-			@if (($auth_user->hasRole('SuperAdmin')))
-                $("#state_change_button").on("click",function(e){
-
-                var r = confirm("Ειστε σίγουρος ότι θέλετε να μετατρέψετε αυτον τον χρήστη σε SSO ; Εάν πατήσετε ok οποιαδήποτε μη-αποθηκευμένη αλλαγή που έχετε κάνει στην φόρμα θα χαθεί!");
-
-				if (r === true) {
-
-
-                    $.post("/users/change_state_to_sso",
-						{
-						    _token: '{{csrf_token()}}',
-							user_id: {{$user->id}},
-						})
-                        .done(function (data) {
-
-                            if(data.status==='success')
-                          	 window.location.replace("/users?email="+data.email);
-                            else
-                                console.log(data);
-
-                        });
-                }
-                e.preventDefault();
-				});
-			@endif
 		});
-
-
 	</script>
-	 
 @endsection
 @section('extra-css')
 <style>
@@ -196,7 +116,7 @@
 			}
 		.zero-width {
 			display:none;
-			width: 0px;
+			width: 0;
 			}
 			
 		table#example td {
@@ -302,7 +222,7 @@
         <div class="container">
             <div class="box first" style="margin-top:100px">
 			@if ($errors->any())
-				<ul class="alert alert-danger" style="margin: 0px 15px 10px 15px">
+				<ul class="alert alert-danger" style="margin: 0 15px 10px 15px">
 					<strong>{{trans('users.changesNotSaved')}}</strong>
 					@foreach($errors->all() as $error)
 						<li>{{ $error }}</li>

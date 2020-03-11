@@ -11,8 +11,6 @@
 |
 */
 
-
-
 Route::get('/', function () {
     if(Auth::check() && !Auth::user()->confirmed){
         Auth::logout();
@@ -125,51 +123,36 @@ Route::get('statistics/realtime/users_no_h323', 'StatisticsController@realtime_c
 Route::get('statistics/realtime/users_per_room', 'StatisticsController@realtime_users_per_room_refresh');
 Route::get('statistics/realtime/users_daily', 'StatisticsController@users_daily');
 
-//Authentication Start
-
+//Authentication Routes Start
 
 Route::get('/auth/callback','Auth\GsisAuthenticationController@callback');
 Route::get('/login','Auth\GsisAuthenticationController@login');
 Route::get('/register/{token}','Auth\GsisAuthenticationController@register');
-
 Route::get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('auth/login', 'Auth\LoginController@login');
-
 Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 
-
-
-//Authentication End
+//Authentication Routes End
 
 //Users
 
 Route::get('users', 'UsersController@index');
 Route::post('users', 'UsersController@store');
-
 Route::patch('users/{id}/local', 'UsersExtraController@updateLocalUser');
 Route::patch('users/{id}/sso', 'UsersExtraController@updateSsoUser');
 Route::post('users/change_state_to_sso', 'UsersExtraController@changeStateToSso');
 Route::post('users/change_state_to_local', 'UsersExtraController@changeStateToLocal');
 Route::post('users/resend_activation_email', 'UsersExtraController@resend_activation_email');
-
-
-
 Route::get('get_activation_mail/{token}','UsersExtraController@resend_local_user_activation_email_token');
-
-
 Route::patch('users/{id}', 'UsersController@update');
 Route::post('users/{id}', 'UsersController@update');
-
 Route::get('users/delete/{id}', 'UsersController@delete');
 Route::post('users/delete_user', 'UsersController@delete_user');
-
 Route::post('users/delete_anonymize/{id}','UsersController@delete_anonymize');
-
 Route::post('users/disable_user', 'UsersController@disable_user');
 Route::get('users/{id}/edit', 'UsersExtraController@edit');
 
 //Manage extra emails by admins
-
 
 Route::get('users/{id}/edit/emails', 'ExtraEmailsController@showManageEmailsFromAdmin');
 Route::post('users/{id}/emails/add_new','ExtraEmailsController@addExtraMailFromAdmin');
@@ -180,8 +163,6 @@ Route::get('users/{id}', 'UsersController@edit');
 Route::post('users/delete_user_image', 'UsersController@delete_user_image');
 Route::get('administrators', 'UsersController@administrators');
 Route::post('administrators/sendEmailToCoordinators', 'EmailsController@sendEmailToCoordinators');
-
-
 
 Route::post('store_department_admin', 'UsersController@store_new_department_admin');
 Route::post('store_institution_admin', 'UsersController@store_new_institution_admin');

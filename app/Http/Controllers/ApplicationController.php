@@ -175,8 +175,11 @@ class ApplicationController extends Controller
             return back()->with('error', trans('site.roleChangeRequestDenied'));
         }
 
+        // Set default institution id value for department administrators requesting role upgrade
 
-        //else continue
+        if($user->hasRole("DepartmentAdministrator")){
+            $input['institution_id'] = $user->institutions()->first()->id;
+        }
 
         $institution = $user->institutions()->first();
         $department = $user->departments()->first();

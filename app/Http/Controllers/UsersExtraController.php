@@ -14,6 +14,7 @@ use App\Email;
 use App\ExtraEmail;
 use App\Role;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +82,7 @@ class UsersExtraController extends Controller
      */
     public function updateSsoUser(Requests\UpdateSsoAccountRequest $request, $id)
     {
+        Log::info("Update User: ".json_encode($request->all()));
         // State input values+
 
         $user = User::find($id);
@@ -98,7 +100,6 @@ class UsersExtraController extends Controller
 
         $input = $request->all();
         $input['name'] = $user->email;
-        $institution = $user->institutions()->first();
         $message = trans('controllers.changesSaved');
 
         //Role assignment
@@ -143,15 +144,17 @@ class UsersExtraController extends Controller
             });
         }
 
-        if (isset($input['department_id'])) {
-            //Detaching current institution/department
-            if ($input['department_id'] == "other") {
-                $new_department = Department::create(['title' => $input['new_department'],'institution_id' => $institution->id]);
-                $input['department_id'] = $new_department->id;
-                $custom_values['department'] = "";
-            }
-            $user->departments()->sync([$input['department_id']]);
+        if($auth_user->hasRole('SuperAdmin')){
+            $user->institutions()->sync([$input['institution_id']]);
+        }else{
+            $input['institution_id'] = $user->institutions()->first()->id;
         }
+
+       if ($input['department_id'] == "other") {
+           $new_department = Department::create(['title' => $input['new_department'],'institution_id' => $input['institution_id']]);
+           $input['department_id'] = $new_department->id;
+        }
+        $user->departments()->sync([$input['department_id']]);
         $user->update(array_except($input,['password']));
         return back()->with('message', $message);
     }

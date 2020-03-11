@@ -71,7 +71,7 @@
                         <div class="col-sm-8 form-control-static">
                             @if($user->hasRole('DepartmentAdministrator'))
                             {{ $institution->title }}
-                            <input type="hidden" name="institution_id" value="$institution->id">
+                            <input type="hidden" name="institution_id" value="{{$institution->id}}">
                             @else
                              {!! Form::select('institution_id', ['' => ''] + App\Institution::pluck("title","id")->toArray(), $institution->id, ['id' => 'FieldRoleChangeInstitutionId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                             @endif

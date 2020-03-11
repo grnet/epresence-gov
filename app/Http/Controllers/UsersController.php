@@ -300,12 +300,10 @@ class UsersController extends Controller
         //Validation end
 
         $password = str_random(15);
-
         $input['created_at'] = Carbon::now();
         $input['updated_at'] = Carbon::now();
         $input['password'] = bcrypt($password);
         $input['name'] = $input['dept_admin_email'];
-
         $input['firstname'] = $input['dept_admin_firstname'];
         $input['lastname'] = $input['dept_admin_lastname'];
         $input['email'] = $input['dept_admin_email'];
@@ -315,12 +313,8 @@ class UsersController extends Controller
         $input['new_institution'] = isset($input['dept_admin_new_institution']) ? $input['dept_admin_new_institution'] : null ;
         $input['department_id'] = $input['dept_admin_department_id'];
         $input['new_department'] = isset($input['dept_admin_new_department']) ? $input['dept_admin_new_department'] : null ;
-
-
-
         $input['status'] = 1;
         $input['creator_id'] = Auth::user()->id;
-
         if ($input['state'] == 'sso') {
             $input['activation_token'] = str_random(15);
         }
@@ -346,7 +340,6 @@ class UsersController extends Controller
         $user->institutions()->attach($input['institution_id']);
         $user->departments()->attach($input['department_id']);
 
-
         // Send email to user for the new account
 
         $user->email_for_new_account($password);
@@ -363,9 +356,7 @@ class UsersController extends Controller
                     ->returnPath(env('RETURN_PATH_MAIL'))
                     ->subject($email->title);
             });
-
         }
-
         return back()->with('message', trans('controllers.userAddedActivationEmailSent'));
     }
 

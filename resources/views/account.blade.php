@@ -193,8 +193,6 @@
             @endif
 
             update_ia_inst_selection_ui(false);
-
-
             function update_ia_inst_selection_ui(load_departments){
                 if(RoleChangeInstitutionSelect.val() > 0) {
                     if(load_departments){
@@ -202,7 +200,7 @@
                     }
                 }
                 else {
-                  //  function_clear_inst_admin_selections();
+                    function_clear_inst_admin_selections();
                 }
             }
 
@@ -215,9 +213,6 @@
                     placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
                 });
             }
-
-
-
 
              @if($pop_role_change)
              $("#RequestRoleChangeModal").modal("show");

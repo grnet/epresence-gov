@@ -23,7 +23,8 @@ class UpdateSsoAccountRequest extends Request
             'firstname' => 'required',
             'telephone' => 'required_unless:role,EndUser',
             'thumbnail' => 'image|max:300',
-            'department_id' => 'required_unless:role,SuperAdmin',
+            'institution_id'=>'required',
+            'department_id' => 'required',
             'new_department' => 'required_if:department_id,other',
         ];
     }
@@ -35,13 +36,11 @@ class UpdateSsoAccountRequest extends Request
         return [
             'lastname.required' => trans('requests.lastnameRequired'),
             'firstname.required' => trans('requests.firstnameRequired'),
-
             'telephone.required_unless' => trans('requests.phoneRequired'),
-
             'thumbnail.image' => trans('requests.photoFileType').': jpeg, png, bmp, gif, svg',
             'thumbnail.max' => trans('requests.maxPhotoSize'),
-
-            'department_id.required_unless' => trans('requests.departmentRequired'),
+            'institution_id.required' => trans('requests.institutionRequired'),
+            'department_id.required' => trans('requests.departmentRequired'),
             'new_department.required_if' => trans('requests.newDepartmentRequired'),
         ];
     }
