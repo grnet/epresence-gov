@@ -989,7 +989,6 @@ class Statistics extends Model
                     $query2->whereIn('name', ['InstitutionAdministrator', 'DepartmentAdministrator']);
                 });
         })
-            ->where('slug', '<>', 'other')
             ->count();
 
 

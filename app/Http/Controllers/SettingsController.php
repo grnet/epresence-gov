@@ -3,20 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Settings;
-use App\Conference;
-use App\User;
-use App\Email;
-use DateTime;
-use Validator;
-use Mail;
-use URL;
-use Log;
-
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 class SettingsController extends Controller
 {
@@ -28,7 +19,7 @@ class SettingsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Factory|Response|View
      */
     public function index()
     {
@@ -38,6 +29,9 @@ class SettingsController extends Controller
         return view('settings.index', compact('settings'));
     }
 
+    /**
+     * @return Factory|View
+     */
     public function conferences_settings()
     {
         // Application settings

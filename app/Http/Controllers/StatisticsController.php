@@ -56,12 +56,8 @@ class StatisticsController extends Controller
         if (!Auth::user()->hasRole('SuperAdmin')) {
             abort(403);
         }
-
-        $former_statistics_results = self::get_utilization_results('former');
         $statistics_results = self::get_utilization_results('active');
-
         return view('statistics.utilization', [
-            'former_statistics_results' => $former_statistics_results,
             'statistics_results' => $statistics_results,
             'total_resources'=>Settings::option('conference_totalResources')
         ]);

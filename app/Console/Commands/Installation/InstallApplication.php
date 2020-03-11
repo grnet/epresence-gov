@@ -38,7 +38,6 @@ class InstallApplication extends Command
     public function handle()
     {
         $this->call("install:institutions");
-        $this->call("install:departments");
         $this->info("Installed default institution and departments...");
         $this->call("install:languages");
         $this->call("install:videos");
