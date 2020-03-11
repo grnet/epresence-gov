@@ -97,7 +97,7 @@
 
                 {{--Department section start--}}
 
-                @if(!$user->hasRole('SuperAdmin'))
+                @if(!$user->hasRole('SuperAdmin') && !$user->hasRole('DepartmentAdministrator'))
                     <div class="form-group" id="DepContainer">
                         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">

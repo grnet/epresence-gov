@@ -201,7 +201,7 @@ class AccountController extends Controller
 
         //every sso user can change department except SuperAdmins
 
-        if (isset($input['department_id'])) {
+        if (isset($input['department_id']) && $user->hasRole('InstitutionAdministrator')) {
             if (!empty($input['new_department']) && $input['department_id'] == "other") {
                 $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
                 $input['department_id'] = $new_department->id;

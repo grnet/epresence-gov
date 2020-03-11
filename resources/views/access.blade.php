@@ -190,40 +190,33 @@
         #main-slider {
             background-image: url(/images/slider-prosbasi.jpg);
         }
-
         .img-center {
             display: block;
             margin: 0 auto;
         }
-
         .font-counter {
             font-size: 28px;
             font-weight: bold;
             color: #fff;
         }
-
         .counter-small {
             font-size: 18px;
             color: #fff;
             padding-top: 5px;
         }
-
         h2.orange {
             font-size: 28px;
-            padding: 0px;
-            margin-bottom: 0px;
+            padding: 0;
+            margin-bottom: 0;
         }
-
         .large.tooltip-inner {
             max-width: 350px;
             width: 350px;
         }
-
         .ssoRow {
             display: table;
             width: 100%;
         }
-
         .ssoColumn {
             display: table-cell;
             vertical-align: middle;
