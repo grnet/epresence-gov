@@ -17,6 +17,9 @@ class CreateInstitutionsTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('title');
+            $table->string('contact_name')->nullable();
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
             $table->string('category')->nullable();
             $table->string('type')->nullable();
             $table->integer('ws_id')->nullable();

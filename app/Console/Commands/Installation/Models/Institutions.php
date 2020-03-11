@@ -54,7 +54,6 @@ class Institutions extends Command
         foreach ($iterator as $iteration) {
             if ($counter > 0 && !empty($iteration)) {
                 $csv_row = str_getcsv($iteration, ",", '"');
-                $this->info("Loading row:".$counter);
                 $ws_id = $csv_row[0];
                 $title = $csv_row[1];
                 $api_code = $csv_row[2];

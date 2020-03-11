@@ -105,34 +105,14 @@
                     <div class="form-group">
                         {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
-                            @if($institution->slug == 'other')
-                                {!! Form::select('institution_id', ['' => ''] + App\Institution::whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], 'other', ['id' => 'FieldUserOrg', 'style' => 'width: 100%'])!!}
-                            @else
-                                {!! Form::select('institution_id', ['' => ''] + App\Institution::whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $institution->id, ['id' => 'FieldUserOrg', 'style' => 'width: 100%'])!!}
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group" id="NewOrgContainer">
-                        {!! Form::label('FieldUserOrgNew', trans('users.newInstitution').':', ['class' => 'control-label col-sm-4']) !!}
-                        <div class="col-sm-8">
-
-                            @if($institution->slug == 'other')
-                                {!! Form::text('new_institution', $user->customValues()['institution'], ['class' => 'form-control', 'placeholder' => trans('users.enterInstitutionRequired'), 'id' => 'FieldUserOrgNew']) !!}
-                            @else
-                                {!! Form::text('new_institution', null, ['class' => 'form-control', 'placeholder' => trans('users.enterInstitutionRequired'), 'id' => 'FieldUserOrgNew']) !!}
-                            @endif
-                            <div class="help-block with-errors" style="margin:0px;"></div>
+                                {!! Form::select('institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), $institution->id, ['id' => 'FieldUserOrg', 'style' => 'width: 100%'])!!}
                         </div>
                     </div>
                 @else
                     <div class="form-group">
                         {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($institution->slug == 'other')
-                                {{ $institution->title }} ({{ $user->customValues()['institution'] }})
-                            @else
                                 {{ $institution->title }}
-                            @endif
                         </div>
                     </div>
                 @endif
@@ -145,11 +125,7 @@
                         <div class="form-group" id="DepContainer">
                             {!! Form::label('FieldUserDepart',trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                             <div class="col-sm-8">
-                                @if($department->slug == 'other')
-                                    {!! Form::select('department_id', ['' => ''] + App\Department::whereNotIn('slug', ['other'])->where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], 'other', ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-                                @else
-                                    {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->whereNotIn('slug', ['other'])->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-                                @endif
+                               {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
                             </div>
                         </div>
                         <div class="form-group" id="NewDepContainer">
@@ -166,11 +142,7 @@
                     <div class="form-group">
                         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($department->slug == 'other')
-                            {{ $department->title }} ({{ $user->customValues()['department'] }})
-                            @else
                             {{ $department->title }}
-                            @endif
                         </div>
                     </div>
                 @endif

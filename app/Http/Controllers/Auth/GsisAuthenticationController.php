@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Email;
 use App\Http\Controllers\Controller;
 use App\User;
 use GuzzleHttp\Client;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
 
@@ -31,20 +33,21 @@ class GsisAuthenticationController extends Controller
     {
         // Instantiated gsis oAuth2 server
         $this->server = new GenericProvider([
-            'clientId'                => config('services.gsis.clientId'),
-            'clientSecret'            => config('services.gsis.clientSecret'),
-            'redirectUri'             => config('services.gsis.redirectUri'),
-            'urlAuthorize'            => config('services.gsis.urlAuthorize'),
-            'urlAccessToken'          => config('services.gsis.urlAccessToken'),
+            'clientId' => config('services.gsis.clientId'),
+            'clientSecret' => config('services.gsis.clientSecret'),
+            'redirectUri' => config('services.gsis.redirectUri'),
+            'urlAuthorize' => config('services.gsis.urlAuthorize'),
+            'urlAccessToken' => config('services.gsis.urlAccessToken'),
             'urlResourceOwnerDetails' => config('services.gsis.urlResourceOwnerDetails'),
-            'scopes'=>'read'
+            'scopes' => 'read'
         ]);
     }
 
     /** This method redirects the user to the gsis login page
      * @return RedirectResponse|Redirector
      */
-    public function login(){
+    public function login()
+    {
         return $this->redirectToLoginForm();
     }
 
@@ -53,22 +56,24 @@ class GsisAuthenticationController extends Controller
      * @param $activation_token
      * @return RedirectResponse|Redirector
      */
-    public function register(Request $request,$activation_token){
-        $user = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
-        if($user){
-            session()->put("activation_token",$activation_token);
+    public function register(Request $request, $activation_token)
+    {
+        $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+        if ($user) {
+            session()->put("activation_token", $activation_token);
             return $this->redirectToLoginForm();
-        }else{
-            return redirect('/')->with("error","invalid-token");
+        } else {
+            return redirect('/')->with("error", "invalid-token");
         }
     }
 
     /** This method redirects the user to the gsis login page
      * @return RedirectResponse|Redirector
      */
-    public function redirectToLoginForm(){
+    public function redirectToLoginForm()
+    {
         $authorizationUrl = $this->server->getAuthorizationUrl();
-        session()->put("oauth2state",$this->server->getState());
+        session()->put("oauth2state", $this->server->getState());
         return redirect($authorizationUrl);
     }
 
@@ -78,57 +83,105 @@ class GsisAuthenticationController extends Controller
      * @param Request $request
      * @return RedirectResponse|Redirector
      */
-    public function callback(Request $request){
-        if($request->has('code') && $request->has('state') && session()->has("oauth2state")  && session()->get("oauth2state") == $request->input('state')){
+    public function callback(Request $request)
+    {
+        if ($request->has('code') && $request->has('state') && session()->has("oauth2state") && session()->get("oauth2state") == $request->input('state')) {
             try {
                 $accessToken = $this->server->getAccessToken('authorization_code', [
                     'code' => $request->get('code')
                 ]);
-                $client = new Client(['headers' => ['Authorization' => 'Bearer '.$accessToken]]);
-                $response = $client->request('GET',config('services.gsis.urlResourceOwnerDetails'));
+                $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
+                $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
                 $parsedResponse = simplexml_load_string($response->getBody());
                 // Tax id of the user
                 $taxId = trim($parsedResponse->userinfo['taxid']);
                 $firstName = trim($parsedResponse->userinfo['firstname']);
                 $lastName = trim($parsedResponse->userinfo['lastname']);
-                $user = User::where("tax_id",$taxId)->first();
-
+                $user = User::where("tax_id", $taxId)->first();
                 // User is already registered, checking if user is invited with a new email if so merge the two users, log him in and redirect him to homepage
-                if($user){
-                    if(session()->has("activation_token") && !empty(session()->get("activation_token"))){
+                if ($user) {
+                    if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
                         $activation_token = session()->pull("activation_token");
-                        $userOfToken = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
-                        if($userOfToken){
-                            //Give the user the invited roles if they are higher than the current role
-                            //toDo define what needs to be done here - role upgrading ? what about the institution - department
-//                            $currentRole = $user->roles()->first();
-//                            $tokenUserRole = $userOfToken->roles()->first();
-//                            if($currentRole->id > $tokenUserRole->id){
-//                                $user->roles()->sync($userOfToken->roles()->pluck('id')->toArray());
-//                            }
-                            $user->merge_user($userOfToken->id,true);
+                        $userOfToken = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+                        if ($userOfToken) {
+                            $currentRole = $user->roles()->first();
+                            $currentInstitution = $user->institutions()->first();
+                            $currentDepartment = $user->departments()->first();
+                            $tokenUserRole = $userOfToken->roles()->first();
+                            $tokenUserInstitution = $userOfToken->institutions()->first();
+                            $tokenUserDepartment = $userOfToken->departments()->first();
+                            if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
+                                //Invited user is Administrator
+                                if (in_array($currentRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
+                                    //Current user is Administrator && invited user is Administrator
+                                    $isSame = $currentRole->id == $tokenUserRole->id &&
+                                        $currentInstitution->id == $tokenUserInstitution->id &&
+                                        $currentDepartment->id == $tokenUserDepartment->id;
+                                    if (!$isSame) {
+                                        //Notify invited user creator & support that the request could not be completed
+                                        $recipients[] = $userOfToken->creator->email;
+                                        $recipients[] = env('RETURN_PATH_MAIL');
+                                        $parameters = [
+                                            'invitation_email_address' => $userOfToken->email,
+                                            'requested_role_name' => $tokenUserRole->name,
+                                            'requested_institution_name' => $tokenUserInstitution->title,
+                                            'requested_department_name' => $tokenUserDepartment->title,
+                                            'email_address' => $user->email,
+                                            'role_name' => $currentRole->name,
+                                            'institution_name' => $currentInstitution->title,
+                                            'department_name' => $currentDepartment->title,
+                                        ];
+                                        $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
+                                        Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
+                                            $message->from($email->sender_email, 'e:Presence')
+                                                ->to($recipients)
+                                                ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
+                                                ->returnPath(env('RETURN_PATH_MAIL'))
+                                                ->subject($email->title);
+                                        });
+                                    }
+
+                                } else {
+                                    //Current user is end user && invited user is Administrator
+                                    $user->roles()->sync([$tokenUserRole->id]);
+                                    $user->institutions()->sync([$tokenUserInstitution->id]);
+                                    $user->departments()->sync([$tokenUserDepartment->id]);
+                                    $recipients[] = $user->email;
+                                    $parameters = ['new_role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
+                                    $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
+                                    Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
+                                        $message->from($email->sender_email, 'e:Presence')
+                                            ->to($recipients)
+                                            ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
+                                            ->returnPath(env('RETURN_PATH_MAIL'))
+                                            ->subject($email->title);
+                                    });
+                                }
+                            }
+                            $user->merge_user($userOfToken->id, true);
                         }
                     }
                     Auth::login($user);
                     return redirect('/');
-                }else{
-                // User is not registered checking is there is a valid activation token in the session, if so
-                // match authenticated user with the invited account
-                    if(session()->has("activation_token") && !empty(session()->get("activation_token"))){
+                } else {
+                    // User is not registered checking is there is a valid activation token in the session, if so
+                    // match authenticated user with the invited account
+                    if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
                         $activation_token = session()->pull("activation_token");
-                        $user = User::where("confirmed",false)->where("activation_token",$activation_token)->first();
-                        if($user){
-                            $user->update(['firstname'=>$firstName,'lastname'=>$lastName,'tax_id'=>$taxId,'confirmed'=>true,'activation_token'=>null]);
+                        $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+                        if ($user) {
+                            $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
                             $user->create_join_urls();
                             Auth::login($user);
                             return redirect('/');
                         }
                     }
                 }
-            } catch (IdentityProviderException $e) {
-                Log::error("GsisAuthenticationController callback IdentityProviderException:".$e->getMessage());
+            } catch
+            (IdentityProviderException $e) {
+                Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
-        return redirect('/')->with("error","auth-error");
+        return redirect('/')->with("error", "auth-error");
     }
 }

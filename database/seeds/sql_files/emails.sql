@@ -61,7 +61,11 @@ INSERT INTO `emails` (`id`, `name`, `title`, `body`, `sender_email`, `created_at
 (32, 'anonymizedAccount', 'Απενεργοποίηση λογαριασμού e:Presence (account deactivation)', NULL, 'no-reply@epresence.gr', '2016-02-24 23:00:00', '2016-02-24 23:00:00'),
 (33, 'participantDeletedCoordinatorsInactivity', 'e:Presence: Αυτόματη Διαγραφή συμμετέχοντα σε τηλεδιάσκεψή σας λόγω αδρανούς λογαριασμού', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00'),
 (34, 'participantDeletedCoordinatorsSelf', 'e:Presence: Διαγραφή συμμετέχοντα σε τηλεδιάσκεψή σας', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00'),
-(35, 'updatedInstitution', 'Σχετικά με τον λογαριασμό σας στο e:Presence', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00');
+(35, 'updatedInstitution', 'Σχετικά με τον λογαριασμό σας στο e:Presence', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00'),
+(36, 'invitationRoleChangeRequestNotCompleted', 'Η πρόσκληση δεν μπόρεσε να ολοκληρωθεί', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00'),
+(37, 'accountDetailsUpdated', 'Τα στοιχεία του λογαριασμού σας άλλαξαν', NULL, 'no-reply@epresence.gr', '2016-06-20 18:00:00', '2016-06-20 18:00:00');
+
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

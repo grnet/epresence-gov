@@ -14,19 +14,21 @@
 
 
 Route::get('/', function () {
-    if(Auth::check() && !Auth::user()->confirmed)
-        return redirect('account_activation');
+    if(Auth::check() && !Auth::user()->confirmed){
+        Auth::logout();
+        return redirect('/');
+    }
     else
-        return view('epresence');
-
+    return view('epresence');
 });
 
 Route::get('/home', function () {
-    if(Auth::check() && !Auth::user()->confirmed)
-        return redirect('account_activation');
+    if(Auth::check() && !Auth::user()->confirmed){
+        Auth::logout();
+        return redirect('/');
+    }
     else
         return view('epresence');
-
 });
 
 //Access static page
