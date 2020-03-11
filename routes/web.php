@@ -97,7 +97,7 @@ Route::post('users/request_role_change', 'ApplicationController@requestRoleChang
 Route::post('applications/decline_application','ApplicationController@decline_application');
 Route::post('applications/accept_application','ApplicationController@accept_application');
 Route::get('administrators/applications', 'ApplicationController@index');
-Route::post('store_admin_application', 'ApplicationController@store_admin_application');
+//Route::post('store_admin_application', 'ApplicationController@store_admin_application');
 Route::get('/email_activation/{token}', 'ExtraEmailsController@ConfirmExtraEmail');
 
 // Change Language
