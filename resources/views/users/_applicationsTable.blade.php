@@ -6,7 +6,6 @@
         <th class="cellId">User Id</th>
         <th class="cellName sortingasc" id="sort_lastname">{{trans('users.fullName')}}</th>
         <th class="cellRole">{{trans('users.requestedRole')}}</th>
-        <th class="cellState sorting hidden-xs" id="sort_state">{{trans('users.localUserShort')}}</th>
         <th class="cellOrg hidden-xs">{{trans('users.institution')}}</th>
         <th class="cellDepart hidden-xs">{{trans('users.department')}}</th>
         <th class="cellStatus sorting" id="sort_status">{{trans('users.status')}}</th>
@@ -25,22 +24,8 @@
                 <td>{{$application->user->id}}</td>
                 <td class="cellName sorting main_table">{{ $application->user->lastname }} {{ $application->user->firstname }}</td>
                 <td class="cellRole main_table">{{ trans($application->role->label) }}</td>
-                <td class="cellState hidden-xs main_table">{{ $application->user->state_string($application->user->state) }}</td>
-                @if($application->user->institutions()->first()->slug == 'other')
-                    <td class="cellOrg hidden-xs main_table">{{ $application->user->institutions()->first()->title or trans('users.notDefinedYet') }}
-                        ({{ ($application->user->customValues()['institution']) }})
-                    </td>
-                @else
-                    <td class="cellOrg hidden-xs  main_table">{{ $application->user->institutions()->first()->title  or trans('users.notDefinedYet')}}</td>
-                @endif
-
-                @if($application->user->departments()->first()->slug == 'other')
-                    <td class="cellDepart hidden-xs main_table">{{ $application->user->departments()->first()->title or trans('users.notDefinedYet') }}
-                        ({{ ($application->user->customValues()['department']) }})
-                    </td>
-                @else
-                    <td class="cellDepart hidden-xs  main_table">{{ $application->user->departments()->first()->title  or trans('users.notDefinedYet')}}</td>
-                @endif
+                <td class="cellOrg hidden-xs  main_table">{{ $application->user->institutions()->first()->title  or trans('users.notDefinedYet')}}</td>
+                <td class="cellDepart hidden-xs  main_table">{{ $application->user->departments()->first()->title  or trans('users.notDefinedYet')}}</td>
                 <td class="cellState hidden-xs main_table">{{ $application->getStatusString() }}</td>
                 <td class="cellCreationDate hidden-xs sorting main_table">{{ $application->created_at }}</td>
                 <td class="cellButton center main_table">
@@ -66,20 +51,16 @@
                                     <span class="table-span"><strong>Σχόλια αίτησης:</strong> {{ $application->comment }}</span><br/>
                                     <span class="table-span"><strong>{{trans('users.fullName')}} :</strong> {{ $application->user->lastname }} {{ $application->user->firstname }} </span><br/>
                                     <span class="table-span"><strong>Email:</strong> {{ $application->user->email }}<br/></span>
-                                    <?php
-                                    $extra_emails_sso = $application->user->extra_emails_sso()->toArray();
-                                    $extra_emails_custom = $application->user->extra_emails_custom()->toArray();
-                                    ?>
                                     <div>
-                                        @if((count($extra_emails_sso)+count($extra_emails_custom))>0)
+                                        @if((count($application->user->extra_emails_sso()->toArray())+count($application->user->extra_emails_custom()->toArray()))>0)
                                             <span style="font-weight:bold;">{{trans('users.extraEmail')}}:</span>
-                                            @foreach($extra_emails_sso as $mail)
+                                            @foreach($application->user->extra_emails_sso()->toArray() as $mail)
                                                 <div style="color:green;">
                                                     {{$mail['email']}} (sso {{trans('users.emailConfirmedShort')}})
                                                 </div>
                                             @endforeach
                                             <div style="padding-bottom:7px;">
-                                                @foreach($extra_emails_custom as $mail)
+                                                @foreach($application->user->extra_emails_custom()->toArray() as $mail)
                                                     @if($mail['confirmed'] == 0)
                                                         <div style="color:red;">
                                                             {{$mail['email']}}
@@ -103,16 +84,10 @@
                                     <br/>
                                     {{--//FIX CUSTOM VALUES--}}
                                     <strong>{{trans('users.requestedRole')}}:</strong> {{ trans($application->role->label) }}<br/>
-                                    @if($application->user->institutions()->first()->slug == 'other')
-                                        <span class="table-span"><strong>{{trans('users.institution')}}:</strong> {{ $application->user->institutions()->first()->title }} ({{ ($application->user->customValues()['institution']) }})</span><br/>
-                                    @else
-                                        <span class="table-span"><strong>{{trans('users.institution')}} :</strong> {{ $application->user->institutions->first()->title or trans('users.notDefinedYet') }}</span><br/>
-                                    @endif
-                                    @if($application->user->departments()->first()->slug == 'other')
-                                        <span class="table-span"><strong>{{trans('users.department')}}:</strong> {{ $application->user->departments()->first()->title }}({{ ($application->user->customValues()['department']) }})</span>
-                                    @else
-                                        <span class="table-span"><strong>{{trans('users.department')}}:</strong> {{ $application->user->departments->first()->title or trans('users.notDefinedYet') }}</span>
-                                    @endif
+                                    <strong>{{trans('users.requestedInstitution')}}:</strong> {{ trans($application->institution->title) }}<br/>
+                                    <strong>{{trans('users.requestedDepartment')}}:</strong> {{ trans($application->department->title) }}<br/>
+                                    <span class="table-span"><strong>{{trans('users.institution')}} :</strong> {{ $application->user->institutions->first()->title or trans('users.notDefinedYet') }}</span><br/>
+                                    <span class="table-span"><strong>{{trans('users.department')}}:</strong> {{ $application->user->departments->first()->title or trans('users.notDefinedYet') }}</span>
                                     <br/><span class="table-span"><strong>{{trans('users.otherInstitutionModerators')}}:</strong><br/>
                                     @foreach($application->user->institutions()->first()->institutionAdmins() as $institutionAdmin)
                                             <a href="/users/{{ $institutionAdmin->id }}/edit"

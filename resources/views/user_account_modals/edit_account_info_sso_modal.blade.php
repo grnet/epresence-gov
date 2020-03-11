@@ -98,7 +98,7 @@
 
                 @if(!$user->hasRole('SuperAdmin'))
                     <div class="form-group" id="DepContainer">
-                        {!! Form::label('FieldUserDepart', trans('users.department').':'.$department->title, ['class' => 'control-label col-sm-4']) !!}
+                        {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
                          {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
                         </div>

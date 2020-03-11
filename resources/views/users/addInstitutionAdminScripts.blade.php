@@ -20,7 +20,6 @@
             allowClear: true,
             placeholder: "{!!trans('users.selectInstitutionRequired')!!}"
         }).on("change", function () {
-
             update_ia_inst_selection_ui(true);
         });
 
@@ -28,24 +27,18 @@
 
 
         function update_ia_inst_selection_ui(load_departments){
-
             if (InstitutionAdminOrg.val() === "other") {
                 InstitutionAdminOrgNewContainer.show();
                 InstitutionAdminDepContainer.hide();
                 InstitutionAdminDepNewContainer.show();
             }
             else if (InstitutionAdminOrg.val() > 0 && InstitutionAdminOrg.val() !== "other") {
-
                 if(load_departments){
                     InstitutionAdminDep.select2("data", null, {allowClear: true}).load("/institutions/departments/" + InstitutionAdminOrg.val());
-
                 }else{
-
                    if(InstitutionAdminDep.val() === "other")
                        InstitutionAdminDepNewContainer.show();
-
                 }
-
                 InstitutionAdminOrgNewContainer.hide();
             }
             else {
@@ -54,7 +47,6 @@
         }
 
         InstitutionAdminDep.select2({placeholder: "{!!trans('users.selectInstitutionFirst')!!}"});
-
         InstitutionAdminDep.on("change", function () {
 
             if (InstitutionAdminDep.val() === "other") {

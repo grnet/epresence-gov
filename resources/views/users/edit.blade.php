@@ -97,12 +97,6 @@
 
                 } else if (parseInt(organization_select_field.val()) === {{ $institution->id or null }}) {
 
-					if (user_dep == {{$institution->otherDepartment()->id}}) {
-                        new_org_container.hide();
-                        new_dep_container.show();
-                        new_custom_department_field.show();
-                        dep_container.show();
-                    } else {
                         new_org_container.hide();
                         new_dep_container.hide();
                         dep_container.show();
@@ -110,18 +104,13 @@
                         department_select_field.select2().load("/institutions/departments/" + organization_select_field.val(),function(){
 
 							@if($department)
-							@if($department->slug=="other")
-                            department_select_field.val('other');
-							@else
                             department_select_field.val({{$department->id}});
-							@endif
 							@else
                            // department_select_field.select2("val","");
                             department_select_field.select2({placeholder: "{!!trans('site.selectDepartment')!!}",val:""});
 							@endif
 
                         });
-                    }
                 }
             }).trigger("change");
 
@@ -325,15 +314,9 @@
 					{{ session('message') }}
 				</div>
 			@endif
-
 				{!! Form::model($user, array('url' => ['users/' . $user->id.'/'.$user->state], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form', 'files' => true)) !!}
-				@if($user->state=="local")
-				@include('users.edit_local_user_form')
-				@else
 				@include('users.edit_sso_user_form')
-				@endif
 				{!! Form::close() !!}
-
 			</div>                        
 		</div><!--/.box-->
 <!-- Form Details -END -->

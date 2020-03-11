@@ -119,10 +119,9 @@ class InstitutionsController extends Controller
 
     /**
      * @param $id
-     * @param null $department_id
      * @return string
      */
-	public function listDepartments($id, $department_id = null)
+	public function listDepartments($id)
 	{
         $institution = Institution::findOrFail($id);
 		$departments = $institution->departments()->orderBy('title')->get();
@@ -130,7 +129,9 @@ class InstitutionsController extends Controller
 		foreach($departments as $department){
             $html .= '<option value="'.$department->id.'">'.$department->title.'</option>';
 		}
-        $html .= '<option value="other">'.trans('controllers.other').'</option>';
+		if(!request()->has('include_other') || request()->input('include_other') == 1){
+            $html .= '<option value="other">'.trans('controllers.other').'</option>';
+        }
 		return $html;
 	}
 

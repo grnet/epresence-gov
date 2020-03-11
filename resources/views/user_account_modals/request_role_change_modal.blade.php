@@ -56,14 +56,11 @@
                         {!! Form::label('FieldCoordDepartRole', trans('site.role').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8">
                             <div class="input-group">
-                                @if($user->hasRole('InstitutionAdministrator'))
-                                {!! Form::select('application_role', ['' => ''] + ['DepartmentAdministrator' => trans('site.departmentModerator')], null, ['id' => 'FieldCoordDepartRole', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
-                                @elseif($user->hasRole('DepartmentAdministrator'))
+                                @if($user->hasRole('DepartmentAdministrator'))
                                     {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator')], null, ['id' => 'FieldCoordDepartRole', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                                 @else
                                     {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator'), 'DepartmentAdministrator' => trans('site.departmentModerator')], null, ['id' => 'FieldCoordDepartRole', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                                 @endif
-
                                 <span id="helpBlockRole" class="help-block" style="text-align: left;">{{trans('site.selectRole')}}</span>
                             </div>
                         </div>
@@ -72,26 +69,21 @@
                     <div class="form-group">
                         {!! Form::label('FieldCoordDepartOrg', trans('site.institution').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($institution->slug == 'other')
-                                {{ $institution->title }} ({{ $user->customValues()['institution'] }})
+                            @if($user->hasRole('DepartmentAdministrator'))
+                            {{ $institution->title }}
+                            <input type="hidden" name="institution_id" value="$institution->id">
                             @else
-                                {{ $institution->title }}
+                             {!! Form::select('institution_id', ['' => ''] + App\Institution::pluck("title","id")->toArray(), $institution->id, ['id' => 'FieldRoleChangeInstitutionId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                             @endif
-                            <div class="help-block with-errors" style="margin:0px;"></div>
+                            <div class="help-block with-errors" style="margin:0;"></div>
                         </div>
                     </div>
-
                     <div class="form-group">
                         {!! Form::label('FieldCoordDepartDepart', trans('site.department').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($department->slug == 'other')
-                                {{ $department->title }} ({{ $user->customValues()['department'] }})
-                            @else
-                                {{ $department->title }}
-                            @endif
+                            {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id',old('institution_id',$institution->id))->pluck("title","id")->toArray(), $department->id, ['id' => 'FieldRoleChangeDepartmentId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                         </div>
                     </div>
-
                     <div class="form-group" id="FieldCoordDepartDepartFormGroup">
                         {!! Form::label('FieldCoordDepartComment', trans('site.description').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8">

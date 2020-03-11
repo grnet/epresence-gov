@@ -5,31 +5,38 @@ namespace App\Http\Controllers;
 use App\Application;
 use App\Department;
 use App\Institution;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use URL;
-use Auth;
-use Session;
-use Input;
-use Gate;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Gate;
 use App\User;
-use Log;
-use Validator;
+use Illuminate\Validation\Validator;
 use App\Role;
-use Mail;
+use Illuminate\Support\Facades\Mail;
 use App\Email;
-use Carbon\Carbon;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 class ApplicationController extends Controller
 {
 
+    /**
+     * ApplicationController constructor.
+     */
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['store_admin_application', 'redirect_sso_login_to_account_application', 'redirect_local_login_to_account_application']]);
     }
 
+    /**
+     * @return Factory|View
+     */
     public function index()
     {
         if (!is_null(Session::get('previous_url'))) {
@@ -54,214 +61,52 @@ class ApplicationController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function accept_application(Request $request)
     {
-
-
         $application = Application::find($request->application_id);
-
         //Check if the application is already processed by another admin
-
         if ($application->app_state == "new") {
 
+            $user = $application->user;
+            $current_role = $user->roles()->first();
+            $attached_role = Role::find($application->role_id);
+            $user->roles()->detach($current_role->id);
+            $user->roles()->attach($application->role_id);
+            $user->update(['comment' => $application->comment]);
+            $institution = $user->institutions()->first();
+            $department = $user->departments()->first();
 
-            //User already exists
+            //If institution is other create institution & department (if role requested is department administrator)
 
-            if (isset($application->user)) {
+            $user->institutions()->sync([$application->institution_id]);
+            $user->departments()->sync([$application->department_id]);
 
+            //Get institution admins emails / departments admins email to notify them also about the new application
 
-                $user = $application->user;
+            $admins_to_notify = $institution->institutionAdmins()->pluck('email')->toArray();
 
-                $current_role = $user->roles()->first();
+            if ($attached_role->name == "DepartmentAdministrator") {
 
-                $attached_role = Role::find($application->role_id);
+                $dep_admins_to_notify = $department->departmentAdmins()->pluck('email')->toArray();
+                $admins_to_notify = array_merge($dep_admins_to_notify, $admins_to_notify);
+            }
 
-                $user->roles()->detach($current_role->id);
-                $user->roles()->attach($application->role_id);
 
-                $user->update(['comment' => $application->comment]);
+            $email = Email::where('name', 'applicationAccepted')->first();
+            $parameters = array('contact_url' => URL::to("contact"));
+            if ($user->status == 1) {
 
-                $institution = $user->institutions()->first();
-                $department = $user->departments()->first();
-
-
-                //If institution is other create institution & department (if role requested is department administrator)
-
-                if ($institution->slug == "other") {
-                    $new_institution = new Institution;
-                    $new_institution->title = $user->customValues()['institution'];
-                    $new_institution->slug = "NoID";
-                    $new_institution->shibboleth_domain = null;
-                    $new_institution->url = null;
-
-                    $new_institution->save();
-
-                    $new_admin_department = Department::create(['title' => trans('controllers.administration'), 'slug' => 'admin', 'institution_id' => $new_institution->id]);
-                    Department::create(['title' => trans('controllers.other'), 'slug' => 'other', 'institution_id' => $new_institution->id]);
-
-                    $application->institution_id = $new_institution->id;
-
-                    if ($attached_role->name == "InstitutionAdministrator") {
-                        $application->department_id = $new_admin_department->id;
-                    } else {
-                        $new_department = Department::create(['title' => $user->customValues()['department'], 'slug' => 'noID', 'institution_id' => $new_institution->id]);
-                        $application->department_id = $new_department->id;
-                    }
-
-                    $user->departments()->detach($user->departments()->pluck('id')->toArray());
-                    $user->institutions()->detach($user->institutions()->pluck('id')->toArray());
-
-
-                    $user->institutions()->attach($application->institution_id);
-                    $user->departments()->attach($application->department_id);
-
-                    $application->update();
-
-                }else{
-
-                    //If department is other and institution is not other  and role requested is department administrator create other department
-
-                    if ($department->slug == "other"  && $attached_role->name == "DepartmentAdministrator") {
-
-                        $new_department = Department::create(['title' => $user->customValues()['department'], 'slug' => 'noID', 'institution_id' => $institution->id]);
-
-                        $application->department_id = $new_department->id;
-
-                        $application->update();
-
-                        $user->departments()->detach($user->departments()->pluck('id')->toArray());
-
-                        $user->departments()->attach($application->department_id);
-                    }
-                }
-
-
-
-                //Get institution admins emails / departments admins email to notify them also about the new application
-
-                $admins_to_notify = $institution->institutionAdmins()->pluck('email')->toArray();
-
-                if ($attached_role->name == "DepartmentAdministrator") {
-
-                    $dep_admins_to_notify = $department->departmentAdmins()->pluck('email')->toArray();
-                    $admins_to_notify = array_merge($dep_admins_to_notify, $admins_to_notify);
-                }
-
-
-                $email = Email::where('name', 'applicationAccepted')->first();
-                $parameters = array('contact_url' => URL::to("contact"));
-                if($user->status == 1){
-
-                    Mail::send('emails.application_accepted', $parameters, function ($message) use ($user, $email) {
-                        $message->from($email->sender_email, 'e:Presence')
-                            ->to($user->email)
-                            ->replyTo($email->sender_email, 'e:Presence')
-                            ->returnPath(env('RETURN_PATH_MAIL'))
-                            ->subject($email->title);
-                    });
-                 }
-
-
-            } else {
-
-                //New user
-                //Email Validation
-
-                $data['email'] = $application->email;
-
-                $validator = Validator::make($data, [
-                    'email' => "required|email|unique:users,email|unique:users_extra_emails,email,NULL,id,confirmed,1",
-                ], [
-                    'email.required' => trans('requests.emailRequired'),
-                    'email.unique' => trans('requests.emailNotUnique'),
-                    'email.email' => trans('requests.emailInvalid'),
-                ]);
-
-                if ($validator->fails()) {
-                    return response()->json(['errors' => $validator->errors()]);
-                }
-
-                $attached_role = Role::find($application->role_id);
-
-                //Handle custom_values institution creation | custom_values department creation
-
-                if ($application->institution->slug == "other") {
-
-                    $new_institution = new Institution;
-                    $new_institution->title = $application->customValues()['institution'];
-                    $new_institution->slug = "NoID";
-                    $new_institution->shibboleth_domain = null;
-                    $new_institution->url = null;
-
-                    $new_institution->save();
-
-                    $new_admin_department = Department::create(['title' => trans('controllers.administration'), 'slug' => 'admin', 'institution_id' => $new_institution->id]);
-                    Department::create(['title' => trans('controllers.other'), 'slug' => 'other', 'institution_id' => $new_institution->id]);
-
-                    $application->institution_id = $new_institution->id;
-
-                    if ($attached_role->name == "InstitutionAdministrator") {
-                        $application->department_id = $new_admin_department->id;
-                    } else {
-                        $new_department = Department::create(['title' => $application->customValues()['department'], 'slug' => 'noID', 'institution_id' => $new_institution->id]);
-                        $application->department_id = $new_department->id;
-                    }
-
-                    $application->update();
-
-                }else{
-
-                    //If department is other and institution is not other  and role requested is department administrator create other department
-
-                    if ($application->department->slug == "other"  && $attached_role->name == "DepartmentAdministrator") {
-
-                        $new_department = Department::create(['title' => $application->customValues()['department'], 'slug' => 'noID', 'institution_id' =>  $application->institution_id]);
-                        $application->department_id = $new_department->id;
-                        $application->update();
-                    }
-                }
-
-
-                $user = new User;
-                $password = str_random(15);
-
-                $user->email = $application->email;
-                $user->name = $application->email;
-                $user->firstname = $application->firstname;
-                $user->lastname = $application->lastname;
-                $user->telephone = $application->telephone;
-                $user->password = bcrypt($password);
-                $user->comment = $application->comment;
-                $user->status = 1;
-                $user->confirmed = false;
-
-                $user->custom_values = $application->custom_values;
-
-                $user->state = 'local';
-
-                $user->creator_id = Auth::user()->id;
-                $user->save();
-
-
-                $user->assignRole($attached_role->name);
-
-                //MANAGE institutions-departments
-
-                $user->institutions()->attach($application->institution_id);
-                $user->departments()->attach($application->department_id);
-
-
-                $admins_to_notify = $user->institutions()->first()->institutionAdmins()->pluck('email')->toArray();
-
-                if ($attached_role->name == "DepartmentAdministrator") {
-
-                    $dep_admins_to_notify = $user->departments()->first()->departmentAdmins()->pluck('email')->toArray();
-
-                    $admins_to_notify = array_merge($dep_admins_to_notify, $admins_to_notify);
-                }
-
-
-                $user->email_for_new_account($password);
+                Mail::send('emails.application_accepted', $parameters, function ($message) use ($user, $email) {
+                    $message->from($email->sender_email, 'e:Presence')
+                        ->to($user->email)
+                        ->replyTo($email->sender_email, 'e:Presence')
+                        ->returnPath(env('RETURN_PATH_MAIL'))
+                        ->subject($email->title);
+                });
             }
 
             //Send notification email to department/institution admin about the acceptance of the application
@@ -294,15 +139,16 @@ class ApplicationController extends Controller
                         ->subject($email_for_admins->title);
                 });
             }
-
-
             $application->app_state = 'finalised';
             $application->update();
         }
-
         return response()->json(['status' => 'success']);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function decline_application(Request $request)
     {
         $application = Application::find($request->application_id);
@@ -313,6 +159,10 @@ class ApplicationController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    /**
+     * @param Requests\RequestRoleChangeRequest $request
+     * @return RedirectResponse
+     */
     public function requestRoleChange(Requests\RequestRoleChangeRequest $request)
     {
 
@@ -321,9 +171,10 @@ class ApplicationController extends Controller
 
         //If there is already a pending application from this user deny the application
 
-        if($user->applications()->where('app_state','new')->exists()){
-            return back()->with('error',trans('site.roleChangeRequestDenied'));
+        if ($user->applications()->where('app_state', 'new')->exists()) {
+            return back()->with('error', trans('site.roleChangeRequestDenied'));
         }
+
 
         //else continue
 
@@ -348,6 +199,8 @@ class ApplicationController extends Controller
         $new_application->user_state = 'existing';
         $new_application->app_state = 'new';
         $new_application->comment = $input['application_comment'];
+        $new_application->institution_id = $input['institution_id'];
+        $new_application->department_id = $input['department_id'];
         $new_application->save();
 
         $user->telephone = $input['application_telephone'];
@@ -393,6 +246,10 @@ class ApplicationController extends Controller
         return back()->with('message', trans('requests.applicationSaved'));
     }
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function store_admin_application(Request $request)
     {
         //This method is used only by local-users that don't have an account yet

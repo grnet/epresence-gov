@@ -79,9 +79,6 @@
             // ΣΥΝΑΡΤΗΣΕΙΣ ΣΧΕΤΙΚΕΣ ΜΕ ΤΟΝ ΣΥΝΤΟΝΙΣΤΗ ΤΜΗΜΑΤΟΣ
 
             $("#FieldCoordDepartRole").select2({placeholder: "{!!trans('site.selectRoleRequired')!!}"});
-
-
-
             $( "#FieldCoordDepartTerms" ).on("change", function() {
                 if ($("#FieldCoordDepartTerms").val()==0) {
                     $( "#CoordDepartSubmitBtnNew" ).addClass("disabled");
@@ -89,9 +86,6 @@
                     $( "#CoordDepartSubmitBtnNew" ).removeClass("disabled");
                 }
             });
-
-
-
             // Close Button στο modal Διαχειριστή
             $("#CoordDepartModalButtonClose").click(function() {
                 $("#CoordDepart").modal("hide");
@@ -177,24 +171,66 @@
             @else
             $("#UserModal").modal("show");
             @endif
+            @endif
+            @if($canRequestRoleChange)
 
+            let RoleChangeDepartmentSelect = $("#FieldRoleChangeDepartmentId");
+
+            RoleChangeDepartmentSelect.select2({
+                allowClear: true,
+                placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
+            });
+
+            @if(!$user->hasRole('DepartmentAdministrator'))
+            let RoleChangeInstitutionSelect = $("#FieldRoleChangeInstitutionId");
+
+            RoleChangeInstitutionSelect.select2({
+                allowClear: true,
+                placeholder: "{!!trans('users.selectInstitutionRequired')!!}"
+            }).on("change", function () {
+                update_ia_inst_selection_ui(true);
+            });
             @endif
 
+            update_ia_inst_selection_ui(false);
+
+
+            function update_ia_inst_selection_ui(load_departments){
+                if(RoleChangeInstitutionSelect.val() > 0) {
+                    if(load_departments){
+                        RoleChangeDepartmentSelect.select2("data", null, {allowClear: true}).load("/institutions/departments/" + RoleChangeInstitutionSelect.val()+"?include_other=0");
+                    }
+                }
+                else {
+                  //  function_clear_inst_admin_selections();
+                }
+            }
+
+            function function_clear_inst_admin_selections(){
+                RoleChangeInstitutionSelect.select2("data", null, {allowClear: true});
+                RoleChangeDepartmentSelect.html('<option value=""></option>');
+                RoleChangeDepartmentSelect.select2("data", null, {allowClear: true});
+                RoleChangeDepartmentSelect.select2({
+                    allowClear: true,
+                    placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
+                });
+            }
+
+
+
+
              @if($pop_role_change)
-
-                 @if($canRequestRoleChange)
-                 $("#RequestRoleChangeModal").modal("show");
-                 @else
-                 alert('{!! trans('site.roleChangeRequestDenied')!!}');
-                 @endif
-
+             $("#RequestRoleChangeModal").modal("show");
              @endif
 
+            @else
+            @if($pop_role_change)
+            alert('{!! trans('site.roleChangeRequestDenied')!!}');
+            @endif
+            @endif
         });
     </script>
-
 @endsection
-
 @section('extra-css')
 
     <style>
@@ -211,7 +247,7 @@
         }
 
         .table > tbody > tr > td {
-            border-top: 0px;
+            border-top: 0;
             border-bottom: 1px solid #DDD;
         }
 

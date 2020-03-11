@@ -68,7 +68,7 @@ class LoginController extends Controller
             $user = User::where('email', $request->email)->first();
             if($user->status == 0){
                 $errorMessage = trans('controllers.userEmailDeactivated');
-            }elseif($user->state == 'sso' || !$user->hasRole("SuperAdmin")){
+            }elseif(!$user->hasRole("SuperAdmin")){
                 $errorMessage = trans('controllers.userMustLoginSso');
             }
 
