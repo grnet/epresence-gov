@@ -28,56 +28,32 @@
 
    	<script type="text/javascript">
 
-        function openNewInstModal(){
-
-
-            $(".select2-drop").css("display", "none");
-            $("#newInstitutionTitle").val($('#select2-drop .select2-search input').val());
-            $("#select2-drop-mask").css("display", "none");
-
-
-
-            $('[id^=Field]').prop('disabled', false);
-            $('[id^=SubmitBtn]').hide();
-            $("#SubmitBtnNew").show();
-            $("#OrgModalLabel").text("{!!trans('deptinst.addNewInstitution')!!}");
-            $("#slug").val("");
-            $("#title").val("");
-            $("#url").val("");
-            $("#contact_name").val("");
-            $("#FieldOrgΑminΝame").val("");
-            $("#contact_email").val("");
-            $("#contact_phone").val("");
-            $("#OrgModalMessage").hide();
-            $("#OrgModal").modal("show");
-
-            $("#ModalButtonClose").click(function() {
-                $("#OrgModal").modal("hide");
-            });
-
-
-
-        }
-
-
-
+        {{--function openNewInstModal(){--}}
+        {{--    $(".select2-drop").css("display", "none");--}}
+        {{--    $("#newInstitutionTitle").val($('#select2-drop .select2-search input').val());--}}
+        {{--    $("#select2-drop-mask").css("display", "none");--}}
+        {{--    $('[id^=Field]').prop('disabled', false);--}}
+        {{--    $('[id^=SubmitBtn]').hide();--}}
+        {{--    $("#SubmitBtnNew").show();--}}
+        {{--    $("#OrgModalLabel").text("{!!trans('deptinst.addNewInstitution')!!}");--}}
+        {{--    $("#slug").val("");--}}
+        {{--    $("#title").val("");--}}
+        {{--    $("#url").val("");--}}
+        {{--    $("#contact_name").val("");--}}
+        {{--    $("#FieldOrgΑminΝame").val("");--}}
+        {{--    $("#contact_email").val("");--}}
+        {{--    $("#contact_phone").val("");--}}
+        {{--    $("#OrgModalMessage").hide();--}}
+        {{--    $("#OrgModal").modal("show");--}}
+        {{--    $("#ModalButtonClose").click(function() {--}}
+        {{--        $("#OrgModal").modal("hide");--}}
+        {{--    });--}}
+        {{--}--}}
 
 
         $(document).ready(function() {
 				
 		$('[data-toggle="tooltip"]').tooltip();
-		
-		// Advanced search
-		{{--$("#searchInstitution").select2({--}}
-			{{----}}
-			{{--allowClear: true,--}}
-            {{--formatNoMatches: function () {--}}
-                {{--return '{!!trans("conferences.noUsersFoundEmail")!!} <button type="button" class="btn btn-success" onclick="openModal()"><small> <span class="glyphicon glyphicon-plus-sign"></span> {{trans("conferences.createNewUser")}}</small></button>';--}}
-            {{--}--}}
-		{{--});--}}
-
-
-
 
 		$("#searchInstitution").select2(
 		    {
@@ -86,37 +62,10 @@
 				allowClear: true,
 				placeholder: "{!!trans('deptinst.selectInstitution')!!}",
                 formatNoMatches: function () {
-                    return 'Δεν βρέθηκε οργανισμός με αυτό το όνομα! <br/><button type="button" class="btn btn-success" data-toggle="modal" onclick="openNewInstModal()"><small><span class="glyphicon glyphicon-plus-sign"></span> {{trans('deptinst.newInstitution')}}</small></button>';
+					// <br/><button type="button" class="btn btn-success" data-toggle="modal" onclick="openNewInstModal()"><small><span class="glyphicon glyphicon-plus-sign"></span> {{trans('deptinst.newInstitution')}}</small></button>
+                    return 'Δεν βρέθηκε οργανισμός με αυτό το όνομα!';
                 }
 		    });
-
-            {{--$("#searchInstitution").select2({--}}
-                {{--placeholder: '{!!trans("conferences.typeUserEmail")!!}',--}}
-                {{--minimumInputLength: 5,--}}
-                {{--ajax: {--}}
-                    {{--url: "/i/conferenceAddUserEmail",--}}
-                    {{--dataType: 'json',--}}
-                    {{--type: "POST",--}}
-                    {{--quietMillis: 50,--}}
-                    {{--data: function (term, page) { // page is the one-based page number tracked by Select2--}}
-                        {{--return {--}}
-                            {{--email: term, //search term--}}
-                            {{--page: page // page number--}}
-                        {{--};--}}
-                    {{--},--}}
-                    {{--results: function (data, page) {--}}
-                        {{--var more = (page * 30) < data.total_count; // whether or not there are more results available--}}
-
-                        {{--// notice we return the value of more so Select2 knows if more results can be loaded--}}
-                        {{--return {results: data, more: more};--}}
-                    {{--}--}}
-                {{--},--}}
-                {{--allowClear: true,--}}
-                {{--formatNoMatches: function () {--}}
-                    {{--return '{!!trans("conferences.noUsersFoundEmail")!!} <button type="button" class="btn btn-success" onclick="openModal()"><small> <span class="glyphicon glyphicon-plus-sign"></span> {{trans("conferences.createNewUser")}}</small></button>';--}}
-                {{--}--}}
-            {{--});--}}
-
 				  		
 			$("[id^=openInstitutionDetails]").on("click", function() {
 				var user = $(this).attr('id').split('-').pop(-1);
@@ -132,24 +81,24 @@
 			});
 			
 
-			$('[id^=RowBtnDelete]').click(function() {
-				var row = $(this).closest('tr');
-				var nRow = row[0];
-				var institution = $(this).attr('id').split('-').pop(-1);
-				var r = confirm("{!!trans('deptinst.qDeleteInstitution')!!}");
-					if (r == true) {
-						$.get( "/institutions/delete/"+institution )
-						.done(function(data2) {
-							obj2 = JSON.parse(data2);
-							if(obj2.status == 'error'){
-								alert(obj2.data);
-							}else if(obj2.status == 'success'){
-								nRow.remove();
-								return false;
-							}
-						});
-					}
-			});
+			{{--$('[id^=RowBtnDelete]').click(function() {--}}
+			{{--	var row = $(this).closest('tr');--}}
+			{{--	var nRow = row[0];--}}
+			{{--	var institution = $(this).attr('id').split('-').pop(-1);--}}
+			{{--	var r = confirm("{!!trans('deptinst.qDeleteInstitution')!!}");--}}
+			{{--		if (r == true) {--}}
+			{{--			$.get( "/institutions/delete/"+institution )--}}
+			{{--			.done(function(data2) {--}}
+			{{--				obj2 = JSON.parse(data2);--}}
+			{{--				if(obj2.status == 'error'){--}}
+			{{--					alert(obj2.data);--}}
+			{{--				}else if(obj2.status == 'success'){--}}
+			{{--					nRow.remove();--}}
+			{{--					return false;--}}
+			{{--				}--}}
+			{{--			});--}}
+			{{--		}--}}
+			{{--});--}}
 			
 			$(".pagination").addClass( "pull-right" );
 			

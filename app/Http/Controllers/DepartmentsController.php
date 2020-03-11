@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Department;
 use App\Institution;
 use App\Conference;
 use Carbon\Carbon;
+use Illuminate\View\View;
 use Request;
 use Input;
 
@@ -22,7 +25,7 @@ class DepartmentsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index($id)
 	{
@@ -43,7 +46,11 @@ class DepartmentsController extends Controller
 		
 		return view('departments.index', compact('departments'));
 	}
-	
+
+    /**
+     * @param $id
+     * @return RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function show($id)
 	{
 		$department = Department::findOrFail($id);
@@ -52,32 +59,34 @@ class DepartmentsController extends Controller
 		
 		return redirect("/departments/".$id."/edit");
 	}
-	
-	public function create()
-	{
-		return view('departments.create');
-	}
-	
+
+
+    /**
+     * @param Requests\CreateDepartmentRequest $request
+     * @return RedirectResponse
+     */
 	public function store(Requests\CreateDepartmentRequest $request)
 	{
 		$input = $request->all();
 		$input['created_at'] = Carbon::now();
 		$input['updated_at'] = Carbon::now();
-        $input['slug'] = "NoID";
-		
 		$department = Department::create($input);
-		
 		return redirect("/institutions/".$department->institution_id."/departments")->with('storesSuccessfully', trans('controllers.newDepartmentSaved'));
 	}
-	
+
+    /**
+     * @param $id
+     * @return Factory|View
+     */
 	public function edit($id)
 	{
-		
 		$department = Department::findOrFail($id);
 		return view('departments.edit', compact('department'));
-		
 	}
-	
+
+    /**
+     * @param $id
+     */
 	public function delete($id)
 	{
 		if (Gate::denies('view_institutions')) {
@@ -100,7 +109,12 @@ class DepartmentsController extends Controller
 		}
 		echo json_encode($results);
 	}
-	
+
+    /**
+     * @param Requests\CreateDepartmentRequest $request
+     * @param $id
+     * @return RedirectResponse
+     */
 	public function update(Requests\CreateDepartmentRequest $request, $id)
 	{
 		$department = Department::findOrFail($id);

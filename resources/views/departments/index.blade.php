@@ -320,17 +320,11 @@
                         </span>
 					</div>
 				</div> <!-- Row with search field and add button - END -->
-    
-                @include('departments._departmentTable', [])  
-
-
+                @include('departments._departmentTable', [])
 <!-- DATATABLES END -->
-
             </div><!--/.box-->
         </div><!--/.container-->
-        
-        
-<!-- MODAL start--->
+	<!-- MODAL start--->
 		<div class="modal fade" id="DepModal" tabindex="-1" role="dialog" aria-labelledby="OrgModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -339,7 +333,6 @@
 						<h4 class="modal-title" id="OrgModalLabel">Τμήμα</h4>
 					</div> <!-- .modal-header -->
 					<div class="modal-body">
-
 						{!! Form::open(array('url' => 'departments', 'method' => 'post', 'class' => 'form-horizontal')) !!}
                         
 						<div class="form-group">
@@ -348,17 +341,8 @@
 									{{ $departments->first()->institution->title}}
                                 </div>
                             </div>
-							
 							{!! Form::hidden('institution_id', $departments->first()->institution_id) !!}
-                        
-                            <div class="form-group" style="display:none;">
-								{!! Form::label('slug', trans('deptinst.deptId').':', ['class' => 'control-label col-sm-4 ']) !!}
-                                <div class="col-sm-8">
-									{!! Form::text('slug', null, ['class' => 'form-control', 'id' => 'slug', 'placeholder' => trans('deptinst.deptIdLatin')]) !!}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
+						<div class="form-group">
 								{!! Form::label('title', trans('deptinst.description').':', ['class' => 'control-label col-sm-4 ']) !!}
                                 <div class="col-sm-8">
 									{!! Form::text('title', null, ['class' => 'form-control', 'id' => 'title', 'placeholder' => trans('deptinst.avoidWordDept')]) !!}

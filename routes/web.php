@@ -200,7 +200,8 @@ Route::get('institutions/{id}', 'InstitutionsController@show');
 Route::get('institutions', 'InstitutionsController@index');
 Route::post('institutions', 'InstitutionsController@store');
 Route::patch('institutions/{id}', 'InstitutionsController@update');
-Route::get('institutions/delete/{id}', 'InstitutionsController@delete');
+//Disabled for now
+//Route::get('institutions/delete/{id}', 'InstitutionsController@delete');
 Route::get('institutions/{id}/edit', 'InstitutionsController@edit');
 Route::get('institutions/departments/{id}', 'InstitutionsController@listDepartments');
 
@@ -210,7 +211,8 @@ Route::get('institutions/departments/other', 'InstitutionsController@listDepartm
 
 Route::get('institutions/adminDepartmentFromID/{id}', 'InstitutionsController@adminDepartmentFromID');
 Route::get('institutions/loadDepartmentTable/{id}', 'InstitutionsController@loadDepartmentTable');
-Route::patch('institutions/{id}', 'InstitutionsController@update');
+//Disabled for now
+//Route::patch('institutions/{id}', 'InstitutionsController@update');
 
 //Departments
 Route::get('departments/{id}', 'DepartmentsController@show');

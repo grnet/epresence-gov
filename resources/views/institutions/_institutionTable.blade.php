@@ -13,7 +13,7 @@
 							<td class="cellName main_table">{{ $institution->title }}</td>
 							<td class="cellButton center main_table">
 								<a href="/institutions/{{ $institution->id }}/edit"><button id="RowBtnEdit-{{ $institution->id }}" type="button" class="btn btn-default btn-sm m-right btn-border" data-toggle="tooltip" data-placement="bottom" title="{{trans('deptinst.editInstitution')}}"><span class="glyphicon glyphicon-pencil"></span></button></a>
-								<button id="RowBtnDelete-{{ $institution->id }}" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="{{trans('deptinst.deleteInstitution')}}"><span class="glyphicon glyphicon-trash"></span></button>
+								<button id="RowBtnDelete-{{ $institution->id }}" disabled type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="{{trans('deptinst.deleteInstitution')}}"><span class="glyphicon glyphicon-trash"></span></button>
 								<a href="/institutions/{{ $institution->id }}/departments"><button id="RowBtnDep-{{ $institution->id }}" type="button" class="btn btn-default btn-sm m-right btn-border" data-toggle="tooltip" data-placement="bottom" title="{{trans('deptinst.institutionDepts')}}"><span class="glyphicon glyphicon-list"></span></button></a>
 							</td>
 						</tr>
