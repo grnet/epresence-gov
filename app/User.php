@@ -461,12 +461,10 @@ class User extends Model implements AuthenticatableContract,
     public function canBeDeleted()
     {
         $activeParticipant = DB::table('conference_user')->where('user_id', $this->id)->where('joined_once', 1)->count();
-
         // Cannot delete a user if had at least one conference
         if ($activeParticipant > 0 || $this->conferenceAdmin()->count() > 0) {
             return false;
         }
-
         return true;
     }
 
@@ -477,26 +475,17 @@ class User extends Model implements AuthenticatableContract,
     public function deleteUnconfirmedUser()
     {
         // Delete user
-
         if ($this->hasRole('DepartmentAdministrator') || $this->hasRole('InstitutionAdministrator')) {
-
             $active_or_future_conferences = $this->activeFutureConferences();
-
             foreach ($active_or_future_conferences as $conference) {
-
                 if ($conference->room_enabled == 1) {
-
                 } elseif ($conference->room_enabled == 0 && $conference->start > Carbon::now()) {
                     $conference->cancelConferenceEmail();
                 }
-
                 $conference->delete();
             }
         }
-
-
         $this->delete();
-
         return 'OK';
     }
 
@@ -506,7 +495,6 @@ class User extends Model implements AuthenticatableContract,
      */
     public function email_for_new_account($password)
     {
-
         $user = User::findOrFail($this->id);
         $email = Email::where('name', 'userAccountEnableSso')->first();
         $login_url = URL::to("register/" . $user->activation_token);

@@ -101,7 +101,7 @@ Route::get('administrators/applications', 'ApplicationController@index');
 Route::get('/email_activation/{token}', 'ExtraEmailsController@ConfirmExtraEmail');
 
 // Change Language
-Route::post('language/change_language', 'LanguageController@change_language');
+//Route::post('language/change_language', 'LanguageController@change_language');
 
 //Statistics
 
