@@ -8,8 +8,8 @@
             auto_focus: 'inputTextArea',
             plugins: "code",
             entity_encoding: "raw",
-            height: "240"
-
+            height: "240",
+            forced_root_block : ""
         });
     </script>
     <style>
