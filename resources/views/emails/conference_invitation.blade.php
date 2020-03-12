@@ -1,7 +1,5 @@
 @if($user->confirmed == 0  && $user->state == 'sso')
-	{!!trans('emails.conference_invitation.unconfirmed_notification.sso',["activation_url"=>url('login/'.$user->activation_token)],'el')!!}
-@elseif($user->confirmed == 0  && $user->state == 'local')
-	{!!trans('emails.conference_invitation.unconfirmed_notification.local',["resend_confirmation_email_url"=>url('/get_activation_mail/'.$user->activation_token)],'el')!!}
+	{!!trans('emails.conference_invitation.unconfirmed_notification.sso',["activation_url"=>url('register/'.$user->activation_token)],'el')!!}
 @endif
 {!!trans('emails.conference_invitation.intro_text',
 [

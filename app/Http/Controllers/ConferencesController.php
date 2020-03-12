@@ -1006,10 +1006,8 @@ class ConferencesController extends Controller
 
             $zoom_client = new ZoomClient();
             $zoom_client->update_participant_status($registrant_parameters, $conference->zoom_meeting_id);
-
             event(new ParticipantStatusChanged($conference->id, $status_requested, $user->id));
         }
-
         return response()->json($json);
     }
 
