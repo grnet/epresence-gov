@@ -27,9 +27,7 @@ $(document).ready(function() {
 	
 	$("#FieldPeriod").select2({
 		allowClear: false
-	}); 
-	
-	
+	});
 	
 
 // DATE FIELD

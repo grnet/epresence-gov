@@ -38,39 +38,25 @@ class Statistics extends Model
 
     public static function participant_per_conference($dates, $group)
     {
-
         $periods = array();
         $users_no_desktop = array();
-        $users_no_h323 = array();
         $i = 0;
-
         foreach ($dates as $date) {
-
             $periods[$i] = $date;
-
             if (array_has($group, $date)) {
                 $details = $group[$date];
                 $desktop = 0;
-                $h323 = 0;
-
-
                 foreach ($details as $users) {
                     $desktop += intval($users['users_no_desktop']);
-                    $h323 += intval($users['users_no_h323']);
                 }
-
                 $users_no_desktop[$i] = $desktop;
-                $users_no_h323[$i] = $h323;
-
             } else {
                 $users_no_desktop[$i] = 0;
-                $users_no_h323[$i] = 0;
             }
-
             $i++;
         }
 
-        $json = ['periods' => $periods, 'users_no_desktop' => $users_no_desktop, 'users_no_h323' => $users_no_h323];
+        $json = ['periods' => $periods, 'users_no_desktop' => $users_no_desktop];
         return $json;
     }
 

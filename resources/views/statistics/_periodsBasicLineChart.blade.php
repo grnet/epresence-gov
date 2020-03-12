@@ -33,7 +33,4 @@ title: {
         series: [{
             name: 'Desktop-Mobile',
             data: [{!! implode(", ", $data['users_no_desktop']) !!}]
-        }, {
-            name: 'H323',
-            data: [{!! implode(", ", $data['users_no_h323']) !!}]
         }]
