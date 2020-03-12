@@ -85,7 +85,7 @@ class GsisAuthenticationController extends Controller
      */
     public function callback(Request $request)
     {
-        Log::info("Request callback: ".$request->all());
+        Log::info("Request callback: ".json_encode($request->all()));
         Log::info("Session: ".session()->get("oauth2state"));
 
 
