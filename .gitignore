@@ -3,10 +3,8 @@
 /public/hot
 /public/storage
 /storage/*.key
-/vendor
 /.idea
 /.vagrant
-vendor
 composer.lock
 Homestead.json
 Homestead.yaml
@@ -14,9 +12,11 @@ npm-debug.log
 yarn-error.log
 .env
 /public/phpmyadmin
-/public/support_files
 /public/docs
 /public/images
+/public/vendor
+vendor/
+!resources/views/vendor
 laravel-echo-server.json
 awstats-icon
 awstatsicons
