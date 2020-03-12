@@ -63,7 +63,6 @@
                             <span class="account_h">{!! trans('account.total_conferences_joined') !!}</span> {{$statistics['all_time']['total_conferences_joined']}} {{trans('account.from_invited',['conf_invited'=>$statistics['all_time']['total_conferences_invited']])}}<br/>
                             <span class="account_h">{!! trans('account.connection_type') !!}</span><br/>
                             {{$statistics['all_time']['conferences_joined_by_type']['Desktop-Mobile']}} {!! trans('account.times') !!} Desktop-Mobile <br/>
-                            {{$statistics['all_time']['conferences_joined_by_type']['H323']}} {!! trans('account.times') !!} H323/SIP <br/>
                             <span class="account_h">{!! trans('account.total_duration_joined') !!}</span>
                             @if($statistics['all_time']['total_duration_joined']['hours']>0)
                                 @if($statistics['all_time']['total_duration_joined']['hours']>1)
@@ -100,7 +99,6 @@
                             <span class="account_h">{!! trans('account.total_conferences_joined') !!}</span> {{$statistics['current_year']['total_conferences_joined']}} {{trans('account.from_invited',['conf_invited'=>$statistics['current_year']['total_conferences_invited']])}} <br/>
                             <span class="account_h">{!! trans('account.connection_type') !!}</span><br/>
                             {{$statistics['current_year']['conferences_joined_by_type']['Desktop-Mobile']}} {!! trans('account.times') !!} Desktop-Mobile <br/>
-                            {{$statistics['current_year']['conferences_joined_by_type']['H323']}} {!! trans('account.times') !!} H323/SIP <br/>
                             <span class="account_h">{!! trans('account.total_duration_joined') !!}</span>
                             @if($statistics['current_year']['total_duration_joined']['hours']>0)
                                 @if($statistics['current_year']['total_duration_joined']['hours']>1)
@@ -137,7 +135,6 @@
                             <span class="account_h">{!! trans('account.total_conferences_joined') !!}</span> {{$statistics['previous_year']['total_conferences_joined']}} {{trans('account.from_invited',['conf_invited'=>$statistics['previous_year']['total_conferences_invited']])}} <br/>
                             <span class="account_h">{!! trans('account.connection_type') !!}</span><br/>
                             {{$statistics['previous_year']['conferences_joined_by_type']['Desktop-Mobile']}} {!! trans('account.times') !!} Desktop-Mobile <br/>
-                            {{$statistics['previous_year']['conferences_joined_by_type']['H323']}} {!! trans('account.times') !!} H323/SIP <br/>
                             <span class="account_h">{!! trans('account.total_duration_joined') !!}</span>
                             @if($statistics['previous_year']['total_duration_joined']['hours']>0)
                                 @if($statistics['previous_year']['total_duration_joined']['hours']>1)
