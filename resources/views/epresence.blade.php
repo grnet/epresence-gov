@@ -63,7 +63,7 @@ class="active"
             <div class="item active">
                 <div class="container">
                     <div class="carousel-content">
-                        <h1>e:Presence</h1>
+                        <h1>e:Presence.gov.gr</h1>
                         <p class="lead carousel-shadow">{!!trans('site.epresenceTitle')!!}</p>
                     </div>
                 </div>

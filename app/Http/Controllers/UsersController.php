@@ -454,10 +454,9 @@ class UsersController extends Controller
          }
 
         if (!empty($input['new_department'])) {
-            $new_department = Department::create(['title' => $input['new_department'], 'slug' => 'noID', 'institution_id' => $input['institution_id']]);
+            $new_department = Department::create(['title' => $input['new_department'],'institution_id' => $input['institution_id']]);
             $input['department_id'] = $new_department->id;
         }
-
 
         $user->institutions()->attach($input['institution_id']);
         $user->departments()->attach($input['department_id']);
