@@ -279,10 +279,8 @@
 <section id="Org">
         <div class="container">
             <div class="box first" style="margin-top:100px">
-				
-				<h4>Οργανισμοί</h4>
+				<h4>{{trans('site.institutions')}}</h4>
 				<hr/>
-
 				<div class="small-gap"></div>
 				
 				@if (session('storesSuccessfully'))
