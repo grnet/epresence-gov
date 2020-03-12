@@ -134,15 +134,7 @@
 	</div>
  </div>
 @endif
-<div class="form-group" >
-	{!! Form::label('ApellaIdField', trans('conferences.apella').":", ['class' => 'control-label col-sm-2 ']) !!}
-	<div class="col-sm-3">
-		{!! Form::text('apella_id', $apella_id, ['class' => 'form-control', 'id' => 'ApellaIdField']) !!}
-	</div>
-	<div class="col-sm-3 col-xs-12 .col-xs-offset-6">
-		<span>{!! trans('conferences.apella_info') !!}</span>
-	</div>
-</div>
+
 @if(class_basename(URL::current()) == 'copy')
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="repeat_type_input" style="padding-top:0">{{trans('conferences.repeat_type')}}:</label>

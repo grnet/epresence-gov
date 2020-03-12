@@ -982,7 +982,7 @@
                         </ul>
                     @endif
                     {!! Form::model($conference, array('url' => ['conferences/' . $conference->id], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form')) !!}
-                    @include('conferences._form', ['apella_id'=>$conference->apella_id,'start_date' => $conference->getDate($conference->start), 'start_time' => $conference->getTime($conference->start), 'end_date' => $conference->getDate($conference->end), 'end_time' => $conference->getTime($conference->end), 'max_duration' => null, 'max_users' => null, 'max_h323' => null, 'max_vidyo_room' => null, 'invisible' => Form::getValueAttribute('invisible'), 'submitBtn' => trans('conferences.saveConference'), 'copyBtn' => '<a href="/conferences/'.$conference->id.'/copy"><button type="button" class="btn btn-warning btn-sm" id="TeleCopy" >'.trans('conferences.conferenceCopy').'</button></a>'])
+                    @include('conferences._form', ['start_date' => $conference->getDate($conference->start), 'start_time' => $conference->getTime($conference->start), 'end_date' => $conference->getDate($conference->end), 'end_time' => $conference->getTime($conference->end), 'max_duration' => null, 'max_users' => null, 'max_h323' => null, 'max_vidyo_room' => null, 'invisible' => Form::getValueAttribute('invisible'), 'submitBtn' => trans('conferences.saveConference'), 'copyBtn' => '<a href="/conferences/'.$conference->id.'/copy"><button type="button" class="btn btn-warning btn-sm" id="TeleCopy" >'.trans('conferences.conferenceCopy').'</button></a>'])
                     {!! Form::close() !!}
                 </div>
             </div><!--/.box-->

@@ -438,8 +438,6 @@ class ConferencesController extends Controller
         if (isset($input['copy_of'])) {
             $copy_of = $input['copy_of'];
         }
-        if (empty($input['apella_id']))
-            $input['apella_id'] = null;
 
         //Create the conference in our db
         $conference = Conference::create($input);
@@ -834,9 +832,6 @@ class ConferencesController extends Controller
 
             Statistics::create(['conference_id' => $conference->id, 'institution_id' => $conference->institution_id, 'department_id' => $conference->department_id, 'active' => 1, 'created_at' => Carbon::now()]);
         }
-
-        if (empty($input['apella_id']))
-            $input['apella_id'] = null;
 
         //Check if end or title fields are updated to send Conference-details-changed event
 
