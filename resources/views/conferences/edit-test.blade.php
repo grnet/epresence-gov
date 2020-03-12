@@ -405,31 +405,6 @@
                 if (state.text == 0) return "<span class='glyphicon glyphicon-ban-circle'></span>";
             }
 
-            $('[id^=selectPDevice]').on('change', function () {
-                var row = $(this).closest('tr');
-                var nRow = row[0];
-                var user = $(this).attr('id').split('-').pop(-1);
-                $.post("/conferences/userConferenceDeviceAssign", {
-                    user_id: user,
-                    conference_id: {{ $conference->id }},
-                    device: $(this).val()
-                })
-                    .done(function (data) {
-                        obj = JSON.parse(data);
-                        var oldvalue = obj.oldValue;
-                        if (obj.status == 'error') {
-                            alert("" + obj.data);
-                            location.reload(true);
-                        } else if (obj.status == 'success') {
-                            alert("" + obj.data);
-                        }
-                        //$(".select2-search, .select2-focusser").remove();
-                    })
-                    .fail(function (xhr, textStatus, errorThrown) {
-                        alert(xhr.responseText);
-                    });
-            });
-
             // Sort table
 
             // Get url parameters
@@ -557,7 +532,6 @@
                     {"sClass": "cellRole"},
                     {"sClass": "cellOrg hidden-xs"},
                     {"sClass": "cellDepart hidden-xs"},
-                    {"sClass": "cellStatus"},
                     {"sClass": "cellButton"}
                 ]
             });
@@ -688,7 +662,6 @@
                         {"sClass": "cellRole"},
                         {"sClass": "cellOrg hidden-xs"},
                         {"sClass": "cellDepart hidden-xs"},
-                        {"sClass": "cellStatus"},
                         {"sClass": "cellButton"}
                     ]
                 });
@@ -1057,7 +1030,6 @@
                                 <th>{{trans('conferences.userType')}}</th>
                                 <th>{{trans('conferences.institution')}}</th>
                                 <th>{{trans('conferences.department')}}</th>
-                                <th>{{trans('conferences.localUser')}}</th>
                                 <th></th>
                             </tr>
                             </thead>
