@@ -104,12 +104,7 @@ class="active"
 					@endif
 					<p class="lead">{!!trans('site.serviceText1')!!}</p>
 					<div class="row">
-						<div class="col-md-6">
-							<div>
-								<iframe width="100%" height="300px" src="https://www.youtube.com/embed/Vcc9dN6ptTE?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
-							</div>
-						</div>
-						<div class="col-md-6">
+						<div class="col-md-12">
 							{!!trans('site.serviceText2')!!}
 						</div>
 					</div>

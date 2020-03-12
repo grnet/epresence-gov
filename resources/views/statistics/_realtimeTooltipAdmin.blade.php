@@ -11,7 +11,7 @@
             @foreach ($chunk as $conference_user)
                 <td>
                 <span style="color:{{$active_conference->participantConferenceStatus($conference_user->user_id) == 1 ? 'black' : 'red'}}; margin:10px;">
-                {{App\User::findOrFail($conference_user->user_id)->email}} ("DM")
+                {{App\User::findOrFail($conference_user->user_id)->email}}
                  </span>
                 </td>
             @endforeach

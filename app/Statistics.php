@@ -152,23 +152,16 @@ class Statistics extends Model
         $periods = array();
         $conferences = array();
         $i = 0;
-
         foreach ($dates as $date) {
-
             $periods[$i] = $date;
-
             if (array_has($group, $date)) {
-
                 $details = $group[$date];
                 $one = 0;
                 $two = 0;
                 $three = 0;
                 $four = 0;
-
                 foreach ($details as $users) {
-
                     $conference_total_users = $users['users_no_desktop'] + $users['users_no_h323'];
-
                     if ($conference_total_users < 3) {
                         $one++;
                     } elseif ($conference_total_users >= 3 && $conference_total_users < 5) {

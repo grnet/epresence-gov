@@ -145,7 +145,6 @@
                             <p>{{session()->get('message')}}</p>
                         </div>
                     @endif
-
                     @foreach($language_lines as $line)
                         <div class="row translation_inner_heading_row"
                              style="@if(isset($currently_editing) && $currently_editing == $line->id ) background-color:#d3e0e9; border:1px solid #3097d1; @endif">
