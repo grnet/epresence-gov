@@ -34,14 +34,13 @@
                                 obj = JSON.parse(data);
                                     $("#1_1").html(obj.total_total_conferences);
                                     $("#1_2").html(obj.total_desktop_mobile);
-                                    $("#1_3").html(obj.total_h323);
+                                    // $("#1_3").html(obj.total_h323);
                                     $("#2_1").html(obj.today_total_conferences);
                                     $("#2_2").html(obj.today_desktop_mobile);
-                                    $("#2_3").html(obj.today_h323);
+                                    // $("#2_3").html(obj.today_h323);
                                     $("#3_1").html(obj.now_total_conferences);
                                     $("#3_2").html(obj.now_desktop_mobile);
-                                    $("#3_3").html(obj.now_h323);
-                                console.log('Front page statistics updated');
+                                    // $("#3_3").html(obj.now_h323);
                             })
                             .fail(function (xhr, textStatus, errorThrown) {
                                 console.log('The statistics failed to refresh!');
@@ -126,44 +125,44 @@ class="active"
                 <div class="center">
                 
                     <div class="row">
-                        <div class="col-sm-2"></div>
+                        <div class="col-sm-3"></div>
                         <div class="col-sm-2"><div class="icon-lg icon-usage"><p class="font-counter counter-small">{{trans('site.serviceUsage')}}</p></div></div>
                         <div class="col-sm-2"><div class="icon-lg icon-teleconf" data-toggle="tooltip" data-placement="top" title="{{trans('site.noConferences')}}"><i class="fa fa-comment "></i></div></div>
                         <div class="col-sm-2"><div class="icon-lg icon-user" data-toggle="tooltip" data-placement="top" title="{{trans('site.desktopUsers')}}"><i class="fa fa-user "></i></div></div>
-                        <div class="col-sm-2"><div class="icon-lg icon-terminal"  data-toggle="tooltip" data-placement="top" title="{{trans('site.roomUsers')}}"><i class="fa fa-desktop "></i></div></div>
-                        <div class="col-sm-2"></div>
+{{--                        <div class="col-sm-2"><div class="icon-lg icon-terminal"  data-toggle="tooltip" data-placement="top" title="{{trans('site.roomUsers')}}"><i class="fa fa-desktop "></i></div></div>--}}
+                        <div class="col-sm-3"></div>
                     </div>
                     
                  	<div class="row">          
-                        <div class="col-sm-2"></div>
+                        <div class="col-sm-3"></div>
                         <div class="col-sm-2"><p class="font-counter counter-small">{{trans('site.total')}}:</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="1_1" >{{ DB::table('service_usage')->where('option','total')->value('total_conferences') }}</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="1_2" >{{ DB::table('service_usage')->where('option','total')->value('desktop_mobile') }}</p></div>
-                        <div class="col-sm-2"><p class="font-counter" id="1_3" >{{ DB::table('service_usage')->where('option','total')->value('h323') }}</p></div>
-                        <div class="col-sm-2"></div>
+{{--                        <div class="col-sm-2"><p class="font-counter" id="1_3" >{{ DB::table('service_usage')->where('option','total')->value('h323') }}</p></div>--}}
+                        <div class="col-sm-3"></div>
  					</div>
                     
                  	<div class="row">
-                        <div class="col-sm-2"></div>
+                        <div class="col-sm-3"></div>
                         <div class="col-sm-2"><p class="font-counter counter-small">{{trans('site.today')}}:</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="2_1" >{{ DB::table('service_usage')->where('option','today')->value('total_conferences') }}</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="2_2" >{{ DB::table('service_usage')->where('option','today')->value('desktop_mobile') }}</p></div>
-                        <div class="col-sm-2"><p class="font-counter" id="2_3" >{{ DB::table('service_usage')->where('option','today')->value('h323') }}</p></div>
-                        <div class="col-sm-2"></div>
+{{--                        <div class="col-sm-2"><p class="font-counter" id="2_3" >{{ DB::table('service_usage')->where('option','today')->value('h323') }}</p></div>--}}
+                        <div class="col-sm-3"></div>
  					</div>
                     
                  	<div class="row">
-                        <div class="col-sm-2"></div>
+                        <div class="col-sm-3"></div>
                         <div class="col-sm-2"><p class="font-counter counter-small">{{trans('site.now')}}:</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="3_1" >{{ DB::table('service_usage')->where('option','now')->value('total_conferences') }}</p></div>
                         <div class="col-sm-2"><p class="font-counter" id="3_2" >{{ DB::table('service_usage')->where('option','now')->value('desktop_mobile') }}</p></div>
-                        <div class="col-sm-2"><p class="font-counter" id="3_3" >{{ DB::table('service_usage')->where('option','now')->value('h323') }}</p></div>
-                        <div class="col-sm-2"></div>
+{{--                        <div class="col-sm-2"><p class="font-counter" id="3_3" >{{ DB::table('service_usage')->where('option','now')->value('h323') }}</p></div>--}}
+                        <div class="col-sm-3"></div>
                		</div>
                 </div><!--/.center-->
-                <div class="center">
-                <p class="font-counter counter-small-2">{{trans('site.moneySavedText')}} {{number_format(round(DB::table('service_usage')->where('option','total')->value('euro_saved'),-5),0,'.','.')}}€.</p>
-                </div>
+{{--                <div class="center">--}}
+{{--                <p class="font-counter counter-small-2">{{trans('site.moneySavedText')}} {{number_format(round(DB::table('service_usage')->where('option','total')->value('euro_saved'),-5),0,'.','.')}}€.</p>--}}
+{{--                </div>--}}
                 </div><!--/.box-->
         </div><!--/.container-->
     </section><!--/.counter-->
