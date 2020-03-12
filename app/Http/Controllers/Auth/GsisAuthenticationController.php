@@ -92,6 +92,7 @@ class GsisAuthenticationController extends Controller
                 ]);
                 $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
                 $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
+                Log::info("Api callback: ".$response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 // Tax id of the user
                 $taxId = trim($parsedResponse->userinfo['taxid']);
