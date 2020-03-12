@@ -133,7 +133,6 @@ Route::post('auth/login', 'Auth\LoginController@login');
 Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 //Authentication Routes End
-
 //Users
 
 Route::get('users', 'UsersController@index');

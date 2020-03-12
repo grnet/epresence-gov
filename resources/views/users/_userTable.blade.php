@@ -122,8 +122,6 @@
             @endforeach
     </tbody>
 </table>
-
 <span class="glyphicon glyphicon-eye-open"
       aria-hidden="true"></span> ({{ $users->firstItem() }} - {{ $users->lastItem() }}) {{trans('users.from')}} {{ $users->total() }}
-
 {!! $users->appends(Request::except('page'))->render() !!}
