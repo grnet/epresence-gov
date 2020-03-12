@@ -36,7 +36,7 @@ class StatisticsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return View
+     * @return Factory|View|\Illuminate\View\View
      */
     public function index()
     {

@@ -99,14 +99,11 @@ class="active"
 
 			<div class="small-gap"></div>
 			<div class="row gause">
-            	<div class="col-md-4">
+            	<div class="col-md-6">
                 	<div id="Chart02" class="chartbox"></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
 					<div id="Chart03" class="chartbox"></div>
-                </div>
-				<div class="col-md-4">
-                	<div id="Chart04" class="chartbox"></div>
                 </div>
             </div>
 
