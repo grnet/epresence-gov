@@ -171,6 +171,95 @@ class AccountController extends Controller
         return redirect('/');
     }
 
+    /**
+     * @param Requests\UpdateLocalAccountRequest $request
+     * @return RedirectResponse
+     */
+    public function UpdateLocalAccount(Requests\UpdateLocalAccountRequest $request)
+    {
+
+        //Update account details method called by from account page by the user himself
+
+        // State input values
+
+        $input = $request->all();
+        $user = Auth::user();
+        $role = $user->roles()->first();
+
+        $institution = $user->institutions()->first();
+        $department = $user->departments()->first();
+
+        $custom_values['institution'] = "";
+        $custom_values['department'] = "";
+
+
+        // Handle user image (thumbnail)
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = time() . '-' . $thumbnail->getClientOriginalName();
+
+            // Delete previous file
+            if (!empty($user->thumbnail) && File::exists(public_path() . '/images/user_images/' . $user->thumbnail)) {
+                File::delete(public_path() . '/images/user_images/' . $user->thumbnail);
+            }
+
+            $thumbnail->move(public_path() . '/images/user_images', $filename);
+            $input['thumbnail'] = $filename;
+        }
+
+        //Handle password update
+
+        if (!empty($input['password']) && !empty($input['current_password'])) {
+            if (!Hash::check($input['current_password'], $user->password)) {
+                $errors [] = trans('controllers.currentPasswordWrong');
+                return back()->withErrors($errors);
+            } else {
+                $user->createNewPassword($input['password']);
+            }
+        }
+
+        //Only EndUsers can change institution or department if they are local
+
+        if ($role->name == "EndUser") {
+
+            //Detaching current institution/department
+
+            $user->institutions()->detach($institution->id);
+            $user->departments()->detach($department->id);
+
+
+            //Getting real id of other institution or department
+
+
+            if ($input['institution_id'] == "other") {
+                $institution = Institution::where('slug', 'other')->first();
+                $input['institution_id'] = $institution->id;
+            }
+
+
+            if ((isset($input['department_id']) && ($input['department_id'] == "other" || $input['institution_id'] == "other")) || !isset($input['department_id']))
+                $input['department_id'] = $institution->otherDepartment()->id;
+
+
+            //Update Custom Values
+
+            $custom_values = ["institution" => "", "department" => ""];
+
+            if ($input['new_institution'])
+                $custom_values['institution'] = $input['new_institution'];
+
+            if ($input['new_department'])
+                $custom_values['department'] = $input['new_department'];
+
+
+            $input['custom_values'] = json_encode($custom_values);
+            $user->institutions()->attach($input['institution_id']);
+            $user->departments()->attach($input['department_id']);
+        }
+        $user->update(array_except($input, ['password']));
+        $message = trans('controllers.changesSaved');
+        return back()->with('message', $message);
+    }
 
 
 
