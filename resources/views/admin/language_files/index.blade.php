@@ -16,7 +16,6 @@
         .highlighted {
             color: red;
         }
-
         .translation_heading_row {
             border-bottom: 1px solid #a0bcd0;
             padding: 5px;

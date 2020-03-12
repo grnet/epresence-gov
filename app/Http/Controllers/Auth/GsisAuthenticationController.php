@@ -85,10 +85,6 @@ class GsisAuthenticationController extends Controller
      */
     public function callback(Request $request)
     {
-        Log::info("Request callback: ".json_encode($request->all()));
-        Log::info("Session: ".session()->get("oauth2state"));
-
-
         if ($request->has('code') && $request->has('state') && session()->has("oauth2state") && session()->get("oauth2state") == $request->input('state')) {
             try {
                 $accessToken = $this->server->getAccessToken('authorization_code', [
@@ -96,7 +92,6 @@ class GsisAuthenticationController extends Controller
                 ]);
                 $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
                 $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
-                Log::info("Api callback: ".$response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 // Tax id of the user
                 $taxId = trim($parsedResponse->userinfo['taxid']);
