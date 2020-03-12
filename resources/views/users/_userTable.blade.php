@@ -58,27 +58,12 @@
                             <tr>
                                 <td>
                                     @if(!$user->confirmed)
-                                        @if($user->state=="local")
-                                            <button class="btn btn-primary btn-sm m-right btn-border"
-                                                    onclick="sendConfirmationEmail({{ $user->id }})"
-                                                    style="float:right;">Αποστολή email ενεργοποίησης
-                                            </button>
-                                            <button class="btn btn-primary btn-sm m-right btn-border"
-                                                    onclick="changeStatetoSso({{ $user->id }})" style="float:right;">
-                                                Αλλαγή σε SSO
-                                            </button>
-                                        @else
-                                            @if(empty($user->persistent_id))
+                                          @if(empty($user->tax_id))
                                                 <button class="btn btn-primary btn-sm m-right btn-border"
                                                         onclick="sendConfirmationEmail({{ $user->id }})"
                                                         style="float:right;">Αποστολή email ενεργοποίησης
                                                 </button>
                                             @endif
-                                            <button class="btn btn-primary btn-sm m-right btn-border"
-                                                    onclick="changeStatetoLocal({{ $user->id }})" style="float:right;">
-                                                Αλλαγή σε Local
-                                            </button>
-                                        @endif
                                         <br/>
                                     @endif
                                     <strong>ID:</strong> {{ $user->id}}<br/>
