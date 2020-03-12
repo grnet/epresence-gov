@@ -85,6 +85,10 @@ class GsisAuthenticationController extends Controller
      */
     public function callback(Request $request)
     {
+        Log::info("Request callback: ".$request->all());
+        Log::info("Session: ".session()->get("oauth2state"));
+
+
         if ($request->has('code') && $request->has('state') && session()->has("oauth2state") && session()->get("oauth2state") == $request->input('state')) {
             try {
                 $accessToken = $this->server->getAccessToken('authorization_code', [
