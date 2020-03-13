@@ -51,7 +51,8 @@ return [
         'redirectUri'=>env('GSIS_REDIRECT_URI'),
         'urlAuthorize'=>env('GSIS_USER_AUTHORIZATION_URL'),
         'urlAccessToken'=>env('GSIS_ACCESS_TOKEN_URL'),
-        'urlResourceOwnerDetails'=>env('GSIS_RESOURCE_OWNER')
+        'urlResourceOwnerDetails'=>env('GSIS_RESOURCE_OWNER'),
+        'urlLogout'=>env('GSIS_LOGOUT_URL')
     ]
 
 ];

@@ -1371,7 +1371,7 @@ class ConferencesController extends Controller
                             ->to($user->email)
                             ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                             ->returnPath(env('RETURN_PATH_MAIL'))
-                            ->subject('e:Presence: Πρόσκληση σε τηλεδιάσκεψη (Teleconference Invitation) ' . $conference->getDate($conference->start))
+                            ->subject($email->title.' '. $conference->getDate($conference->start))
                             ->attach(storage_path("app" . $ics), array('mime' => "text/calendar"));
                     });
                 }

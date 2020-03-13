@@ -21,7 +21,11 @@
                 <label>{{trans('site.privacyPolicyAcceptance')}} <input class="accepted_terms_check" id="privacy_accept_modal" type="checkbox"></label>
                 </div>
                 <div class="col-md-12">
-                    <a href="/auth/logout" class="btn btn-danger">{{trans('site.cancel')}}</a>
+                    @if(Auth::user()->state == "sso")
+                        <a href="{{config('services.gsis.urlLogout')}}/{{config('services.gsis.clientId')}}/?url={{route('logout')}}" class="btn btn-danger">{{trans('site.cancel')}}</a>
+                    @else
+                        <a href="{{route('logout')}}" class="btn btn-danger">{{trans('site.cancel')}}</a>
+                    @endif
                     <button type="button" class="btn btn-primary disabled_button" id="accept_modal_terms_button" data-placement="top" data-toggle="tooltip" data-original-title="{{trans('site.acceptTerms_Policy')}}">OK</button>
                 </div>
             </div> <!-- .modal-content -->
