@@ -14,11 +14,9 @@
                             <th class="cellPButton"></th>
 						@endif
 						@if(str_contains( Request::path(), 'manage'))
-							<th class="cellPStatus">{{trans('conferences.state')}}</th>
 							<th class="cellPConnected">{{trans('conferences.connected')}}</th>
 						@endif
 						@if(str_contains( Request::path(), 'details'))
-							<th class="cellPStatus">{{trans('conferences.state')}}</th>
 							<th class="cellPAddress">{{trans('conferences.address')}}</th>
 							<th class="cellPDuration">{{trans('conferences.duration')}}</th>
 						@endif
@@ -147,7 +145,6 @@
 														@else
 															{{trans('users.yes')}}<br/>
 														@endif
-														<strong>{{trans('conferences.localUser')}}:</strong> {{ $participant->state_string($participant->state) }}<br/>
 														<strong>{{trans('conferences.telephone')}}:</strong> {{ $participant->telephone }}<br/>
 														<strong>{{trans('conferences.userType')}}:</strong> {{ trans($participant->roles->first()->label) }}<br/>
 													@if($participant->institutions->count() > 0 && $participant->institutions->first()->slug == 'other')

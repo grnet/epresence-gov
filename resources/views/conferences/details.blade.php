@@ -411,9 +411,6 @@
 						<div class="col-sm-3 col-xs-12 .col-xs-offset-6">
 							Desktop-Mobile: {{ $conference->participantsPerDevice('Desktop-Mobile') }}
 						</div>
-						<div class="col-sm-3 col-xs-12 .col-xs-offset-6">
-							Η.323: {{ $conference->participantsPerDevice('H323') }}
-						</div>
 					</div>
 					<div class="small-gap"></div>
 
@@ -508,17 +505,6 @@
 						</div>
 					@endif
 					<div class="small-gap"></div>
-					@if(!empty($conference->apella_id))
-					<div class="row">
-						<div class="control-label col-sm-2 col-xs-12">
-							<p><strong>{!!trans('conferences.apella')!!}:</strong></p>
-						</div>
-						<div class="col-sm-4">
-							<p>{{ $conference->apella_id }}</p>
-						</div>
-					</div>
-					@endif
-
 					<div class="row">
 						<div class="col-sm-12">
 							<span class="pull-right">
