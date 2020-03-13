@@ -97,7 +97,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<div class="error-template">
-							{{trans('errors.not_authorized')}}
+							{!!trans('errors.not_authorized')!!}
 							<div class="error-actions">
 								<a href="/" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
 								{{trans('errors.homePage')}} </a>
