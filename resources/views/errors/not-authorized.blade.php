@@ -94,15 +94,13 @@
 	<section id="Users">
         <div class="container">
             <div class="box first" style="margin-top:100px">
-
 				<div class="row">
 					<div class="col-md-12">
 						<div class="error-template">
-							<p class="lead">{{trans('errors.noAccessPage')}}</p>
-							<p>{{ $exception->getMessage() }}</p>
+							{{trans('errors.not_authorized')}}
 							<div class="error-actions">
-								<a href="{{ URL::previous() }}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
-								{{trans('errors.previousPage')}} </a><a href="mailto:support@epresence.grnet.gr" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-envelope"></span> {{trans('errors.supportContact')}} </a>
+								<a href="/" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
+								{{trans('errors.homePage')}} </a>
 							</div>
 						</div>
 					</div>

@@ -6,12 +6,14 @@ use App\Email;
 use App\Http\Controllers\Controller;
 use App\User;
 use GuzzleHttp\Client;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
 
@@ -182,6 +184,14 @@ class GsisAuthenticationController extends Controller
                 Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
-        return redirect('/')->with("error", "auth-error");
+        return redirect()->route('not-authorized');
+    }
+
+
+    /**
+     * @return Factory|View
+     */
+    public function notAuthorized(){
+        return view('errors.not-authorized');
     }
 }

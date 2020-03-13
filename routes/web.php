@@ -132,6 +132,8 @@ Route::get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('auth/login', 'Auth\LoginController@login');
 Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::get('auth/not-authorized','Auth\GsisAuthenticationController@notAuthorized')->name('not-authorized');
+
 //Authentication Routes End
 //Users
 
