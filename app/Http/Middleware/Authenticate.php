@@ -3,8 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Log;
-use Request;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 
 class Authenticate
@@ -30,7 +29,7 @@ class Authenticate
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  \Closure  $next
      * @return mixed
      */

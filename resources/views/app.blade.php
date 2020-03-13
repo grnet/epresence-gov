@@ -221,21 +221,6 @@
 						<li @yield('calendar-active')><a href="/calendar">{{trans('site.calendar')}}</a></li>
 					<li><a href="/login">{{trans('site.login')}}</a></li>
 				@endif
-{{--					<li class="dropdown">--}}
-{{--						<a href="#" class="dropdown-toggle" data-toggle="dropdown">--}}
-{{--							<img src="/images/{{ Session::get('locale') }}.png" /> --}}
-{{--							<strong style="text-transform: uppercase !important;">{{ Session::get('locale') }}</strong>--}}
-{{--							<small><span class="glyphicon glyphicon-chevron-down"></span></small>--}}
-{{--						</a>--}}
-{{--						<ul class="dropdown-menu">--}}
-{{--							<li>--}}
-{{--								<a href="#" id="setLangTo-el"><img src="/images/el.png" /> Ελληνικά</a>--}}
-{{--							</li>--}}
-{{--							<li>--}}
-{{--								<a href="#" id="setLangTo-en"><img src="/images/en.png" /> English</a>--}}
-{{--							</li>--}}
-{{--						</ul>--}}
-{{--					</li>--}}
 					@if(Auth::check() && Auth::user()->hasRole('SuperAdmin'))
 						<li><a href="/admin/dashboard" target="_blank">Admin</a></li>
 					@endif
