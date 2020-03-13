@@ -205,11 +205,7 @@
 									<div class="row">
 										<div class="col-lg-12">
 											<p>
-												@if(Auth::user()->state == "sso")
-												<a href="{{config('services.gsis.urlLogout')}}{{config('services.gsis.clientId')}}/?url={{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
-												@else
-													<a href="{{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
-												@endif
+											 <a href="{{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
 											</p>
 										</div>
 									</div>

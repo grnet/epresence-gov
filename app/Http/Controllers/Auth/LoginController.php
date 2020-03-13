@@ -7,6 +7,8 @@ use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -156,5 +158,23 @@ class LoginController extends Controller
 
         return $this->authenticated($request, $this->guard()->user())
             ?: redirect()->intended($this->redirectPath());
+    }
+
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param Request $request
+     * @return RedirectResponse|Redirector
+     */
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        if($user->state=="sso")
+        return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.url('/'));
+        else
+        return redirect(url('/'));
     }
 }
