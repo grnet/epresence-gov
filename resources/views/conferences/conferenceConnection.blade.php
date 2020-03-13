@@ -151,7 +151,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="template">
-                            <img alt="ePresence-logo" src="/images/epresence-logo.png">
+                            <img alt="ePresence-logo" src="/images/gov-logo.png">
                             <div class="details">
                                 <p id="logged-in-participant-offline"
                                    @if($conference->participantConferenceStatus(Auth::user()->id) == 1) style="display:none;" @endif>{{trans('conferences.uNotConnected')}}</p>
