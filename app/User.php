@@ -502,7 +502,7 @@ class User extends Model implements AuthenticatableContract,
         $creator = User::findOrFail($this->creator_id);
         $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
         Mail::send($email_view, $parameters, function ($message) use ($user, $email, $creator) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user->email)
                 ->replyTo($creator->email, $creator->firstname . ' ' . $creator->lastname)
                 ->returnPath(env('RETURN_PATH_MAIL'))

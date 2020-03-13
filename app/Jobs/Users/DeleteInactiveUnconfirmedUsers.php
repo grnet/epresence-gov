@@ -60,9 +60,9 @@ class DeleteInactiveUnconfirmedUsers implements ShouldQueue
 
                 if($coordinator->status == 1){
                     Mail::send('emails.conference_participantDeletedCoordinators', $parameters, function ($message) use ($coordinator, $email) {
-                        $message->from($email->sender_email, 'e:Presence')
+                        $message->from($email->sender_email, config('mail.from.name'))
                             ->to($coordinator->email)
-                            ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                            ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                             ->returnPath(env('RETURN_PATH_MAIL'))
                             ->subject($email->title);
                     });
@@ -80,7 +80,7 @@ class DeleteInactiveUnconfirmedUsers implements ShouldQueue
             $email = Email::where('name', 'deleteUnconfirmedUser')->first();
             $parameters = array('body' => $email->body, 'now' => Carbon::now('Europe/Athens'), 'unconfirmedUsers' => $unconfirmedUsers);
             Mail::send('emails.deleteUnconfirmedUser', $parameters, function ($message) use ($email) {
-                $message->from($email->sender_email, 'e:Presence')
+                $message->from($email->sender_email,config('mail.from.name'))
                     ->to(env('SUPPORT_MAIL'))
                     ->returnPath(env('RETURN_PATH_MAIL'))
                     ->subject($email->title);

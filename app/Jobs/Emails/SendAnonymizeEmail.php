@@ -45,9 +45,9 @@ class SendAnonymizeEmail implements ShouldQueue
         $parameters = array('body' => $email->body, 'user_email' => $email_to, 'user_id' => $user_id);
 
         Mail::send('emails.anonymized_account', $parameters, function ($message) use ($email_to, $email) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($email_to)
-                ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                 ->returnPath(env('RETURN_PATH_MAIL'))
                 ->subject($email->title);
         });

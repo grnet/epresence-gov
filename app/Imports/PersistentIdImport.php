@@ -77,7 +77,7 @@ class PersistentIdImport implements ToCollection
 
 
                 Mail::send($email_view, $parameters, function ($message) use ($user_to_update, $email) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email,config('mail.from.name'))
                         ->to($user_to_update->email)
                         ->replyTo(env('RETURN_PATH_MAIL'))
                         ->returnPath(env('RETURN_PATH_MAIL'))

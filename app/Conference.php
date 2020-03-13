@@ -300,7 +300,7 @@ class Conference extends Model
             // Send cancelation email to the participants that have been invited
             if ($participant->participantValues($this->id)->invited == 1 && $participant->status == 1) {
                 Mail::send('emails.conference_conferenceCanceled', $parameters, function ($message) use ($participant, $email, $moderator) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($participant->email)
                         ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                         ->returnPath(env('RETURN_PATH_MAIL'))
@@ -630,7 +630,7 @@ class Conference extends Model
                 $parameters['moderator'] = $moderator;
 
                 Mail::send('emails.conference_invitationReminder', $parameters, function ($message) use ($userToRemind, $email, $moderator) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email,config('mail.from.name'))
                         ->to($userToRemind->email)
                         ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                         ->returnPath(env('RETURN_PATH_MAIL'))
@@ -646,10 +646,10 @@ class Conference extends Model
                 $email = Email::where('name', 'conferenceRationalUseNoParticipants')->first();
                 $parameters = array('conference' => $this);
                 Mail::send('emails.conference_rationalUseNoParticipants', $parameters, function ($message) use ($moderator, $email) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email,config('mail.from.name'))
                         ->to($moderator->email)
-                        ->cc(env('SUPPORT_MAIL'), 'e:Presence')
-                        ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                        ->cc(env('SUPPORT_MAIL'), config('mail.from.name'))
+                        ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                         ->returnPath(env('RETURN_PATH_MAIL'))
                         ->subject($email->title);
                 });
@@ -675,7 +675,7 @@ class Conference extends Model
                 $email = Email::where('name', 'conferenceEndNotification')->first();
                 $parameters = array('body' => $email->body, 'title' => $this->title);
                 Mail::send('emails.conference_endNotification', $parameters, function ($message) use ($userToRemind, $email, $moderator) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($userToRemind->email)
                         ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                         ->returnPath(env('RETURN_PATH_MAIL'))

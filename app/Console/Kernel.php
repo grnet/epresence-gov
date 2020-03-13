@@ -18,7 +18,6 @@ use App\Jobs\Users\ClearIpAddresses;
 use App\Jobs\Users\DeleteInactiveUnconfirmedUsers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DemoRoomController;
 
@@ -130,7 +129,6 @@ class Kernel extends ConsoleKernel
            // Anonymize confirmed inactive users
 
            AnonymizeConfirmedInactiveUsers::dispatch()->onQueue('low');
-
         })->monthly();
 
     }

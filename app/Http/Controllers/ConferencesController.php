@@ -1434,7 +1434,6 @@ class ConferencesController extends Controller
      */
     public function conferenceUserDisconnect()
     {
-        // path: public/vidyo_client_resources/script/myfunctions.js, lines: 364-368
         $conference_id = $_POST['conference_id'];
         //if user has already joined once
         DB::table('conference_user')
@@ -1529,8 +1528,6 @@ class ConferencesController extends Controller
         } else {
             $department = trans('controllers.notDefinedYet');
         }
-//        $state = '<span style="display:none">' . $user->state . '</span>' . $user->state_string($user->state);
-//        $status = '<span class="glyphicon ' . $user->status_icon($user->status) . '" aria-hidden="true"><span style="display:none">' . $user->status . '</span></span>' . $user->status_string($user->status);
         $button = '<button id="RowAddtoTele-' . $user->id . '" type="button" class="btn btn-success btn-sm btn-border" onclick="assignUserID(' . $user->id . ')">' . trans('conferences.adduser') . ' <span class="glyphicon glyphicon-share-alt"></span></button>';
         $json = array();
         $json['sEcho'] = 1;
@@ -1548,8 +1545,6 @@ class ConferencesController extends Controller
         $input = $request->all();
         $conference = Conference::findOrFail($input['conference_id']);
         $participant = User::findOrFail($input['user_id']);
-        $participants_users = DB::table('conference_user')->where('conference_id', $conference->id)->where('device', 'Desktop-Mobile')->count();
-        $participants_h323 = DB::table('conference_user')->where('conference_id', $conference->id)->where('device', 'H323')->count();
         if ($conference->participantConferenceStatus($input['user_id']) == 1) {
             $results = array(
                 'status' => 'error',
@@ -1591,10 +1586,6 @@ class ConferencesController extends Controller
     public function inviteH323ToConference(Request $request, $id)
     {
         $conference = Conference::findOrFail($id);
-//        $redis = Redis::connection();
-//        $key = "total_online_h323";
-//        $currently_total_online_h323 = $redis->get($key);
-//        $currently_total_online_h323 = is_null($currently_total_online_h323) || empty($currently_total_online_h323) || !is_numeric($currently_total_online_h323) ? 0 : intval($currently_total_online_h323);
         $currently_total_online_h323 = Cdr::whereNull('leave_time')->where('device', 'H323')->count();
         $max_h323_allowed = Settings::where('title', 'conference_H323Resources')->first();
         $is_h323_ip_detection_feature_enabled = Settings::where('title', 'conference_EnabledH323IpDetection')->first();
@@ -1636,26 +1627,18 @@ class ConferencesController extends Controller
     public function conferenceConnection($id)
     {
         $conference = Conference::findOrFail($id);
-
         if ($conference->room_enabled == 0) {
             $data['message'] = trans('controllers.conferenceInactive');
             return view('conferences.conferenceConnectionFailed', $data);
         } else {
-
-            $participantisEnabled = Auth::user()->participantValues($conference->id)->enabled;
-
+            $participantIsEnabled = Auth::user()->participantValues($conference->id)->enabled;
             if ($conference->isParticipant() == false) {
                 abort(403);
-            } elseif ($participantisEnabled == 0) {
+            } elseif ($participantIsEnabled == 0) {
                 $data['message'] = trans('controllers.youAreDisabled');
                 return view('conferences.conferenceConnectionFailed', $data);
             }
-
-
             $seconds_left = Carbon::now()->lessThan($conference->end) ? Carbon::now()->diffInSeconds($conference->end) : 0;
-
-            // $minutes_left = sprintf("%02d", intval((Carbon::now()->diffInMinutes($conference->end) / 60))) . ":" . sprintf("%02d\n", (Carbon::now()->diffInMinutes($conference->end) % 60));
-
             return view('conferences.conferenceConnection', compact('conference'))->with('seconds_left', $seconds_left);
         }
     }

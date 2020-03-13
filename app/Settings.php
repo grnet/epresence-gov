@@ -104,7 +104,7 @@ class Settings extends Model
 			    if($participant->status == 1){
 
                     Mail::send('emails.maintenanceNotification_participant', $parameters, function ($message) use ($participant, $email, $moderator){
-                        $message->from($email->sender_email, 'e:Presence')
+                        $message->from($email->sender_email, config('mail.from.name'))
                             ->to($participant->email)
                             ->replyTo($moderator->email, $moderator->firstname.' '.$moderator->lastname)
                             ->returnPath(env('RETURN_PATH_MAIL'))
@@ -120,9 +120,9 @@ class Settings extends Model
 			if($moderator->status == 1){
 
                 Mail::send('emails.maintenanceNotification_moderator', $parameters, function ($message) use ($moderator, $email){
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($moderator->email)
-                        ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                        ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                         ->returnPath(env('RETURN_PATH_MAIL'))
                         ->subject($email->title);
                 });
