@@ -272,7 +272,7 @@
                             @endif
                         @endif
                         @if (session('message'))
-                            <div class="alert alert-info" style="margin: 0px 0px 10px 0px">
+                            <div class="alert alert-info" style="margin: 0 0 10px 0">
                                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                                 {{ session('message') }}
                             </div>
@@ -288,7 +288,7 @@
                         <div class="gap"></div>
                         <h2 class="orange"> {{trans('site.moderatorAccess')}} </h2>
                         <hr>
-                        <p>{{trans('site.moderatorText1')}}</p>
+                        <p>{!!trans('site.moderatorText1')!!}</p>
                     </div>
                 </div><!--/.row-->
             </div><!--/.box-->
