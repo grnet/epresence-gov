@@ -288,9 +288,7 @@
                         <div class="gap"></div>
                         <h2 class="orange"> {{trans('site.moderatorAccess')}} </h2>
                         <hr>
-                        <p>{{trans('site.moderatorText1')}} <a data-toggle="modal" href="#CoordDepart"
-                                                               id="CoordDepartLink">{{trans('site.moderatorText2')}}</a>. {{trans('site.moderatorText3')}}
-                        </p>
+                        <p>{{trans('site.moderatorText1')}}</p>
                     </div>
                 </div><!--/.row-->
             </div><!--/.box-->
