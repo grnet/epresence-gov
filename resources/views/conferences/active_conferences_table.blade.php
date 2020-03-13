@@ -31,9 +31,14 @@
                                 type="button"
                                 style="margin:5px;"
                                 class="GotoTele btn @if($disabled || $conference->locked)btn-danger @else btn-success @endif btn-sm m-right btn-border">
-                            <span class="glyphicon glyphicon-log-in"></span> <span
-                                    id="ActiveConferenceDevice-{{$conference->id}}">{{$device}}</span>
-                            <span id="status-{{$conference->id}}">@if(!$disabled && !$conference->locked){{trans('conferences.connect')}} @elseif($conference->locked) {{ trans('conferences.conference_room_locked') }} @elseif($disabled) {{trans('application.inactive')}} @endif</span>
+                            <span class="glyphicon glyphicon-log-in"></span>
+{{--                            <span id="ActiveConferenceDevice-{{$conference->id}}">{{$device}}</span>--}}
+                            <span id="status-{{$conference->id}}">
+                                @if(!$disabled && !$conference->locked){{trans('conferences.connect')}}
+                                @elseif($conference->locked) {{ trans('conferences.conference_room_locked') }}
+                                @elseif($disabled) {{trans('application.inactive')}}
+                                @endif
+                            </span>
                         </button>
                     @endif
                 </div>
@@ -41,7 +46,7 @@
         @endforeach
     </div>
     <div id="no_active_conferences_message" class="alert alert-danger"
-         style="margin: 0px 0px 10px 0px; @if(count($active_conferences) !== 0) display:none; @endif">
+         style="margin: 0 0 10px 0; @if(count($active_conferences) !== 0) display:none; @endif">
         {{trans('conferences.noActiveInvites')}}
     </div>
 </div>

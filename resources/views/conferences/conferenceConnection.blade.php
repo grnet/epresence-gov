@@ -165,12 +165,9 @@
                                             @if($conference->participantConferenceStatus($participant->id) == 1)
                                                 <li class="active"
                                                     id="participantConnected-{{ $participant->id }}">{{ $participant->email }}
-                                                    ({{trans('users.localUserShort')}}
-                                                    : {{$participant->state_string($participant->state)}})
                                                 </li>
                                             @elseif($conference->participantConferenceStatus($participant->id) == 0)
                                                 <li id="participantConnected-{{ $participant->id }}">{{ $participant->email }}
-                                                    ({{trans('users.localUserShort')}}: {{$participant->state_string($participant->state)}})
                                                 </li>
                                             @endif
                                         @endforeach

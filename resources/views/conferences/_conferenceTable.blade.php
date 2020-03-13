@@ -78,7 +78,7 @@
 														<strong>{{trans('users.creationDate')}}: </strong> {{ $conference->created_at->format('d-m-Y H:i') }}<br/>
 														<strong>{{trans('conferences.start')}}: </strong> {{ $conference->getDate($conference->start) }} {{ $conference->getTime($conference->start) }}<br/>
 														<strong>{{trans('conferences.end')}}: </strong> {{ $conference->getDate($conference->end) }} {{ $conference->getTime($conference->end) }}<br/>
-														<strong>{{trans('conferences.participants')}}: </strong> Desktop-Mobile: {{ $conference->participantsPerDevice('Desktop-Mobile') }} | H.323: {{ $conference->participantsPerDevice('H323') }}<br/>
+														<strong>{{trans('conferences.participants')}}: </strong> Desktop-Mobile: {{ $conference->participantsPerDevice('Desktop-Mobile') }}
 													</td>
 												</tr>
 											</tbody>
