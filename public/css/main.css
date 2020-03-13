@@ -240,9 +240,9 @@ a:focus {
 		
 @media (min-width: 1210px) {
 	.navbar-default .navbar-brand {
-	  margin-right: 0px;
+	  margin-right: 0;
 	  margin-left: 20px;
-	  width: 260px;
+	  width: 300px;
 	  height: 75px;
 	  background: url(../images/epresence-logo-sm.png) no-repeat 0 50%;
 	}
@@ -251,9 +251,9 @@ a:focus {
 
 @media (max-width: 1211px) {
 	.navbar-default .navbar-brand {
-	  margin-right: 0px;
+	  margin-right: 0;
 	  margin-left: 10px;
-	  width: 105px;
+	  width: 190px;
 	  height: 75px;
 	  background: url(../images/epresence-logo-xs.png) no-repeat 0 50%;
 	}
@@ -269,7 +269,7 @@ a:focus {
 @media (max-width: 768px) {
 	.navbar-nav {
 		float:left;
-		margin:0px !important;
+		margin:0 !important;
 		width:100%;
 	}
 }
