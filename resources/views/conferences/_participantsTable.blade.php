@@ -14,9 +14,11 @@
                             <th class="cellPButton"></th>
 						@endif
 						@if(str_contains( Request::path(), 'manage'))
+							<th class="cellPStatus">{{trans('conferences.state')}}</th>
 							<th class="cellPConnected">{{trans('conferences.connected')}}</th>
 						@endif
 						@if(str_contains( Request::path(), 'details'))
+							<th class="cellPStatus">{{trans('conferences.state')}}</th>
 							<th class="cellPAddress">{{trans('conferences.address')}}</th>
 							<th class="cellPDuration">{{trans('conferences.duration')}}</th>
 						@endif
