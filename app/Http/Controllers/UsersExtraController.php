@@ -82,7 +82,6 @@ class UsersExtraController extends Controller
      */
     public function updateSsoUser(Requests\UpdateSsoAccountRequest $request, $id)
     {
-        Log::info("Update User: ".json_encode($request->all()));
         // State input values+
 
         $user = User::find($id);

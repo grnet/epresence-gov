@@ -19,8 +19,6 @@ class UpdateSsoAccountRequest extends Request
     public function rules()
     {
         return [
-            'lastname' => 'required',
-            'firstname' => 'required',
             'telephone' => 'required_unless:role,EndUser',
             'thumbnail' => 'image|max:300',
             'institution_id'=>'required',
@@ -32,10 +30,7 @@ class UpdateSsoAccountRequest extends Request
 
     public function messages()
     {
-
         return [
-            'lastname.required' => trans('requests.lastnameRequired'),
-            'firstname.required' => trans('requests.firstnameRequired'),
             'telephone.required_unless' => trans('requests.phoneRequired'),
             'thumbnail.image' => trans('requests.photoFileType').': jpeg, png, bmp, gif, svg',
             'thumbnail.max' => trans('requests.maxPhotoSize'),

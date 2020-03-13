@@ -24,14 +24,14 @@
                 <div class="form-group">
                     {!! Form::label('FieldUserSurname', trans('users.surname').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
-                        {!! Form::text('lastname', $user->lastname, ['class' => 'form-control','id' => 'FieldUserSurname', 'placeholder' => trans('users.surnameRequired')]) !!}
+                        {!! Form::text('lastname', $user->lastname, ['disabled'=>true,'class' => 'form-control','id' => 'FieldUserSurname', 'placeholder' => trans('users.surnameRequired')]) !!}
                     </div>
                 </div>
 
                 <div class="form-group">
                     {!! Form::label('FieldUserΝame', trans('users.name').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
-                        {!! Form::text('firstname', $user->firstname, ['class' => 'form-control', 'id' => 'FieldUserΝame', 'placeholder' => trans('users.nameRequired')]) !!}
+                        {!! Form::text('firstname', $user->firstname, ['disabled'=>true,'class' => 'form-control', 'id' => 'FieldUserΝame', 'placeholder' => trans('users.nameRequired')]) !!}
                         <div class="help-block with-errors" style="margin:0px;"></div>
                     </div>
                 </div>
@@ -118,6 +118,7 @@
                         <div class="col-sm-8 form-control-static">
                             {{ $department->title }}
                         </div>
+                        <input type="hidden" value="{{$department->id}}" name="department_id">
                     </div>
                 @endif
                 <div class="modal-footer" style="margin-top:0;">

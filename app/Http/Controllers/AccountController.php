@@ -297,7 +297,7 @@ class AccountController extends Controller
             }
             $user->departments()->sync([$input['department_id']]);
         }
-        $user->update(array_except($input, ['password']));
+        $user->update(array_except($input, ['password','fistname','lastname']));
         $message = trans('controllers.changesSaved');
         return back()->with('message', $message);
     }
