@@ -242,7 +242,7 @@ a:focus {
 	.navbar-default .navbar-brand {
 	  margin-right: 0;
 	  margin-left: 20px;
-	  width: 300px;
+	  width: 260px;
 	  height: 75px;
 	  background: url(../images/epresence-logo-sm.png) no-repeat 0 50%;
 	}
@@ -253,7 +253,7 @@ a:focus {
 	.navbar-default .navbar-brand {
 	  margin-right: 0;
 	  margin-left: 10px;
-	  width: 190px;
+	  width: 105px;
 	  height: 75px;
 	  background: url(../images/epresence-logo-xs.png) no-repeat 0 50%;
 	}
