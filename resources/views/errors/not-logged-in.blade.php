@@ -25,7 +25,6 @@
 						</div>
 					</div>
 				</div>
-  
             </div><!--/.box-->
         </div><!--/.container-->        
     </section>

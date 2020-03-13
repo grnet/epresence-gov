@@ -33,9 +33,9 @@ class UpdateTotalDeviceServiceUsageStatistics implements ShouldQueue
     public function handle()
     {
         $total_desk_mobile_users = DB::table('conference_user')->where('device', 'Desktop-Mobile')->groupBy('user_id')->get()->count();
-        DB::table('service_usage')->where('option', 'total')->update(['desktop_mobile'=>$total_desk_mobile_users+5500]);
+        DB::table('service_usage')->where('option', 'total')->update(['desktop_mobile'=>$total_desk_mobile_users]);
 
         $h323 =  DB::table('conference_user')->where('device', 'H323')->groupBy('user_id')->get()->count();
-        DB::table('service_usage')->where('option', 'total')->update(['h323'=>$h323+300]);
+        DB::table('service_usage')->where('option', 'total')->update(['h323'=>$h323]);
     }
 }
