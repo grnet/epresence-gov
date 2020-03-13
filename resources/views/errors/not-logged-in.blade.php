@@ -10,7 +10,6 @@
 		.error-actions .btn { margin-right:10px; }
 	</style>
 @endsection
-
 @section('content')
 	<section id="Users">
         <div class="container">
@@ -18,7 +17,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<div class="error-template">
-							{!!trans('errors.not_authorized')!!}
+							{!!trans('errors.not_logged_in')!!}
 							<div class="error-actions">
 								<a href="/" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
 								{{trans('errors.homePage')}} </a>
