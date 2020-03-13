@@ -3,7 +3,7 @@
         <div class="box">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <a href="#" target="_blank"><img src="/images/gov-logo.png" style="margin-left:10px; margin-right:10px; margin-bottom:10px;"
+                    <a href="https://www.gov.gr" target="_blank"><img src="/images/gov-logo.png" style="margin-left:10px; margin-right:10px; margin-bottom:10px;"
                                                                      alt="grnet" title="grnet"></a>
                 </div>
                 <div class="col-md-12 text-center" style="overflow: auto;">
