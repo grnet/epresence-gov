@@ -6,7 +6,6 @@
         <th class="cellPEmail" >Email</th>
         <th class="cellPState hidden-xs " id="sort_state">{{trans('conferences.localUserTruncated')}}</th>
         <th class="cellPDevice">{{trans('conferences.device')}}</th>
-        <th class="cellPStatus">{{trans('conferences.state')}}</th>
         <th class="cellPConnected">{{trans('conferences.connected')}}</th>
     </tr>
     </thead>
@@ -19,7 +18,6 @@
             <td class="cellDetails main_table" id="openParticipantDetails-{{ $participant->id }}"><span data-toggle="tooltip" data-placement="bottom" title="{{trans('conferences.details')}}" class="glyphicon glyphicon-zoom-in participant_details" aria-hidden="true"></span></td>
             <td class="cellPName hidden-xs">{{ $participant->lastname }} {{ $participant->firstname }}</td>
             <td class="cellPEmail">{{ $participant->email }}</td>
-            <td class="cellPState hidden-xs"><span style="display:none">{{ $participant->state }}</span> {{ $participant->state_string($participant->state) }}</td>
             <td class="cellPDevice">
                     <span id="device-{{$participant->id}}">{{ $participant->participantValues($conference->id)->device }}</span>
             </td>
@@ -72,7 +70,6 @@
                                 @else
                                     {{trans('users.yes')}}<br/>
                                 @endif
-                                <strong>{{trans('conferences.localUser')}}:</strong> {{ $participant->state_string($participant->state) }}<br/>
                                 <strong>{{trans('conferences.telephone')}}:</strong> {{ $participant->telephone }}<br/>
                                 <strong>{{trans('conferences.userType')}}:</strong> {{ trans($participant->roles->first()->label) }}<br/>
                                 @if($participant->institutions->count() > 0 && $participant->institutions->first()->slug == 'other')
