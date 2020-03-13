@@ -211,11 +211,7 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <p>
-                                                    @if(Auth::user()->state == "sso")
-                                                        <a href="{{config('services.gsis.urlLogout')}}{{config('services.gsis.clientId')}}/?url={{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
-                                                    @else
-                                                        <a href="{{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
-                                                    @endif
+                                                    <a href="{{route('logout')}}" class="btn btn-danger btn-block">{{trans('site.logout')}}</a>
                                                 </p>
                                             </div>
                                         </div>
@@ -232,21 +228,6 @@
                         <li @yield('calendar-active')><a href="/calendar">{{trans('site.calendar')}}</a></li>
                         <li><a href="/login">{{trans('site.login')}}</a></li>
                     @endif
-{{--                    <li class="dropdown">--}}
-{{--                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">--}}
-{{--                            <img src="/images/{{ Session::get('locale') }}.png"/>--}}
-{{--                            <strong style="text-transform: uppercase !important;">{{ Session::get('locale') }}</strong>--}}
-{{--                            <span class="glyphicon glyphicon-chevron-down"></span>--}}
-{{--                        </a>--}}
-{{--                        <ul class="dropdown-menu">--}}
-{{--                            <li>--}}
-{{--                                <a href="#" id="setLangTo-el"><img src="/images/el.png"/> Ελληνικά</a>--}}
-{{--                            </li>--}}
-{{--                            <li>--}}
-{{--                                <a href="#" id="setLangTo-en"><img src="/images/en.png"/> English</a>--}}
-{{--                            </li>--}}
-{{--                        </ul>--}}
-{{--                    </li>--}}
                     @if(Auth::check() && Auth::user()->hasRole('SuperAdmin'))
                        <li><a href="/admin/dashboard" target="_blank">Admin</a></li>
                     @endif
