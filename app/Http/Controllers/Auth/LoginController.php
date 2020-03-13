@@ -169,12 +169,13 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = $request->user();
-        $this->guard()->logout();
-        $request->session()->invalidate();
-        if($user->state=="sso")
-        return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.url('/'));
-        else
-        return redirect(url('/'));
+        if(Auth::check()){
+            $user = $request->user();
+            $this->guard()->logout();
+            $request->session()->invalidate();
+            return $user->state == "sso" ? redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . url('/')) : redirect(url('/'));
+        }else{
+            return redirect(url('/'));
+        }
     }
 }
