@@ -6,7 +6,6 @@ use Illuminate\Session\Store;
     
 class SessionTimeout {
 	protected $session;
-	protected $timeout=3600;
 	
 	public function __construct(Store $session){
 		$this->session=$session;
@@ -20,14 +19,12 @@ class SessionTimeout {
 	*/
 	public function handle($request, Closure $next)
 	{
-
-
 		if(!$this->session->has('lastActivityTime'))
 			$this->session->put('lastActivityTime',time());
 		elseif((time() - $this->session->get('lastActivityTime') > $this->getTimeOut()) && Auth::check()){
 			$this->session->forget('lastActivityTime');
 			Auth::logout();
-			return redirect('auth/login')->withErrors([trans('controllers.userLogout')]);
+            return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.route('not-logged-in'));
 		}
 		$this->session->put('lastActivityTime',time());
 		return $next($request);
@@ -35,6 +32,6 @@ class SessionTimeout {
      
 	protected function getTimeOut()
 	{
-		return (env('TIMEOUT')) ?: $this->timeout;
+		return config('session.lifetime')*60;
 	}
 }
