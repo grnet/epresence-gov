@@ -42,7 +42,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-
         // WARNING: scheduled tasks wont run if application is in maintenance mode
         // Every 15 minutes
 
@@ -63,6 +62,7 @@ class Kernel extends ConsoleKernel
            //Disabled during zoom migration  17/1/2019
 
            RemindUsersForClosingConferences::dispatch()->onQueue('high');
+
         })->cron('0,15,30,45 * * * * *');
 
 

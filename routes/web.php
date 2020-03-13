@@ -133,7 +133,7 @@ Route::post('auth/login', 'Auth\LoginController@login');
 Route::get('auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('auth/not-authorized','Auth\GsisAuthenticationController@notAuthorized')->name('not-authorized');
-
+Route::get('auth/not-logged-in','Auth\GsisAuthenticationController@notLoggedIn')->name('not-logged-in');
 //Authentication Routes End
 //Users
 

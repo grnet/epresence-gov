@@ -22,7 +22,7 @@
                 </div>
                 <div class="col-md-12">
                     @if(Auth::user()->state == "sso")
-                        <a href="{{config('services.gsis.urlLogout')}}/{{config('services.gsis.clientId')}}/?url={{route('logout')}}" class="btn btn-danger">{{trans('site.cancel')}}</a>
+                        <a href="{{config('services.gsis.urlLogout')}}{{config('services.gsis.clientId')}}/?url={{route('logout')}}" class="btn btn-danger">{{trans('site.cancel')}}</a>
                     @else
                         <a href="{{route('logout')}}" class="btn btn-danger">{{trans('site.cancel')}}</a>
                     @endif

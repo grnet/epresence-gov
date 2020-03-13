@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 use Request;
 use Illuminate\Contracts\Auth\Guard;
 
@@ -39,16 +40,10 @@ class Authenticate
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
             } else {
-                return redirect()->guest('/');
+                return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.route('not-logged-in'));
             }
         }
-		
-		if ($request->user()->confirmed == 0 && !str_contains(Request::path(), 'users/'.$request->user()->id)){
-			return redirect('account_activation');
-		}elseif($request->user()->status == 0){
-			$this->auth->logout();
-			return redirect('/')->withErrors(trans('controllers.userEmailDeactivated'));
-		}
+
         return $next($request);
     }
 }
