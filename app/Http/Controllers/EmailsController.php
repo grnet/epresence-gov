@@ -29,7 +29,7 @@ class EmailsController extends Controller
 		
 	    Mail::send('emails.contact_form', ['fullname' => $input['fullname'], 'email' => $input['email'], 'text' => $text,'user_agent'=>$request->header('User-Agent')], function ($message) use ($input){
 			$message->from($input['email'], $input['fullname'])
-					->sender(env('SUPPORT_MAIL'), 'e:Presence')
+					->sender(env('SUPPORT_MAIL'), config('mail.from.name'))
 					->replyTo($input['email'], $input['fullname'])
 					->to(env('SUPPORT_MAIL'))
 					->subject('Contact Form Submission');
@@ -86,8 +86,8 @@ class EmailsController extends Controller
 			$parameters['coordinator'] = $coordinator;
 			$parameters['sender'] = Auth::user();
 			Mail::send('emails.coordinators_mail', $parameters, function ($message) use ($coordinator, $email, $input){ 
-				$message->from($email->sender_email, 'e:Presence')
-						->replyTo(Auth::user()->email, 'e:Presence')
+				$message->from($email->sender_email, config('mail.from.name'))
+						->replyTo(Auth::user()->email, Auth::user()->firstname.' '.Auth::user()->lastname)
 						->returnPath(env('RETURN_PATH_MAIL'))
 						->to($coordinator->email)
 						->subject($input['title']);

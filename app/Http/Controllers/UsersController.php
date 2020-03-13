@@ -350,7 +350,7 @@ class UsersController extends Controller
             $parameters = array('user' => $user);
 
             Mail::send('emails.newDepartmentAdministrator', $parameters, function ($message) use ($email, $user) {
-                $message->from($email->sender_email, 'e:Presence')
+                $message->from($email->sender_email, config('mail.from.name'))
                     ->to(env('SUPPORT_MAIL'))
                     ->replyTo($user->email, $user->firstname . ' ' . $user->lastname)
                     ->returnPath(env('RETURN_PATH_MAIL'))
@@ -488,7 +488,7 @@ class UsersController extends Controller
 
                 $parameters = array('body' => $email->body, 'user' => $userToInvite, 'inviting_user' => $authUser, 'department' => $user_department_title);
                 Mail::send('emails.departmentAdministratorInvitation', $parameters, function ($message) use ($userToInvite, $email) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($userToInvite->email)
                         ->replyTo(env('SUPPORT_MAIL'))
                         ->returnPath(env('RETURN_PATH_MAIL'))
@@ -535,7 +535,7 @@ class UsersController extends Controller
 
         $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
         Mail::send($email_view, $parameters, function ($message) use ($user, $email) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user->email)
                 ->replyTo(env('SUPPORT_MAIL'))
                 ->returnPath(env('RETURN_PATH_MAIL'))

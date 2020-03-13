@@ -133,7 +133,7 @@ class GsisAuthenticationController extends Controller
                                         ];
                                         $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
                                         Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
-                                            $message->from($email->sender_email, 'e:Presence')
+                                            $message->from($email->sender_email,config('mail.from.name'))
                                                 ->to($recipients)
                                                 ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
                                                 ->returnPath(env('RETURN_PATH_MAIL'))
@@ -150,7 +150,7 @@ class GsisAuthenticationController extends Controller
                                     $parameters = ['new_role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
                                     $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
                                     Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
-                                        $message->from($email->sender_email, 'e:Presence')
+                                        $message->from($email->sender_email,config('mail.from.name'))
                                             ->to($recipients)
                                             ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
                                             ->returnPath(env('RETURN_PATH_MAIL'))

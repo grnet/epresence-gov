@@ -112,9 +112,9 @@ class AccountController extends Controller
             if($coordinator->status == 1){
 
                 Mail::send('emails.conference_participantDeletedCoordinatorsSelf', $parameters, function ($message) use ($coordinator, $email) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($coordinator->email)
-                        ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                        ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                         ->returnPath(env('RETURN_PATH_MAIL'))
                         ->subject($email->title);
                 });
@@ -162,7 +162,7 @@ class AccountController extends Controller
         $parameters = array('deletedEmail' => $deleted_email);
 
         Mail::send('emails.user_deleted', $parameters, function ($message) use ($email) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to(env('SUPPORT_MAIL'))
                 ->returnPath(env('RETURN_PATH_MAIL'))
                 ->subject($email->title);

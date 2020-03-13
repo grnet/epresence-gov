@@ -101,9 +101,9 @@ class ApplicationController extends Controller
             if ($user->status == 1) {
 
                 Mail::send('emails.application_accepted', $parameters, function ($message) use ($user, $email) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($user->email)
-                        ->replyTo($email->sender_email, 'e:Presence')
+                        ->replyTo($email->sender_email, config('mail.from.name'))
                         ->returnPath(env('RETURN_PATH_MAIL'))
                         ->subject($email->title);
                 });
@@ -132,7 +132,7 @@ class ApplicationController extends Controller
                 $application_parameters = array('body' => $email_for_admins->body, 'user' => $user, 'role_requested' => $attached_role->label);
 
                 Mail::send('emails.application_accepted_for_admins', $application_parameters, function ($message) use ($email_for_admins, $admins_to_notify) {
-                    $message->from($email_for_admins->sender_email, 'e:Presence')
+                    $message->from($email_for_admins->sender_email, config('mail.from.name'))
                         ->to($admins_to_notify)
                         ->replyTo($email_for_admins->sender_email)
                         ->returnPath(env('RETURN_PATH_MAIL'))
@@ -225,7 +225,7 @@ class ApplicationController extends Controller
         $parameters = array('body' => $email->body, 'user' => $user, 'role_requested' => $attached_role->label);
 
         Mail::send('emails.admin_application', $parameters, function ($message) use ($email, $user) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to(env('RETURN_PATH_MAIL'))
                 ->replyTo($user->email, $user->firstname . ' ' . $user->lastname)
                 ->returnPath(env('RETURN_PATH_MAIL'))
@@ -237,7 +237,7 @@ class ApplicationController extends Controller
             $email_for_admins = Email::where('name', 'adminApplicationForAdmins')->first();
 
             Mail::send('emails.admin_application_for_other_admins', $parameters, function ($message) use ($email_for_admins, $user, $admins_to_notify) {
-                $message->from($email_for_admins->sender_email, 'e:Presence')
+                $message->from($email_for_admins->sender_email, config('mail.from.name'))
                     ->to($admins_to_notify)
                     ->replyTo($email_for_admins->sender_email)
                     ->returnPath(env('RETURN_PATH_MAIL'))
@@ -365,7 +365,7 @@ class ApplicationController extends Controller
             $parameters = array('body' => $email->body, 'user' => $user, 'role_requested' => $role->label);
 
             Mail::send('emails.admin_application', $parameters, function ($message) use ($email, $user) {
-                $message->from($email->sender_email, 'e:Presence')
+                $message->from($email->sender_email, config('mail.from.name'))
                     ->to(env('RETURN_PATH_MAIL'))
                     ->replyTo($user['email'], $user['firstname'] . ' ' . $user['lastname'])
                     ->returnPath(env('RETURN_PATH_MAIL'))
@@ -378,7 +378,7 @@ class ApplicationController extends Controller
                 $email_for_admins = Email::where('name', 'adminApplicationForAdmins')->first();
 
                 Mail::send('emails.admin_application_for_other_admins', $parameters, function ($message) use ($email_for_admins, $admins_to_notify) {
-                    $message->from($email_for_admins->sender_email, 'e:Presence')
+                    $message->from($email_for_admins->sender_email, config('mail.from.name'))
                         ->to($admins_to_notify)
                         ->replyTo($email_for_admins->sender_email)
                         ->returnPath(env('RETURN_PATH_MAIL'))

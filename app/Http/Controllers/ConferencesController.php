@@ -1171,7 +1171,7 @@ class ConferencesController extends Controller
                 $email = Email::where('name', 'participantDeleted')->first();
                 $moderator = User::findOrFail($conference->user_id);
                 Mail::send('emails.conference_participantDeleted', $parameters, function ($message) use ($detached_user, $email, $moderator) {
-                    $message->from($email->sender_email, 'e:Presence')
+                    $message->from($email->sender_email, config('mail.from.name'))
                         ->to($detached_user->email)
                         ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                         ->returnPath(env('RETURN_PATH_MAIL'))
@@ -1367,7 +1367,7 @@ class ConferencesController extends Controller
                 $ics = $conference->geticsFile($moderator, $user);
                 if ($user->status == 1) {
                     Mail::send('emails.conference_invitation', $parameters, function ($message) use ($user, $email, $conference, $moderator, $ics) {
-                        $message->from($email->sender_email, 'e:Presence')
+                        $message->from($email->sender_email, config('mail.from.name'))
                             ->to($user->email)
                             ->replyTo($moderator->email, $moderator->firstname . ' ' . $moderator->lastname)
                             ->returnPath(env('RETURN_PATH_MAIL'))

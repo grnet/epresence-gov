@@ -112,7 +112,7 @@ class UsersExtraController extends Controller
                 $parameters = array('contact_url' => URL::to("support"),'new_role' =>  $update_role->label,'user'=>$user);
                 if($user->status == 1){
                     Mail::send('emails.user_role_updated', $parameters, function ($message) use ($user, $email) {
-                        $message->from($email->sender_email, 'e:Presence')
+                        $message->from($email->sender_email, config('mail.from.name'))
                             ->to($user->email, $user->firstname . ' ' . $user->lastname)
                             ->replyTo(env('RETURN_PATH_MAIL'))
                             ->returnPath(env('RETURN_PATH_MAIL'))
@@ -135,10 +135,10 @@ class UsersExtraController extends Controller
             $parameters = ['contact_url' => URL::to("contact")];
 
             Mail::send('emails.account_disabled', $parameters, function ($message) use ($user, $email) {
-                $message->from($email->sender_email, 'e:Presence')
+                $message->from($email->sender_email, config('mail.from.name'))
                     ->to($user->email)
-                    ->cc(env('SUPPORT_MAIL'), 'e:Presence')
-                    ->replyTo(env('SUPPORT_MAIL'), 'e:Presence')
+                    ->cc(env('SUPPORT_MAIL'), config('mail.from.name'))
+                    ->replyTo(env('SUPPORT_MAIL'), config('mail.from.name'))
                     ->returnPath(env('RETURN_PATH_MAIL'))
                     ->subject($email->title);
             });
@@ -194,9 +194,9 @@ class UsersExtraController extends Controller
         $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
 
         Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user, $email) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user->email)
-                ->replyTo($email->sender_email, 'e:Presence')
+                ->replyTo($email->sender_email, config('mail.from.name'))
                 ->returnPath(env('RETURN_PATH_MAIL'))
                 ->subject($email->title);
         });
@@ -257,9 +257,9 @@ class UsersExtraController extends Controller
         $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
 
         Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user_email, $email) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user_email)
-                ->replyTo($email->sender_email, 'e:Presence')
+                ->replyTo($email->sender_email, config('mail.from.name'))
                 ->returnPath(env('RETURN_PATH_MAIL'))
                 ->subject($email->title);
         });
@@ -321,12 +321,12 @@ class UsersExtraController extends Controller
             $reply_to['full_name'] = $creator->firstname . ' ' . $creator->lastname;
         }else{
             $reply_to['email'] = env('SUPPORT_MAIL');
-            $reply_to['full_name'] = 'e:Presence';
+            $reply_to['full_name'] = config('mail.from.name');
         }
 
         $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
         Mail::send($view, $parameters, function ($message) use ($user, $email, $reply_to) {
-            $message->from($email->sender_email, 'e:Presence')
+            $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user->email)
                 ->replyTo($reply_to['email'],$reply_to['full_name'])
                 ->returnPath(env('RETURN_PATH_MAIL'))
@@ -356,7 +356,7 @@ class UsersExtraController extends Controller
 
             $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
             Mail::send('emails.enable_account_local', $parameters, function ($message) use ($user, $email, $creator) {
-                $message->from($email->sender_email, 'e:Presence')
+                $message->from($email->sender_email, config('mail.from.name'))
                     ->to($user->email)
                     ->replyTo($creator->email, $creator->firstname . ' ' . $creator->lastname)
                     ->returnPath(env('RETURN_PATH_MAIL'))
