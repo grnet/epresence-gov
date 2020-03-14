@@ -49,7 +49,9 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['email', 'password', 'firstname', 'lastname', 'telephone', 'tax_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'application', 'apply_for', 'custom_values', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms'];
+    protected $fillable = ['email', 'password', 'firstname', 'lastname', 'telephone', 'tax_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'application', 'apply_for', 'custom_values', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms',
+    'confirmation_code'
+    ];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -1293,5 +1295,14 @@ class User extends Model implements AuthenticatableContract,
                     ->update($update_parameters);
             }
         }
+    }
+
+    /**
+     *Checks if user has entered a email address on his account
+     *
+     * @return bool
+     */
+    public function hasEmailAddress(){
+        return strpos($this->email,'@') !== false && !empty($this->email);
     }
 }

@@ -158,136 +158,19 @@ class UsersExtraController extends Controller
         return back()->with('message', $message);
     }
 
-
     /**
-     * @param Request $request
+     * @param $confirmation_code
      * @return RedirectResponse
      */
-    public function send_email_confirmation_link(Request $request){
-
-        $input = $request->all();
-        $user =  Auth::user();
-
-        $validator = Validator::make($request->all(), [
-            'email' => "required|email|unique:users,email,".$user->id.",id|unique:users_extra_emails,email,NULL,id,confirmed,1",
-        ], [
-            'email.required' => trans('requests.emailRequired'),
-            'email.unique' => trans('requests.emailNotUniqueNewSSO'),
-            'email.email' => trans('requests.emailInvalid'),
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+    public function confirm_sso_email($confirmation_code){
+        $user = User::where('confirmation_code',$confirmation_code)->first();
+        if($user){
+            $user->update(['confirmation_code'=>null,'confirmed'=>true]);
+            Auth::login($user);
+            return redirect()->route('account-activation')->with('message', trans('users.emailConfirmed'));
+        }else{
+            abort(403);
         }
-
-        $user->email = $input['email'];
-        $user->name = $input['email'];
-
-        $user->activation_token =  str_random(15);
-        $user->update();
-
-        $email = Email::where('name', 'ssoUserEmailConfirm')->first();
-        $login_url = URL::to("confirm_sso_email/" . $user->activation_token);
-
-
-        $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
-
-        Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user, $email) {
-            $message->from($email->sender_email, config('mail.from.name'))
-                ->to($user->email)
-                ->replyTo($email->sender_email, config('mail.from.name'))
-                ->returnPath(env('RETURN_PATH_MAIL'))
-                ->subject($email->title);
-        });
-
-        return back();
-      }
-
-
-    /**
-     * @param Request $request
-     * @return RedirectResponse|Redirector
-     */
-    public function send_email_confirmation_link_create_user(Request $request)
-    {
-
-        $input = $request->all();
-
-        $validator = Validator::make($request->all(), [
-            'email' => "required|email|unique:users,email,NULL,id|unique:users_extra_emails,email,NULL,id,confirmed,1",
-            'persistent_id'=>"required|unique:users,persistent_id",
-        ], [
-            'email.required' => trans('requests.emailRequired'),
-            'email.unique' => trans('requests.emailNotUniqueNewSSO'),
-            'email.email' => trans('requests.emailInvalid'),
-            'persistent_id.unique' => trans('requests.persistent_id_confirmed'),
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-        $user = new User;
-
-        $user->lastname = $input['lastname'];
-        $user->firstname = $input['firstname'];
-        $user->email = $input['email'];
-        $user->name = $input['email'];
-        $user->telephone = $input['telephone'];
-        $user->password = str_random(15);
-        $user->confirmed = false;
-        $user->confirmation_state = "pending_email";
-        $user->persistent_id = $input['persistent_id'];
-        $user->state = 'sso';
-        $user->status = true;
-        $user->activation_token =  str_random(15);
-        $user->save();
-
-        // Assign role to user
-        $user->assignRole("EndUser");
-
-        $user->institutions()->attach($input['institution_id']);
-
-        $email = Email::where('name', 'ssoUserEmailConfirm')->first();
-
-        $login_url = URL::to("confirm_sso_email/" . $user->activation_token);
-
-        $user_email = $input['email'];
-
-        $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
-
-        Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user_email, $email) {
-            $message->from($email->sender_email, config('mail.from.name'))
-                ->to($user_email)
-                ->replyTo($email->sender_email, config('mail.from.name'))
-                ->returnPath(env('RETURN_PATH_MAIL'))
-                ->subject($email->title);
-        });
-
-       Auth::login($user);
-
-       session()->forget("emails");
-
-       return redirect("account_activation");
-    }
-
-    /**
-     * @param $token
-     * @return RedirectResponse
-     */
-    public function confirm_sso_email($token){
-
-        $user = User::where('activation_token',$token)->first();
-
-        $user->confirmation_state = "custom_email_confirmed";
-        $user->update();
-
-        Auth::login($user);
-
-        session()->put('confirmed_sso_email',$user->email);
-
-        ExtraEmail::where('email',$user->email)->where('confirmed', 0)->delete();
-
-        return redirect('account_activation')->with('message', trans('users.emailConfirmed'));;
     }
 
 
@@ -338,37 +221,4 @@ class UsersExtraController extends Controller
 
         return response()->json(['status' => $status, 'message' => $message]);
     }
-
-
-    /**
-     * @param $token
-     * @return RedirectResponse
-     */
-    public function resend_local_user_activation_email_token($token){
-        $user = User::where('activation_token',$token)->where('confirmed',0)->where('state','local')->first();
-        if(isset($user->id)){
-            $login_url = URL::to("auth/login");
-            $email = Email::where('name', 'userAccountEnable')->first();
-            $password = str_random(15);
-            $user->createNewPassword($password);
-            $creator = $user->creator;
-
-            $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
-            Mail::send('emails.enable_account_local', $parameters, function ($message) use ($user, $email, $creator) {
-                $message->from($email->sender_email, config('mail.from.name'))
-                    ->to($user->email)
-                    ->replyTo($creator->email, $creator->firstname . ' ' . $creator->lastname)
-                    ->returnPath(env('RETURN_PATH_MAIL'))
-                    ->subject($email->title);
-            });
-
-            $user->update(['activation_token'=>'']);
-
-            return redirect('/message')->with('message',trans('admin.emailSent'));
-
-        }else{
-            return redirect('/message')->with('error',trans('requests.tokenInvalidOrUsed'));
-        }
-    }
-
 }

@@ -44,7 +44,6 @@ return [
         'h323_sensor_ip_address'=>env('ZOOM_H323_SENSOR_IP_ADDRESS'),
         'h323_disabled_group_id'=>env('ZOOM_H323_DISABLED_GROUP_ID'), //The id of the zoom group that h323 connections are disabled
     ],
-
     'gsis'=>[
         'clientId'=>env('GSIS_CLIENT_ID'),
         'clientSecret'=>env('GSIS_CLIENT_SECRET'),
@@ -53,6 +52,11 @@ return [
         'urlAccessToken'=>env('GSIS_ACCESS_TOKEN_URL'),
         'urlResourceOwnerDetails'=>env('GSIS_RESOURCE_OWNER'),
         'urlLogout'=>env('GSIS_LOGOUT_URL')
+    ],
+    'gov-employees-api'=>[
+        'endpoint'=>env('GOV_EMPLOYEES_API_ENDPOINT'),
+        'username'=>env('GOV_EMPLOYEES_API_USERNAME'),
+        'password'=>env('GOV_EMPLOYEES_API_PASSWORD')
     ]
 
 ];

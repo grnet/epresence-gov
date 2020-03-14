@@ -16,7 +16,6 @@ Route::get('/', function () {
 });
 
 
-Route::get('account-activation','AccountController@accountActivation')->name('account-activation');
 
 
 //Access static page
@@ -55,7 +54,7 @@ Route::post('/demo_room/disconnectAll','DemoRoomController@disconnectAll');
 Route::post('store_new_sso_user', 'UsersExtraController@store_new_sso_user');
 Route::post('send_email_confirmation_link_create_user', 'UsersExtraController@send_email_confirmation_link_create_user');
 Route::post('send_email_confirmation_link', 'UsersExtraController@send_email_confirmation_link');
-Route::get('confirm_sso_email/{token}','UsersExtraController@confirm_sso_email');
+Route::get('confirm_sso_email/{token}','UsersExtraController@confirm_sso_email')->name('confirm-sso-email');
 
 
 //My account static page
@@ -74,8 +73,9 @@ Route::patch('account/update_local','AccountController@UpdateLocalAccount');
 Route::patch('account/update_sso','AccountController@UpdateSsoAccount');
 
 // Account activation
-Route::get('account_activation', 'AccountController@accountActivation');
-Route::post('account_activation', 'AccountController@ssoAccountActivation');
+
+Route::get('account-activation','AccountController@accountActivation')->name('account-activation');
+Route::post('account-activation', 'AccountController@ssoAccountActivation')->name('account-activation');
 Route::post('account/delete_anonymize','AccountController@delete_anonymize');
 Route::get('request_role_change', 'AccountController@redirect_to_request_role_change');
 

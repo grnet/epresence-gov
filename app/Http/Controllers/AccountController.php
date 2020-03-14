@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Role;
 use App\Http\Requests;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,7 @@ use App\ExtraEmail;
 use App\Application;
 use App\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 
@@ -336,97 +338,22 @@ class AccountController extends Controller
      */
     public function ssoAccountActivation(Requests\ActivateSsoAccountRequest $request)
     {
-
-        //Update account details method called by from account page by the user himself
-
-        // State input values
-
         $input = $request->except(['accept_terms_input','privacy_policy_input']);
         $user = Auth::user();
-        $emails_array[] = $input['email'];
-
-
-
-
-        //Delete extra emails using on of these emails
-
-        ExtraEmail::whereIn('email', $emails_array)->delete();
-
-        //Only local users is possible to be here since sso activation
-        // blocks activating account with emails used as primary from an sso account
-
-        $users_using_emails = User::whereIn('email', $emails_array)->where('id', '!=', $user->id)->get();
-
-        foreach ($users_using_emails as $user_to_merge) {
-            $user->merge_user($user_to_merge);
-        }
-
-        $institution = $user->institutions()->first();
-        $department = $user->departments()->first();
-
-
-        if ($department)
-            $user->departments()->detach($department->id);
-
-        // Handle user image (thumbnail)
-
-        if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail');
-            $filename = time() . '-' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(public_path() . '/images/user_images', $filename);
-            $input['thumbnail'] = $filename;
-        }
-
-        //Handle extra emails
-
-        if ($request->exists('extra_sso_email_1') && !empty($input['extra_sso_email_1'])) {
-            $extraMail = new ExtraEmail;
-            $extraMail->user_id = $user->id;
-            $extraMail->email = $input['extra_sso_email_1'];
-            $extraMail->confirmed = 1;
-
-            if ($request->exists('invited_email_key') && $input['invited_email_key'] == 1)
-                $extraMail->type = 'custom';
-            else
-                $extraMail->type = 'sso';
-
-            $extraMail->created_at = Carbon::now();
-            $extraMail->updated_at = Carbon::now();
-            $extraMail->save();
-        }
-
-        if ($request->exists('extra_sso_email_2') && !empty($input['extra_sso_email_2'])) {
-            $extraMail = new ExtraEmail;
-            $extraMail->user_id = $user->id;
-            $extraMail->email = $input['extra_sso_email_2'];
-            $extraMail->confirmed = 1;
-
-            if ($request->exists('invited_email_key') && $input['invited_email_key'] == 2)
-                $extraMail->type = 'custom';
-            else
-                $extraMail->type = 'sso';
-
-            $extraMail->created_at = Carbon::now();
-            $extraMail->updated_at = Carbon::now();
-            $extraMail->save();
-        }
-
-        //Handle department
-
-        if (!empty($input['new_department']) && $input['department_id'] == "other") {
-            $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
-            $input['department_id'] = $new_department->id;
-        }
-
-        $user->departments()->sync($input['department_id']);
-        $input['confirmed'] = true;
         $input['activation_token'] = null;
-
-        if(empty($user->accepted_terms))
-            $input['accepted_terms'] = Carbon::now()->toDateTimeString();
-
-        $user->update(array_except($input, ['password']));
-        $user->create_join_urls();
+        $input['accepted_terms'] = Carbon::now()->toDateTimeString();
+        $confirmation_code = str_random(15);
+        $user->update(['email'=>$input['email'],'confirmation_code'=>$confirmation_code]);
+        $email = Email::where('name', 'ssoUserEmailConfirm')->first();
+        $login_url = URL::to("confirm_sso_email/" . $confirmation_code);
+        $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
+        Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user, $email) {
+            $message->from($email->sender_email, config('mail.from.name'))
+                ->to($user->email)
+                ->replyTo($email->sender_email, config('mail.from.name'))
+                ->returnPath(env('RETURN_PATH_MAIL'))
+                ->subject($email->title);
+        });
         return redirect("account")->with('message', trans('controllers.epresenceAccountActivated'));
     }
 
@@ -441,7 +368,7 @@ class AccountController extends Controller
 
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function accept_terms_ajax(){
         Auth::user()->update(['accepted_terms'=>Carbon::now()]);

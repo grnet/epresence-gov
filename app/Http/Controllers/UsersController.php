@@ -186,10 +186,8 @@ class UsersController extends Controller
      */
     public function store(Requests\CreateUserRequest $request)
     {
-        $password = str_random(15);
+        $password = str_random(9);
         $input = $request->all();
-        $input['created_at'] = Carbon::now();
-        $input['updated_at'] = Carbon::now();
         $input['password'] = bcrypt($password);
         $input['status'] = 1;
         $input['state'] = 'sso';
