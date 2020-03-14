@@ -12,27 +12,17 @@
 */
 
 Route::get('/', function () {
-    if(Auth::check() && !Auth::user()->confirmed){
-        Auth::logout();
-        return redirect('/');
-    }
-    else
     return view('epresence');
 });
 
-Route::get('/home', function () {
-    if(Auth::check() && !Auth::user()->confirmed){
-        Auth::logout();
-        return redirect('/');
-    }
-    else
-        return view('epresence');
-});
+
+Route::get('account-activation','AccountController@accountActivation')->name('account-activation');
+
 
 //Access static page
 Route::get('/access', function () {
     return view('access', ['lastname' => null, 'name' => null, 'emails' => null, 'state' => 'local', 'persistent_id' => null]);
-});
+})->name('access');
 
 
 Route::get('update_front_stats','ConferencesController@update_front_stats');
@@ -43,10 +33,10 @@ Route::get('update_front_stats','ConferencesController@update_front_stats');
 
 Route::get('/contact', function () {
     return view('contact');
-});
+})->name('contact');
 
-Route::get('/cookies','SupportPageController@show_cookies_page');
-Route::get('/support/{type?}','SupportPageController@index');
+Route::get('/cookies','SupportPageController@show_cookies_page')->name('cookies');
+Route::get('/support/{type?}','SupportPageController@index')->name('support');
 Route::post('/support/downloads','SupportPageController@store_download');
 Route::post('/support/downloads/delete','SupportPageController@delete_download');
 Route::post('/support/downloads/get_download_details_ajax','SupportPageController@get_download_details_ajax');
@@ -85,9 +75,7 @@ Route::patch('account/update_sso','AccountController@UpdateSsoAccount');
 
 // Account activation
 Route::get('account_activation', 'AccountController@accountActivation');
-
-Route::post('account_activation_local', 'AccountController@localAccountActivation');
-Route::post('account_activation_sso', 'AccountController@ssoAccountActivation');
+Route::post('account_activation', 'AccountController@ssoAccountActivation');
 Route::post('account/delete_anonymize','AccountController@delete_anonymize');
 Route::get('request_role_change', 'AccountController@redirect_to_request_role_change');
 
@@ -272,10 +260,11 @@ Route::get('conferences/post_attendee','ConferencesController@post_attendee');
 
 Route::get('terms', function () {
     return view('terms.terms');
-});
+})->name('terms');
+
 Route::get('privacy_policy', function () {
     return view('terms.privacy_policy');
-});
+})->name('privacy-policy');
 
 Route::post('/accept_terms_ajax', 'AccountController@accept_terms_ajax');
 

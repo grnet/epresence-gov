@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
@@ -244,8 +245,6 @@ class ApplicationController extends Controller
                     ->subject($email_for_admins->title);
             });
         }
-
-
         return back()->with('message', trans('requests.applicationSaved'));
     }
 
@@ -391,6 +390,9 @@ class ApplicationController extends Controller
 
     }
 
+    /**
+     * @return RedirectResponse|Redirector
+     */
     public function redirect_sso_login_to_account_application()
     {
         if (!Auth::check()) {
@@ -403,6 +405,9 @@ class ApplicationController extends Controller
     }
 
 
+    /**
+     * @return RedirectResponse|Redirector
+     */
     public function redirect_local_login_to_account_application()
     {
         if (!Auth::check()) {

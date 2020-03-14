@@ -166,8 +166,11 @@ class GsisAuthenticationController extends Controller
                     Auth::login($user);
                     return redirect('/');
                 } else {
-                    // User is not registered checking is there is a valid activation token in the session, if so
-                    // match authenticated user with the invited account
+                    // User is not registered checking if there is a valid activation token in the session, if so
+                    // match authenticated user with the invited account if not use the API to determine if this user is
+                    // civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
+                    // after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform
+                    // as an End User
                     if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
                         $activation_token = session()->pull("activation_token");
                         $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
@@ -177,6 +180,15 @@ class GsisAuthenticationController extends Controller
                             Auth::login($user);
                             return redirect('/');
                         }
+                    }else{
+                      // toDO Call real webservice here
+
+
+
+
+
+
+
                     }
                 }
             } catch

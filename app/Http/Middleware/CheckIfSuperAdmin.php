@@ -24,12 +24,9 @@ class CheckIfSuperAdmin
                 return redirect()->guest('/');
             }
         }else{
-
             if(!backpack_auth()->user()->hasRole('SuperAdmin')){
-
                 return redirect('/');
             }
-
         }
 
         return $next($request);

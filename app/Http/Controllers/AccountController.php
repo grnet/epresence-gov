@@ -314,141 +314,26 @@ class AccountController extends Controller
 
         $user = Auth::user();
 
-        if ($user->confirmed == 1) {
+        if ($user->confirmed) {
             return redirect("/");
         }
 
         $institution = $user->institutions()->first();
         $department = $user->departments()->first();
-
-        if ($user->state == "sso" && session()->has('emails')) {
-            $emails = explode(';', session()->get('emails'));
-            $invited_email_key = session()->get('invited_email_key');
-        } elseif ($user->state == "sso" && session()->has('confirmed_sso_email')) {
-            $emails [] = session()->get('confirmed_sso_email');
-            $invited_email_key = false;
-        } else {
-            $emails = false;
-            $invited_email_key = false;
-        }
-
-
         return view('account_activation',
 
             [
                 'user' => $user,
                 'role' => $user->roles()->first(),
-                'emails' => $emails,
-                'invited_email_key' => $invited_email_key,
                 'institution' => $institution,
                 'department' => $department
             ]);
     }
 
-
-    public function localAccountActivation(Requests\ActivateLocalAccountRequest $request)
-    {
-
-        //Update account details method called by from account page by the user himself
-
-        // State input values
-
-        $input = $request->all();
-
-        $user = Auth::user();
-        $role = $user->roles()->first();
-
-        unset($input['accept_terms_input']);
-        unset($input['privacy_policy_input']);
-
-
-        // Handle user image (thumbnail)
-        if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail');
-            $filename = time() . '-' . $thumbnail->getClientOriginalName();
-
-            // Delete previous file
-            if (!empty($user->thumbnail) && File::exists(public_path() . '/images/user_images/' . $user->thumbnail)) {
-                File::delete(public_path() . '/images/user_images/' . $user->thumbnail);
-            }
-
-            $thumbnail->move(public_path() . '/images/user_images', $filename);
-            $input['thumbnail'] = $filename;
-        }
-
-        //Handle password update
-
-        if (!empty($input['password']) && !empty($input['current_password'])) {
-            if (!Hash::check($input['current_password'], $user->password)) {
-                $errors [] = trans('controllers.currentPasswordWrong');
-                return back()->withErrors($errors);
-            } else {
-                $user->createNewPassword($input['password']);
-            }
-        }
-
-        //Only EndUsers can change institution or department if they are local
-
-        if ($role->name == "EndUser") {
-
-            //Getting real id of other institution or department
-
-            $current_institution = $user->institutions()->first();
-
-            $current_department = $user->departments()->first();
-
-            if ($current_institution)
-                $user->institutions()->detach($current_institution->id);
-
-            if ($current_department)
-                $user->departments()->detach($current_department->id);
-
-
-            if ($input['institution_id'] == "other") {
-                $institution = Institution::where('slug', 'other')->first();
-                $input['institution_id'] = $institution->id;
-            } else {
-                $institution = Institution::find($input['institution_id']);
-            }
-
-
-            if ((isset($input['department_id']) && ($input['department_id'] == "other" || $input['institution_id'] == "other")) || !isset($input['department_id']))
-                $input['department_id'] = $institution->otherDepartment()->id;
-
-
-            //Update Custom Values
-
-            $custom_values = ["institution" => "", "department" => ""];
-
-            if ($input['new_institution'])
-                $custom_values['institution'] = $input['new_institution'];
-
-            if ($input['new_department'])
-                $custom_values['department'] = $input['new_department'];
-
-
-            $input['custom_values'] = json_encode($custom_values);
-
-
-            $user->institutions()->attach($input['institution_id']);
-            $user->departments()->attach($input['department_id']);
-        }
-
-
-        if(empty($user->accepted_terms))
-            $input['accepted_terms'] = Carbon::now()->toDateTimeString();
-
-
-        $input['confirmed'] = true;
-
-        $user->update(array_except($input, ['password']));
-
-        $user->create_join_urls();
-
-        return redirect("account")->with('message', trans('controllers.epresenceAccountActivated'));
-    }
-
-
+    /**
+     * @param Requests\ActivateSsoAccountRequest $request
+     * @return RedirectResponse
+     */
     public function ssoAccountActivation(Requests\ActivateSsoAccountRequest $request)
     {
 
@@ -456,23 +341,11 @@ class AccountController extends Controller
 
         // State input values
 
-        $input = $request->all();
-
-        unset($input['accept_terms_input']);
-        unset($input['privacy_policy_input']);
-
-
+        $input = $request->except(['accept_terms_input','privacy_policy_input']);
         $user = Auth::user();
-
-
         $emails_array[] = $input['email'];
 
 
-        if ($request->exists('extra_sso_email_1') && !empty($input['extra_sso_email_1']))
-            $emails_array[] = $input['extra_sso_email_1'];
-
-        if ($request->exists('extra_sso_email_2') && !empty($input['extra_sso_email_2']))
-            $emails_array[] = $input['extra_sso_email_2'];
 
 
         //Delete extra emails using on of these emails
@@ -541,13 +414,11 @@ class AccountController extends Controller
         //Handle department
 
         if (!empty($input['new_department']) && $input['department_id'] == "other") {
-
             $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
             $input['department_id'] = $new_department->id;
         }
 
         $user->departments()->sync($input['department_id']);
-
         $input['confirmed'] = true;
         $input['activation_token'] = null;
 
@@ -555,27 +426,27 @@ class AccountController extends Controller
             $input['accepted_terms'] = Carbon::now()->toDateTimeString();
 
         $user->update(array_except($input, ['password']));
-
         $user->create_join_urls();
-
         return redirect("account")->with('message', trans('controllers.epresenceAccountActivated'));
     }
 
+    /**
+     * @return RedirectResponse|Redirector
+     */
     public function redirect_to_request_role_change()
     {
-
         session()->put("pop_role_change", 1);
         return redirect('/account');
     }
 
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function accept_terms_ajax(){
-
         Auth::user()->update(['accepted_terms'=>Carbon::now()]);
-
         $response['status']='success';
         $response['message']='terms_accepted';
-
         return response()->json($response);
     }
 
