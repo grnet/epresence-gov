@@ -44,12 +44,16 @@
                                 class="glyphicon glyphicon-info-sign"
                                 title="{!!  trans('users.primaryEmailMessage') !!}"></span></label>
                     <div class="col-sm-8">
-                        <input type="email" name="email" value="{{old('email',$user->hasEmailAddress() ? $user->email : null)}}" class="form-control" aria-describedby="helpBlockRole" id="emailInput" placeholder="{{trans('users.primaryEmail')}}">
+                        <input type="email" name="email"
+                               value="{{old('email',$user->hasEmailAddress() ? $user->email : null)}}"
+                               class="form-control" aria-describedby="helpBlockRole" id="emailInput"
+                               placeholder="{{trans('users.primaryEmail')}}">
                         @if(!$user->hasEmailAddress())
                             <div class="help-block with-errors" style="margin:0;">{{trans('account.please_add_email')}}
                             </div>
                         @else
-                            <div class="help-block with-errors" style="margin:0;">{{trans('account.please_confirm_email')}}
+                            <div class="help-block with-errors"
+                                 style="margin:0;">{{trans('account.please_confirm_email')}}
                             </div>
                         @endif
                     </div>
@@ -72,7 +76,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="Privacy" class="control-label col-sm-4">{{trans('site.privacyPolicyAcceptance')}}: </label>
+                    <label for="Privacy" class="control-label col-sm-4">{{trans('site.privacyPolicyAcceptance')}}
+                        : </label>
                     <div class="col-sm-8 form-control-static">
                         <input name="privacy_policy_input" id="Privacy" type="checkbox"
                                @if(!empty($user->accepted_terms) || (old('privacy_policy_input') =='on')) checked @endif>
@@ -81,9 +86,9 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-				<div class="btn-group pull-right" role="group" id="TeleInitialSaveGroupButtons">
-                      {!! Form::submit('Αποστολή email επιβεβαίωσης', ['class' => 'btn btn-primary']) !!}
-                </div>
+                        <div class="btn-group pull-right" role="group" id="TeleInitialSaveGroupButtons">
+                            {!! Form::submit('Αποστολή email επιβεβαίωσης', ['class' => 'btn btn-primary']) !!}
+                        </div>
                     </div>
                 </div>
                 {!! Form::close() !!}
