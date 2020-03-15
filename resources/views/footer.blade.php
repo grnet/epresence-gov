@@ -7,9 +7,7 @@
                                                                      alt="gov.gr" title="gov.gr"></a>
                 </div>
                 <div class="col-md-12 text-center" style="overflow: auto;">
-                    @auth
-                        <a class="bottomLinks" href="/access" title="">{{trans('site.access')}}</a>&nbsp;&nbsp;|&nbsp;
-                        &nbsp;
+                    @auth                        &nbsp;
                         <a class="bottomLinks" href="/support" title="">{{trans('site.support')}}</a>&nbsp;&nbsp;|&nbsp;
                         &nbsp;
                         <a class="bottomLinks" href="/contact" title="">{{trans('site.contact')}}</a>&nbsp;&nbsp;|&nbsp;

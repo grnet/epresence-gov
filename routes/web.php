@@ -19,9 +19,9 @@ Route::get('/', function () {
 
 
 //Access static page
-Route::get('/access', function () {
-    return view('access', ['lastname' => null, 'name' => null, 'emails' => null, 'state' => 'local', 'persistent_id' => null]);
-})->name('access');
+//Route::get('/access', function () {
+//    return view('access', ['lastname' => null, 'name' => null, 'emails' => null, 'state' => 'local', 'persistent_id' => null]);
+//})->name('access');
 
 
 Route::get('update_front_stats','ConferencesController@update_front_stats');

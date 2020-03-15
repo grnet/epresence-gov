@@ -215,7 +215,6 @@
 					</li>
 				@else
 						<li @yield('home-active')><a href="/"><span class="glyphicon glyphicon glyphicon-home"></span></a></li>
-						<li @yield('access-active')><a href="/access">{{trans('site.access')}}</a></li>
 						<li @yield('support-active')><a href="/support">{{trans('site.support')}}</a></li>
 						<li @yield('contact-active')><a href="/contact">{{trans('site.contact')}}</a></li>
 						<li @yield('calendar-active')><a href="/calendar">{{trans('site.calendar')}}</a></li>
