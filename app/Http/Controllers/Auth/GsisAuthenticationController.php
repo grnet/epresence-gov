@@ -196,7 +196,7 @@ class GsisAuthenticationController extends Controller
                         Log::info("Employee api response: ".$response->getBody());
                         $responseObject = json_decode($response->getBody());
                         $userIsCivilServant = false;
-                        if(!isset($responseObject->errorCode) && isset($responseObject->employmentInfos) && count($responseObject->employmentInfos) > 0){
+                        if(!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0){
                         //User is a civil servant
                             $userIsCivilServant = true;
                             $employmentInfo = $responseObject->employmentInfos;
@@ -274,7 +274,6 @@ class GsisAuthenticationController extends Controller
      * @return bool|RedirectResponse|Redirector
      */
     private function validateParameters($userInfo){
-
         Log::info("Validating parameters: ".json_encode($userInfo));
 
         //Check that all parameters are there and are not empty
