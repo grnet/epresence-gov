@@ -290,17 +290,16 @@ class GsisAuthenticationController extends Controller
      */
     private function validateParameters($userInfo)
     {
-        Log::info("Validating parameters: " . json_encode($userInfo));
-
+        Log::info("Validating parameters: ".json_encode($userInfo));
         //Check that all parameters are there and are not empty
-        if (!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
+        if(!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
             return false;
         }
-        if (!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
+        if(!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
             Log::error("Gsis account was found with empty firstname aborted since this account is not a physical person's account");
             return false;
         }
-        if (!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
+        if(!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
             return false;
         }
         return true;

@@ -39,7 +39,7 @@ class Authenticate
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
             } else {
-                return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.route('not-logged-in'));
+                return redirect('/');
             }
         }
 

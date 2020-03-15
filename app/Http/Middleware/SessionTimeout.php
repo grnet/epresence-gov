@@ -24,7 +24,7 @@ class SessionTimeout {
 		elseif((time() - $this->session->get('lastActivityTime') > $this->getTimeOut()) && Auth::check()){
 			$this->session->forget('lastActivityTime');
 			Auth::logout();
-            return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.route('not-logged-in'));
+            return redirect()->route('not-logged-in');
 		}
 		$this->session->put('lastActivityTime',time());
 		return $next($request);
