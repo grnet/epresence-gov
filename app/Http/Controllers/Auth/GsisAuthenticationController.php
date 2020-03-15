@@ -142,14 +142,8 @@ class GsisAuthenticationController extends Controller
                                         $recipients[] = $userOfToken->creator->email;
                                         $recipients[] = env('RETURN_PATH_MAIL');
                                         $parameters = [
-                                            'invitation_email_address' => $userOfToken->email,
-                                            'requested_role_name' => $tokenUserRole->name,
-                                            'requested_institution_name' => $tokenUserInstitution->title,
-                                            'requested_department_name' => $tokenUserDepartment->title,
-                                            'email_address' => $user->email,
-                                            'role_name' => $currentRole->name,
-                                            'institution_name' => $currentInstitution->title,
-                                            'department_name' => $currentDepartment->title,
+                                            'role'=>$tokenUserRole->label,
+                                            'email' =>$userOfToken->email
                                         ];
                                         $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
                                         Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
@@ -160,8 +154,7 @@ class GsisAuthenticationController extends Controller
                                                 ->subject($email->title);
                                         });
                                     }
-                                    $user->merge_user($userOfToken->id, true);
-
+                                   $user->merge_user($userOfToken->id, true);
                                 } else {
                                     //Current user is end user && invited user is Administrator
                                     $user->roles()->sync([$tokenUserRole->id]);
@@ -174,10 +167,9 @@ class GsisAuthenticationController extends Controller
                                     } else{
                                         $user->merge_user($userOfToken->id, true);
                                     }
-
                                     $recipients[] = $user->email;
-                                    $parameters = ['new_role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
-                                    $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
+                                    $parameters = ['role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
+                                    $email = Email::where('name', 'accountDetailsUpdated')->first();
                                     Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
                                         $message->from($email->sender_email, config('mail.from.name'))
                                             ->to($recipients)
