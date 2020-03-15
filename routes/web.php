@@ -266,7 +266,7 @@ Route::get('privacy_policy', function () {
     return view('terms.privacy_policy');
 })->name('privacy-policy');
 
-Route::post('/accept_terms_ajax', 'AccountController@accept_terms_ajax');
+Route::post('/accept_terms_ajax', 'AccountController@accept_terms_ajax')->name('accept-terms-ajax');
 
 //
 //Route::get('sync_domains','ExtraEmailsController@SyncDomains');

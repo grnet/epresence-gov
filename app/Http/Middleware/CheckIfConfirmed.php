@@ -17,7 +17,7 @@ class CheckIfConfirmed
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && !in_array(Route::currentRouteName(),['account-activation','terms','privacy-policy','contact','cookies','access','support','logout','confirm-sso-email'])) {
+        if (Auth::check() && !in_array(Route::currentRouteName(),['account-activation','terms','privacy-policy','contact','cookies','access','support','logout','confirm-sso-email','accept-terms-ajax'])) {
             if(!request()->user()->confirmed){
                 return redirect()->route('account-activation');
             }
