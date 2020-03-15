@@ -61,21 +61,15 @@ class ExtraEmailsController extends Controller
      */
     public function ConfirmExtraEmail($token)
     {
-        $mail = ExtraEmail::where('activation_token', $token)->first();
+        $mail = ExtraEmail::where('activation_token', $token)->where('confirmed',false)->first();
         if($mail) {
             $mail_already_confirmed_by_other_extra_Mail = ExtraEmail::where('email', $mail->email)->where('confirmed', 1)->count();
-            $mail_already_confirmed_by_other_user = User::where('email', $mail->email)->where('confirmed', 1)->where('state', 'sso')->count();
-            $ExistingUser = User::find($mail->user_id);
-            if ($mail_already_confirmed_by_other_extra_Mail == 0 && $mail_already_confirmed_by_other_user == 0 && isset($ExistingUser->id)) {
+            $ExistingUserWithThisEmail = User::where("confirmed",true)->where("email",$mail->email)->count();
+            if($mail_already_confirmed_by_other_extra_Mail == 0 && $ExistingUserWithThisEmail==0) {
                 $mail->confirmed = 1;
                 $mail->update();
                 ExtraEmail::where('email', $mail->email)->where('confirmed', 0)->delete();
-                $accounts_to_be_merged = User::where('email', $mail->email)->where('state', 'local')->get();
-
-                foreach ($accounts_to_be_merged as $account) {
-                    $ExistingUser->merge_user($account->id,false);
-                }
-
+                User::where("confirmed",false)->where("email",$mail->email)->delete();
                 return redirect('message')->with('message', trans('users.emailConfirmed'));
             } else {
                 return redirect('message')->with('error', trans('users.emailAlreadyConfirmed'));
