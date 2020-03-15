@@ -274,6 +274,9 @@ class GsisAuthenticationController extends Controller
      * @return bool|RedirectResponse|Redirector
      */
     private function validateParameters($userInfo){
+
+        Log::info("Validating parameters: ".json_encode($userInfo));
+
         //Check that all parameters are there and are not empty
         if(!isset($userInfo['taxid']) || !$this->checkIfEmptyParameter($userInfo['taxid'])){
             return false;
