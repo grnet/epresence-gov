@@ -195,6 +195,7 @@ class GsisAuthenticationController extends Controller
                         ]);
                         Log::info("Employee api response: ".$response->getBody());
                         $responseObject = json_decode($response->getBody());
+                        Log::info("Response object".json_encode($responseObject));
                         $userIsCivilServant = false;
                         if(!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0){
                         //User is a civil servant
