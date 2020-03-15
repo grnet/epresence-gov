@@ -200,7 +200,7 @@ class GsisAuthenticationController extends Controller
                         if(!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0){
                         //User is a civil servant
                             $userIsCivilServant = true;
-                            $employmentInfo = $responseObject->employmentInfos;
+                            $employmentInfo = $responseObject->data->employmentInfos;
                             foreach($employmentInfo as $employmentOrganization){
                                 //toDo try to match with an institution in our db
                             }
