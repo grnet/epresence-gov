@@ -7,9 +7,4 @@
 "user_lastname"=>$user['lastname'],
 "user_email"=>$user['email'],
  ],'el') !!}
-@if($user['state'] == "local")
-    {!! trans('emails.application_accepted_for_admins.local',[],'el') !!}
-@else
-    {!! trans('emails.application_accepted_for_admins.sso',[],'el') !!}
-@endif
 {!! trans('emails.application_accepted_for_admins.outro',["role_requested"=>trans($role_requested,[],'el'),"user_comment"=>$user['comment']],'el') !!}
