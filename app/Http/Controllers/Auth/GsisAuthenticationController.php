@@ -104,10 +104,11 @@ class GsisAuthenticationController extends Controller
                   return  redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
                 }
 
-                // Tax id of the user
+                // Tax id of the account
                 $taxId = trim($userInfo['taxid']);
 
-                //When first name is 'null' mean that this user is a not physical user and is not allowed to
+                //When first name is 'null' mean that this account is a not physical person's account and is not allowed to
+                //use the app
                 $firstName = trim($userInfo['firstname']);
                 $lastName = trim($userInfo['lastname']);
 
@@ -122,6 +123,7 @@ class GsisAuthenticationController extends Controller
                             $currentRole = $user->roles()->first();
                             $currentInstitution = $user->institutions()->first();
                             $currentDepartment = $user->departments()->first();
+
                             $tokenUserRole = $userOfToken->roles()->first();
                             $tokenUserInstitution = $userOfToken->institutions()->first();
                             $tokenUserDepartment = $userOfToken->departments()->first();
@@ -199,7 +201,7 @@ class GsisAuthenticationController extends Controller
                             $userIsCivilServant = true;
                             $employmentInfo = $responseObject->employmentInfos;
                             foreach($employmentInfo as $employmentOrganization){
-                                //toDo try to match with our institutions
+                                //toDo try to match with an institution in our db
                             }
                         }
 
