@@ -299,7 +299,9 @@ class GsisAuthenticationController extends Controller
     private function checkIfEmptyParameter($parameter){
 
         Log::info("Checking parameter: ".$parameter);
-
-        return !empty($parameter) && !is_null($parameter) && $parameter !== 'null';
+        $result = !empty($parameter) && !is_null($parameter) && $parameter !== 'null';
+        Log::info("Result: ");
+        Log::info($result ? "TRUE" : "FALSE");
+        return $result;
     }
 }
