@@ -4,30 +4,23 @@
         <h4>{!!trans('conferences.advancedSearch')!!}<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
         </h4>
         <hr/>
-
         {!! Form::open(array('url' => '/conferences/all', 'method' => 'get', 'class' => 'form-horizontal', 'id' => 'CoordOrgForm', 'role' => 'form')) !!}
-
         <div class="row">
             <h4>{{trans('conferences.conferenceDetails')}}</h4>
             <hr/>
         </div>
-
         <div class="row">
             <div class="col-sm-4">
                 {!! Form::text('id', Input::get('id'), ['class' => 'form-control', 'placeholder' => trans('conferences.conferenceID'), 'id' => 'searchID']) !!}
             </div>
-
             <div class="col-sm-4">
                 {!! Form::text('title', Input::get('title'), ['class' => 'form-control', 'placeholder' => trans('conferences.title'), 'id' => 'searchTitle']) !!}
             </div>
-
             <div class="col-sm-4">
                 {!! Form::select('invisible', ['' => ''] + [1 => 'Κρυφή', 0 => 'Ορατή'], Input::get('invisible'), ['id' => 'searchInvisible', 'style' => 'width: 100%'])!!}
             </div>
         </div>
-
         <div class="small-gap"></div>
-
         <div class="row">
             @if(Auth::user()->hasRole('InstitutionAdministrator') && !Auth::user()->hasRole('SuperAdmin') || Auth::user()->hasRole('DepartmentAdministrator'))
                 <div class="col-sm-4">
@@ -52,9 +45,7 @@
                 </div>
             @endif
         </div>
-
         <div class="small-gap"></div>
-
         <div class="row">
             <div class="col-sm-4">
                 {!! Form::label('searchStartFrom', 'Ημ/νία Έναρξης από:', ['class' => 'control-label']) !!}
@@ -78,41 +69,29 @@
                     <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                 </div>
             </div>
-
         </div>
-
         <div class="small-gap"></div>
-
         <div class="row">
             <h4>{{trans('conferences.moderatorDetails')}}</h4>
             <hr/>
         </div>
-
         <div class="row">
             <div class="col-sm-4">
                 {!! Form::text('firstname', Input::get('firstname'), ['class' => 'form-control', 'placeholder' => trans('conferences.name'), 'id' => 'searchFirstname']) !!}
             </div>
-
             <div class="col-sm-4">
                 {!! Form::text('lastname', Input::get('lastname'), ['class' => 'form-control', 'placeholder' => trans('conferences.surname'), 'id' => 'searchLastname']) !!}
             </div>
-
             @if(Auth::user()->hasRole('SuperAdmin') || Auth::user()->hasRole('InstitutionAdministrator'))
                 <div class="col-sm-4">
                     {!! Form::text('email', Input::get('email'), ['class' => 'form-control', 'placeholder' => 'Email', 'id' => 'searchEmail']) !!}
                 </div>
             @endif
-
         </div>
-
-
         <div class="small-gap"></div>
-
         <div>
             {!! Form::submit(trans('conferences.search'), ['class' => 'btn btn-primary', 'id' => 'UserSubmitBtnNew', 'name' => 'advancedSearch']) !!}
         </div>
-
-
         {!! Form::close() !!}
 
     </div>

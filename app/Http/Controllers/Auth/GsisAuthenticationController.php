@@ -96,14 +96,14 @@ class GsisAuthenticationController extends Controller
                 ]);
                 $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
                 $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
-                Log::info("User details api response: ".$response->getBody());
+                Log::info("User details api response: " . $response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 $userInfo = $parsedResponse->userinfo;
                 $result = $this->validateParameters($userInfo);
 
                 //If parameters are not valid logout from gsis and redirect to not-authorized page of our app
-                if(!$result){
-                  return  redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+                if (!$result) {
+                    return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
                 }
 
                 // Tax id of the account
@@ -152,7 +152,7 @@ class GsisAuthenticationController extends Controller
                                         ];
                                         $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
                                         Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
-                                            $message->from($email->sender_email,config('mail.from.name'))
+                                            $message->from($email->sender_email, config('mail.from.name'))
                                                 ->to($recipients)
                                                 ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
                                                 ->returnPath(env('RETURN_PATH_MAIL'))
@@ -169,7 +169,7 @@ class GsisAuthenticationController extends Controller
                                     $parameters = ['new_role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
                                     $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
                                     Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
-                                        $message->from($email->sender_email,config('mail.from.name'))
+                                        $message->from($email->sender_email, config('mail.from.name'))
                                             ->to($recipients)
                                             ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
                                             ->returnPath(env('RETURN_PATH_MAIL'))
@@ -188,56 +188,58 @@ class GsisAuthenticationController extends Controller
                     // civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
                     // after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform
                     // as an End User
-                    $client = new Client();
-                    try {
-                        $response = $client->get(config('services.gov-employees-api.endpoint').$taxId,[
-                            'auth'=>[
-                                config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
-                            ]
-                        ]);
-                        Log::info("Employee api response: ".$response->getBody());
-                        $responseObject = json_decode($response->getBody());
-                        Log::info("Response object".json_encode($responseObject));
-                        $userIsCivilServant = false;
-                        $institutionToAttach = Institution::first();
-                        $departmentToAttach = Department::first();
-                        if(!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0){
-                        //User is a civil servant
-                            $userIsCivilServant = true;
-                            $employmentInfo = collect($responseObject->data->employmentInfos);
-                            $primaryOrganization = $employmentInfo->where("primary",true)->first();
-                            $organizationToMatch = isset($primaryOrganization->organicOrganizationId) ? $primaryOrganization : $employmentInfo->first();
-                            $institution = Institution::where("ws_id",$organizationToMatch->organicOrganizationId)->first();
-                            if(isset($institution->id)){
-                                $institutionToAttach = $institution;
-                                $departmentToAttach = $institution->departments()->first();
-                            }
+                    if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
+                        $activation_token = session()->pull("activation_token");
+                        $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+                        if ($user) {
+                            $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
+                            $user->create_join_urls();
+                            Auth::login($user);
+                            return redirect('/');
+                        }else{
+                            //Invalid activation token
+                            Log::error("Invalid activation token: ".$activation_token);
                         }
-
-                        if($userIsCivilServant){
-                            Log::info("User with tax_id: ".$taxId." is a civil servant continuing...");
-                            if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
-                                $activation_token = session()->pull("activation_token");
-                                $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
-                                if ($user) {
-                                    $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
-                                    $user->create_join_urls();
-                                    Auth::login($user);
-                                    return redirect('/');
+                    } else {
+                        try {
+                            $client = new Client();
+                            $response = $client->get(config('services.gov-employees-api.endpoint') . $taxId, [
+                                'auth' => [
+                                    config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
+                                ]
+                            ]);
+                            Log::info("Employee api response: " . $response->getBody());
+                            $responseObject = json_decode($response->getBody());
+                            Log::info("Response object" . json_encode($responseObject));
+                            $userIsCivilServant = false;
+                            $institutionToAttach = Institution::first();
+                            $departmentToAttach = Department::first();
+                            if (!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0) {
+                                //User is a civil servant
+                                $userIsCivilServant = true;
+                                $employmentInfo = collect($responseObject->data->employmentInfos);
+                                $primaryOrganization = $employmentInfo->where("primary", true)->first();
+                                $organizationToMatch = isset($primaryOrganization->organicOrganizationId) ? $primaryOrganization : $employmentInfo->first();
+                                $institution = Institution::where("ws_id", $organizationToMatch->organicOrganizationId)->first();
+                                if (isset($institution->id)) {
+                                    $institutionToAttach = $institution;
+                                    $departmentToAttach = $institution->departments()->first();
                                 }
-                            }else{
-                                Log::info("Creating new user with tax_id: ".$taxId." First name: ".$firstName." Last name: ".$lastName);
-                                $nextUserId = User::count() > 0 ? User::orderBy("id","desc")->first()->id : 0;
-                                    $user = User::create(
+                            }
+                            if ($userIsCivilServant) {
+                                Log::info("User with tax_id: " . $taxId . " is a civil servant continuing...");
+                                Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
+                                $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
+                                $user = User::create(
                                     [
-                                     'firstname' => $firstName,
-                                     'lastname' => $lastName,
-                                     'email'=>'not-retrieved-'.$nextUserId,
-                                     'tax_id' => $taxId,
-                                     'confirmed' => false,
-                                     'state' => 'sso',
-                                     'status'=>1,
-                                     'password'=>  bcrypt(str_random(9))
+                                        'firstname' => $firstName,
+                                        'lastname' => $lastName,
+                                        'email' => 'not-retrieved-' . $nextUserId,
+                                        'tax_id' => $taxId,
+                                        'confirmed' => false,
+                                        'state' => 'sso',
+                                        'status' => 1,
+                                        'password' => bcrypt(str_random(9))
                                     ]);
                                 $user->institutions()->attach($institutionToAttach->id);
                                 $user->departments()->attach($departmentToAttach->id);
@@ -246,12 +248,12 @@ class GsisAuthenticationController extends Controller
                                 $user->assignRole('EndUser');
                                 Auth::login($user);
                                 return redirect()->route('account-activation');
+                            } else {
+                                Log::info("User with tax_id: " . $taxId . " is not a civil servant aborting!");
                             }
-                        }else{
-                            Log::info("User with tax_id: ".$taxId." is not a civil servant aborting!");
+                        } catch (\Exception $e) {
+                            Log::error("Employee api exception: " . $e->getMessage());
                         }
-                    }catch (\Exception $e){
-                        Log::error("Employee api exception: ".$e->getMessage());
                     }
                 }
             } catch
@@ -259,14 +261,15 @@ class GsisAuthenticationController extends Controller
                 Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
-        return redirect(config('services.gsis.urlLogout').config('services.gsis.clientId').'/?url='.route('not-authorized'));
+        return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
     }
 
 
     /**
      * @return Factory|View
      */
-    public function notAuthorized(){
+    public function notAuthorized()
+    {
         return view('errors.not-authorized');
     }
 
@@ -274,7 +277,8 @@ class GsisAuthenticationController extends Controller
     /**
      * @return Factory|View
      */
-    public function notLoggedIn(){
+    public function notLoggedIn()
+    {
         return view('errors.not-logged-in');
     }
 
@@ -282,18 +286,19 @@ class GsisAuthenticationController extends Controller
      * @param $userInfo
      * @return bool|RedirectResponse|Redirector
      */
-    private function validateParameters($userInfo){
-        Log::info("Validating parameters: ".json_encode($userInfo));
+    private function validateParameters($userInfo)
+    {
+        Log::info("Validating parameters: " . json_encode($userInfo));
 
         //Check that all parameters are there and are not empty
-        if(!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])){
+        if (!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
             return false;
         }
-        if(!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])){
+        if (!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
             Log::error("Gsis account was found with empty firstname aborted since this account is not a physical person's account");
             return false;
         }
-        if(!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])){
+        if (!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
             return false;
         }
         return true;
@@ -304,8 +309,9 @@ class GsisAuthenticationController extends Controller
      * @param $parameter
      * @return bool
      */
-    private function checkIfEmptyParameter($parameter){
-        Log::info("Checking parameter: ".$parameter);
+    private function checkIfEmptyParameter($parameter)
+    {
+        Log::info("Checking parameter: " . $parameter);
         $result = empty($parameter) || is_null($parameter) || $parameter == 'null';
         Log::info("Is empty Parameter Result: ");
         Log::info($result ? "TRUE" : "FALSE");
