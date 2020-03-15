@@ -94,7 +94,7 @@ class GsisAuthenticationController extends Controller
                 ]);
                 $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
                 $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
-                Log::info("User details api response: ",$response);
+                Log::info("User details api response: ".$response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 $userInfo = $parsedResponse->userinfo;
                 $result = $this->validateParameters($userInfo);
