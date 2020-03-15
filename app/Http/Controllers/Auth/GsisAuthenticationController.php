@@ -168,8 +168,9 @@ class GsisAuthenticationController extends Controller
                                     $user->institutions()->sync([$tokenUserInstitution->id]);
                                     $user->departments()->sync([$tokenUserDepartment->id]);
                                     if(!$user->confirmed){
-                                        $user->update(['email'=>$userOfToken->email,'confirmed'=>true]);
+                                        $invitedEmail = $userOfToken->email;
                                         $user->merge_user($userOfToken->id, false);
+                                        $user->update(['email'=>$invitedEmail,'confirmed'=>true]);
                                     } else{
                                         $user->merge_user($userOfToken->id, true);
                                     }
