@@ -52,6 +52,9 @@ class GsisAuthenticationController extends Controller
      */
     public function login()
     {
+        if(Auth::check()){
+            return redirect('/');
+        }
         return $this->redirectToLoginForm();
     }
 
@@ -62,6 +65,9 @@ class GsisAuthenticationController extends Controller
      */
     public function register(Request $request, $activation_token)
     {
+        if(Auth::check()){
+            return redirect('/');
+        }
         $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
         if ($user) {
             session()->put("activation_token", $activation_token);
