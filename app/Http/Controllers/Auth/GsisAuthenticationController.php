@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Department;
 use App\Email;
 use App\Http\Controllers\Controller;
+use App\Institution;
 use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\View\Factory;
@@ -197,12 +199,18 @@ class GsisAuthenticationController extends Controller
                         $responseObject = json_decode($response->getBody());
                         Log::info("Response object".json_encode($responseObject));
                         $userIsCivilServant = false;
+                        $institutionToAttach = Institution::first();
+                        $departmentToAttach = Department::first();
                         if(!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0){
                         //User is a civil servant
                             $userIsCivilServant = true;
-                            $employmentInfo = $responseObject->data->employmentInfos;
-                            foreach($employmentInfo as $employmentOrganization){
-                                //toDo try to match with an institution in our db
+                            $employmentInfo = collect($responseObject->data->employmentInfos);
+                            $primaryOrganization = $employmentInfo->where("primary",true)->first();
+                            $organizationToMatch = isset($primaryOrganization->organicOrganizationId) ? $primaryOrganization : $employmentInfo->first();
+                            $institution = Institution::where("ws_id",$organizationToMatch->organicOrganizationId)->first();
+                            if(isset($institution->id)){
+                                $institutionToAttach = $institution;
+                                $departmentToAttach = $institution->departments()->first();
                             }
                         }
 
@@ -231,8 +239,8 @@ class GsisAuthenticationController extends Controller
                                      'status'=>1,
                                      'password'=>  bcrypt(str_random(9))
                                     ]);
-                                $user->institutions()->attach(1);
-                                $user->departments()->attach(1);
+                                $user->institutions()->attach($institutionToAttach->id);
+                                $user->departments()->attach($departmentToAttach->id);
 
                                 // Assign role to user
                                 $user->assignRole('EndUser');
