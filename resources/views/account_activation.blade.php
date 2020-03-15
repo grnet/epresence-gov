@@ -46,15 +46,10 @@
                     <div class="col-sm-8">
                         <input type="email" name="email" value="{{old('email',$user->hasEmailAddress() ? $user->email : null)}}" class="form-control" aria-describedby="helpBlockRole" id="emailInput" placeholder="{{trans('users.primaryEmail')}}">
                         @if(!$user->hasEmailAddress())
-                            <div class="help-block with-errors" style="margin:0;">Μόλις συμπληρώσετε το παραπάνω πεδίο
-                                με την δεύθυνση σας και πατήσετε "Αποστολή email επιβεβαίωσης" θα σας αποσταλεί email
-                                επιβεβαίωσης, για να προχωρήσετε θα πρέπει να πατήστε τον σύνδεσμο στο email
-                                επιβεβαίωσης
+                            <div class="help-block with-errors" style="margin:0;">{{trans('account.please_add_email')}}
                             </div>
                         @else
-                            <div class="help-block with-errors" style="margin:0;">Σας έχει αποστάλει email επιβεβαίωσης
-                                στην παραπάνω διεύθυνση, για να προχωρήσετε παρακαλώ πατήστε τον σύνδεσμο στο email
-                                επιβεβαίωσης
+                            <div class="help-block with-errors" style="margin:0;">{{trans('account.please_confirm_email')}}
                             </div>
                         @endif
                     </div>
