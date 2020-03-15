@@ -219,7 +219,7 @@ class GsisAuthenticationController extends Controller
                                 }
                             }else{
                                 Log::info("Creating new user with tax_id: ".$taxId." First name: ".$firstName." Last name: ".$lastName);
-                                $nextUserId = User::orderyBy("id","desc")->exists() ? User::orderyBy("id","desc")->first()->id : 0;
+                                $nextUserId = User::count() > 0 ? User::orderBy("id","desc")->first()->id : 0;
                                     $user = User::create(
                                     [
                                      'firstname' => $firstName,
