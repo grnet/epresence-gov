@@ -126,8 +126,6 @@ class AccountController extends Controller
         }
 
         if ($user->participantInConferences()->count() > 0 || $user->conferenceAdmin()->count() > 0) {
-
-            $user->name = "Deleted";
             $user->email = "Deleted-" . $user->id . "@example.org";
             $user->password = str_random(15);
             $user->firstname = "Deleted";
@@ -135,14 +133,12 @@ class AccountController extends Controller
             $user->telephone = null;
             $user->status = 0;
             $user->thumbnail = null;
-            $user->persistent_id = null;
+            $user->tax_id = null;
             $user->activation_token = null;
             $user->confirmation_code = null;
             $user->remember_token = null;
             $user->deleted = true;
-
             $user->update();
-
             ExtraEmail::where("user_id",$user->id)->delete();
 
             //Remove current role & attach end user role
@@ -153,8 +149,6 @@ class AccountController extends Controller
 
             $user->roles()->detach($current_role->id);
             $user->roles()->attach($end_user_role->id);
-
-
         } else {
             $user->delete();
         }
