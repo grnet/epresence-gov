@@ -67,7 +67,8 @@ class GsisAuthenticationController extends Controller
             session()->put("activation_token", $activation_token);
             return $this->redirectToLoginForm();
         } else {
-            return redirect('/')->with("error", "invalid-token");
+            session()->flash('invalid-activation-token');
+            return redirect()->route('not-authorized');
         }
     }
 
