@@ -301,6 +301,6 @@ class GsisAuthenticationController extends Controller
         $result = empty($parameter) || is_null($parameter) || $parameter == 'null';
         Log::info("Is empty Parameter Result: ");
         Log::info($result ? "TRUE" : "FALSE");
-        return !$result;
+        return $result;
     }
 }
