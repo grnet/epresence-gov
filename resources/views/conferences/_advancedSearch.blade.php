@@ -51,9 +51,6 @@
                     {!! Form::select('department_id', ['' => ''], Input::get('department_id'), ['id' => 'searchDepartment', 'style' => 'width: 100%'])!!}
                 </div>
             @endif
-                <div class="col-sm-4">
-                    {!! Form::text('apella', Input::get('apella'), ['class' => 'form-control', 'placeholder' => trans('conferences.apella'), 'id' => 'searchApella']) !!}
-                </div>
         </div>
 
         <div class="small-gap"></div>

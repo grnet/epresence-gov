@@ -46,16 +46,6 @@
                         {{ $user->email }}
                     </div>
                 </div>
-
-
-
-                <div class="form-group">
-                    {!! Form::label('FieldUseStatus', trans('users.localUserShort').':', ['class' => 'control-label col-sm-4']) !!}
-                    <div class="col-sm-8 form-control-static">
-                        {{ $user->state_string($user->state) }}
-                    </div>
-                </div>
-
                 <div class="form-group">
                     {!! Form::label('FieldUserPhone', trans('users.telephone').':', ['class' => 'control-label col-sm-4']) !!}
                     <div class="col-sm-8">
