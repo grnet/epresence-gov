@@ -199,6 +199,7 @@ class GsisAuthenticationController extends Controller
                         }else{
                             //Invalid activation token
                             Log::error("Invalid activation token: ".$activation_token);
+                            session()->flash('invalid-activation-token');
                         }
                     } else {
                         try {
