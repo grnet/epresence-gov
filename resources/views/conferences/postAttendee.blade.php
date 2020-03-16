@@ -25,7 +25,7 @@
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            border: 0px;
+            border: 0;
         }
 
         .template {
