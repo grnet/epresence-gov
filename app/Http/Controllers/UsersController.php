@@ -343,18 +343,18 @@ class UsersController extends Controller
         $user->email_for_new_account($password);
 
         // Send email to the Super Admins if an InstitutionAdministrator create a DepartmentAdministrator
-        if ($user->hasRole('DepartmentAdministrator') && isset($input['creator_id']) && $user->creator->hasRole('InstitutionAdministrator') && $user->status == 1) {
-            $email = Email::where('name', 'newDepartmentAdministrator')->first();
-            $parameters = array('user' => $user);
-
-            Mail::send('emails.newDepartmentAdministrator', $parameters, function ($message) use ($email, $user) {
-                $message->from($email->sender_email, config('mail.from.name'))
-                    ->to(env('SUPPORT_MAIL'))
-                    ->replyTo($user->email, $user->firstname . ' ' . $user->lastname)
-                    ->returnPath(env('RETURN_PATH_MAIL'))
-                    ->subject($email->title);
-            });
-        }
+//        if ($user->hasRole('DepartmentAdministrator') && isset($input['creator_id']) && $user->creator->hasRole('InstitutionAdministrator') && $user->status == 1) {
+//            $email = Email::where('name', 'newDepartmentAdministrator')->first();
+//            $parameters = array('user' => $user);
+//
+//            Mail::send('emails.newDepartmentAdministrator', $parameters, function ($message) use ($email, $user) {
+//                $message->from($email->sender_email, config('mail.from.name'))
+//                    ->to(env('SUPPORT_MAIL'))
+//                    ->replyTo($user->email, $user->firstname . ' ' . $user->lastname)
+//                    ->returnPath(env('RETURN_PATH_MAIL'))
+//                    ->subject($email->title);
+//            });
+//        }
         return back()->with('message', trans('controllers.userAddedActivationEmailSent'));
     }
 
