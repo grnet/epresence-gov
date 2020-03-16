@@ -42,35 +42,35 @@ class NamedUsers extends Command
     public function handle()
     {
         Schema::disableForeignKeyConstraints();
-       // Db::table('named_users')->truncate();
+        Db::table('named_users')->truncate();
         $zoom_client = new ZoomClient();
         $named_users_to_create = $this->argument('number');
         $offset_number = $this->argument('offset');
         $upperLimit = $named_users_to_create+$offset_number;
-//        for ($i = $offset_number; $i <= $upperLimit; $i++) {
-//            $this->info("Creating named user: ".$i);
-//            $parameters = [
-//                "action" => "custCreate",
-//                "user_info" => [
-//                    "email" => "NamedUserGov" . $i . "@zoom.epresence.grnet.gr",
-//                    "type" => 2,
-//                    "first_name" => "NamedUser" . $i,
-//                    "last_name" => "NamedUser" . $i,
-//                ]
-//            ];
-//            $response = $zoom_client->create_user($parameters);
-//            if (isset($response->id)) {
-//                NamedUser::create(["email" => $parameters['user_info']['email'], "latest_used" => 0, "zoom_id" => $response->id, "type" => "conferences"]);
-//                $add_user_to_group_params = [
-//                    "members" => [
-//                        [
-//                            "id" => $response->id
-//                        ]
-//                    ]
-//                ];
-//                $zoom_client->add_user_to_group($add_user_to_group_params, config('services.zoom.h323_disabled_group_id'));
-//            }
-//        }
+        for ($i = $offset_number; $i <= $upperLimit; $i++) {
+            $this->info("Creating named user: ".$i);
+            $parameters = [
+                "action" => "custCreate",
+                "user_info" => [
+                    "email" => "NamedUserGov" . $i . "@zoom.epresence.grnet.gr",
+                    "type" => 2,
+                    "first_name" => "NamedUser" . $i,
+                    "last_name" => "NamedUser" . $i,
+                ]
+            ];
+            $response = $zoom_client->create_user($parameters);
+            if (isset($response->id)) {
+                NamedUser::create(["email" => $parameters['user_info']['email'], "latest_used" => 0, "zoom_id" => $response->id, "type" => "conferences"]);
+                $add_user_to_group_params = [
+                    "members" => [
+                        [
+                            "id" => $response->id
+                        ]
+                    ]
+                ];
+                $zoom_client->add_user_to_group($add_user_to_group_params, config('services.zoom.h323_disabled_group_id'));
+            }
+        }
 
         $DemoUserParameters = [
             "action" => "custCreate",
