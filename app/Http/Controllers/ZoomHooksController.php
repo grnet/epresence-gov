@@ -47,6 +47,7 @@ class ZoomHooksController extends Controller
 
 
             if(!isset($conference->id)){
+                Log::info("Not matched with conference");
 
                 //Check if this zoom meeting id is the demo-room
 
@@ -54,6 +55,8 @@ class ZoomHooksController extends Controller
 
                 $demo_room_key = 'demo_room_active';
                 $current_demo_room_zoom_id = $redis->get($demo_room_key);
+
+                Log::info("Current demo room id: ".$current_demo_room_zoom_id);
 
                 if($current_demo_room_zoom_id == $zoom_meeting_id){
                     $meeting_type = "demo_room";
@@ -71,6 +74,8 @@ class ZoomHooksController extends Controller
             }else{
                 $meeting_type = "conference";
             }
+
+            Log::info("Meeting type resolved: ".$meeting_type);
 
             if(!is_null($meeting_type)){
 
