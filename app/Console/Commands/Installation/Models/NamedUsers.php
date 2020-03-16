@@ -72,27 +72,27 @@ class NamedUsers extends Command
             }
         }
 
-//        $DemoUserParameters = [
-//            "action" => "custCreate",
-//            "user_info" => [
-//                "email" => "NamedUserDemoRoomGov@zoom.epresence.grnet.gr",
-//                "type" => 2,
-//                "first_name" => "NamedUserDemoRoomGov",
-//                "last_name" => "NamedUserDemoRoomGov",
-//            ]
-//        ];
-//        $response = $zoom_client->create_user($DemoUserParameters);
-//        if (isset($response->id)) {
-//            NamedUser::create(["email" => $DemoUserParameters['user_info']['email'], "latest_used" => 0, "zoom_id" => $response->id, "type" => "demo_room"]);
-//            $add_user_to_group_params = [
-//                "members" => [
-//                    [
-//                        "id" => $response->id
-//                    ]
-//                ]
-//            ];
-//            $zoom_client->add_user_to_group($add_user_to_group_params, config('services.zoom.h323_disabled_group_id'));
-//        }
+        $DemoUserParameters = [
+            "action" => "custCreate",
+            "user_info" => [
+                "email" => "NamedUserDemoRoomGov@zoom.epresence.grnet.gr",
+                "type" => 2,
+                "first_name" => "NamedUserDemoRoomGov",
+                "last_name" => "NamedUserDemoRoomGov",
+            ]
+        ];
+        $response = $zoom_client->create_user($DemoUserParameters);
+        if (isset($response->id)) {
+            NamedUser::create(["email" => $DemoUserParameters['user_info']['email'], "latest_used" => 0, "zoom_id" => $response->id, "type" => "demo_room"]);
+            $add_user_to_group_params = [
+                "members" => [
+                    [
+                        "id" => $response->id
+                    ]
+                ]
+            ];
+            $zoom_client->add_user_to_group($add_user_to_group_params, config('services.zoom.h323_disabled_group_id'));
+        }
         Schema::enableForeignKeyConstraints();
     }
 }
