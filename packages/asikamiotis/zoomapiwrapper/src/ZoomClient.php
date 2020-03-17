@@ -160,9 +160,10 @@ class ZoomClient
     }
 
 
-    //Participants
-
-
+    /**Participants
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function get_participants($zoom_meeting_id)
     {
 

@@ -4,10 +4,8 @@ namespace App\Jobs\Conferences;
 
 use App\Conference;
 use App\DemoRoomCdr;
-use App\Exceptions\EmptyParticipantsTableException;
 use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Exception;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
