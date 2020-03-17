@@ -6,18 +6,12 @@ use App\DemoRoomCdr;
 use App\ExtraEmail;
 use App\NamedUser;
 use Asikamiotis\ZoomApiWrapper\ZoomClient;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Auth;
-use App\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
-use SoapClient;
-use App\Conference;
+
 
 class DemoRoomController extends Controller
 {

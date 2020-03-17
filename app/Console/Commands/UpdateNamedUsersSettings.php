@@ -43,14 +43,14 @@ class UpdateNamedUsersSettings extends Command
 
         foreach($named_users as $named_user){
 
-            $client = new ZoomClient();
+            $zoom_client = new ZoomClient();
             $parameters = [
                 "in_meeting"=>[
                     "e2e_encryption"=>false
                 ]
             ];
 
-            $client->update_user_settings($parameters,$named_user->zoom_id);
+            $zoom_client->update_user_settings($parameters,$named_user->zoom_id);
         }
     }
 }

@@ -4,12 +4,9 @@ namespace App\Jobs\Conferences;
 
 
 use App\Cdr;
-use App\Conference;
-use App\Events\ParticipantJoined;
 use App\Events\ParticipantLeft;
 use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Carbon\Carbon;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

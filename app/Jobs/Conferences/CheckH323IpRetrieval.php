@@ -2,21 +2,14 @@
 
 namespace App\Jobs\Conferences;
 
-use App\Cdr;
-use App\Conference;
 use App\Events\H323IpNotRetrieved;
 use App\Events\H323IpRetrieved;
-use App\Events\ParticipantJoined;
-use App\NamedUser;
 use Asikamiotis\ZoomApiWrapper\ZoomClient;
-use Carbon\Carbon;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use phpseclib\Crypt\RSA;

@@ -1069,8 +1069,8 @@ class Conference extends Model
                 ]
             ];
 
-            $client = new ZoomClient();
-            $client->update_meeting($parameters,$this->zoom_meeting_id);
+            $zoom_client = new ZoomClient();
+            $zoom_client->update_meeting($parameters,$this->zoom_meeting_id);
 
             $this->update(['room_enabled' => 1]);
 

@@ -7,12 +7,12 @@ use Carbon\Carbon;
 use App\Institution;
 use App\Department;
 use App\Conference;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use DateTime;
 use DateInterval;
 use DatePeriod;
-use Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Statistics extends Model
 {
@@ -1259,5 +1259,15 @@ class Statistics extends Model
         }
 
         return $value2 . ' (' . $action . ' ' . $percentage . '% ' . trans('statistics.compared_to_same_period_last').')';
+    }
+
+
+    /**
+     *
+     */
+    public static function incrementTotalConferencesServiceUsage(){
+        DB::table('service_usage')->where('option', 'total')->increment('total_conferences');
+        $avg_old = DB::table('service_usage')->where('option', 'total')->value('average_participants');
+        DB::table('service_usage')->where('option', 'total')->increment('euro_saved', round($avg_old / 2 * config('conferences.euro_saved')));
     }
 }

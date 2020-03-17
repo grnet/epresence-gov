@@ -486,11 +486,7 @@ class ConferencesController extends Controller
             // Add conference to statistics table
             $conference->update(['room_enabled' => 1, 'instantActivation' => 1]);
             Statistics::create(['conference_id' => $conference->id, 'institution_id' => $conference->institution_id, 'department_id' => $conference->department_id, 'active' => 1, 'created_at' => Carbon::now()]);
-            if (!$conference->is_test()) {
-                DB::table('service_usage')->where('option', 'total')->increment('total_conferences');
-                $avg_old = DB::table('service_usage')->where('option', 'total')->value('average_participants');
-                DB::table('service_usage')->where('option', 'total')->increment('euro_saved', round($avg_old / 2 * config('conferences.euro_saved')));
-            }
+            Statistics::incrementTotalConferencesServiceUsage();
         }
         $type = $conference->room_enabled ? 'active' : 'future';
         event(new ConferenceCreated($conference, $type));
@@ -621,6 +617,7 @@ class ConferencesController extends Controller
                 ]);
 
             Statistics::create(['conference_id' => $conference->id, 'institution_id' => $conference->institution_id, 'department_id' => $conference->department_id, 'active' => 1, 'created_at' => Carbon::now()]);
+            Statistics::incrementTotalConferencesServiceUsage();
             event(new ConferenceCreated($conference, 'active'));
             return redirect('test-conferences/' . $conference->id . '/edit')->with('storesSuccessfully', trans('controllers.conferenceSaved') . trans('controllers.click') . '<a href="#ParticipatsBody">' . trans('controllers.here') . '</a>' . trans('controllers.toAddParticipants'));
         }
@@ -906,8 +903,8 @@ class ConferencesController extends Controller
 
         $update_parameters = $conference->get_zoom_update_parameters();
 
-        $client = new ZoomClient();
-        $client->update_meeting($update_parameters, $conference->zoom_meeting_id);
+        $zoom_client = new ZoomClient();
+        $zoom_client->update_meeting($update_parameters, $conference->zoom_meeting_id);
 
         if (isset($fields_updated) && count($fields_updated) > 0 && $notify)
             event(new ConferenceDetailsChanged($conference, $fields_updated));
@@ -933,8 +930,8 @@ class ConferencesController extends Controller
         }
         $conference->update($input);
         $update_parameters = $conference->get_zoom_update_parameters();
-        $client = new ZoomClient();
-        $client->update_meeting($update_parameters, $conference->zoom_meeting_id);
+        $zoom_client = new ZoomClient();
+        $zoom_client->update_meeting($update_parameters, $conference->zoom_meeting_id);
         if (isset($fields_updated) && count($fields_updated) > 0 && $notify)
             event(new ConferenceDetailsChanged($conference, $fields_updated));
 
