@@ -30,6 +30,8 @@ class ZoomClient
 
         $jwt = JWT::encode($token, $secret);
 
+        Log::info($jwt);
+
         $this->headers = [
             'Authorization' => 'Bearer ' . $jwt,
             'Accept' => 'application/json',
@@ -177,10 +179,22 @@ class ZoomClient
             $get_participants_response = json_decode($get_participants_response->getBody());
 
         } catch (ClientException $e) {
+
             $get_participants_response = $e->getResponse();
-            $responseBodyAsString = $get_participants_response->getBody()->getContents();
+            Log::error("Error status code: ".$get_participants_response->getStatusCode());
+
+            //Rate limiting header status code
+            if($get_participants_response->getStatusCode() == 429){
+                Log::error("Error headers: ".json_encode($get_participants_response->getHeaders()));
+                Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("X-RateLimit-Limit")));
+                Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("X-RateLimit-Remaining")));
+                Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("Retry-After")));
+
+
+            }
+
             Log::error($e->getMessage());
-            Log::error($responseBodyAsString);
+
             $get_participants_response = false;
         }
 

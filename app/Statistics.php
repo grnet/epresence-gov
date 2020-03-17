@@ -26,16 +26,27 @@ class Statistics extends Model
         'active'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function conference()
     {
         return $this->belongsTo('App\Conference', 'conference_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function institution()
     {
         return $this->belongsTo('App\Institution', 'institution_id');
     }
 
+    /**
+     * @param $dates
+     * @param $group
+     * @return array
+     */
     public static function participant_per_conference($dates, $group)
     {
         $periods = array();
@@ -60,6 +71,11 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @param $dates
+     * @param $group
+     * @return array
+     */
     public static function duration_per_conference($dates, $group)
     {
         $periods = array();
@@ -96,6 +112,11 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @param $dates
+     * @param $group
+     * @return array
+     */
     public static function conferences_duration($dates, $group)
     {
         $periods = array();
@@ -147,6 +168,11 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @param $dates
+     * @param $group
+     * @return array
+     */
     public static function conference_participants($dates, $group)
     {
         $periods = array();
@@ -196,6 +222,10 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @param $statistics
+     * @return array
+     */
     public static function conferences_per_institution($statistics)
     {
         $institutions = $statistics->groupBy('institution_id')->toArray();
@@ -235,6 +265,10 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @param $statistics
+     * @return array
+     */
     public static function conference_duration_per_institution($statistics)
     {
         $institutions = $statistics->groupBy('institution_id')->toArray();
@@ -381,6 +415,9 @@ class Statistics extends Model
         return $current_five_minute_id+1;
     }
 
+    /**
+     * @return array
+     */
     public static function realtime_num_of()
     {
         $conferences = Conference::where('room_enabled', 1)->get();
@@ -408,6 +445,10 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @return array
+     * @throws \Throwable
+     */
     public static function realtime_users_per_room()
     {
         $active_conferences = Conference::where('room_enabled', 1)->orderBy('id', 'asc')->get();
@@ -489,33 +530,26 @@ class Statistics extends Model
         return $json;
     }
 
+    /**
+     * @return array
+     */
     public static function get_last_year_report_all_conferences_count()
     {
-
-
         $data = Array();
-
         $previous_year = Carbon::now()->startOfMonth()->subYear();
-
-
         $time_needle_start = $previous_year->copy();
         $time_needle_end = $time_needle_start->copy()->addMonth();
-
-
         while ($time_needle_end <= Carbon::now()->startOfMonth()->addMonth()) {
-
-
             $data[] = Conference::whereBetween('start', [$time_needle_start, $time_needle_end])->orderBy('start', 'asc')->count();
-
             $time_needle_end->addMonth();
             $time_needle_start->addMonth();
         }
-
-
         return $data;
-
     }
 
+    /**
+     * @return array
+     */
     public static function get_last_year_report_test_conferences_count()
     {
         $data = Array();
@@ -541,6 +575,10 @@ class Statistics extends Model
         return $data;
     }
 
+    /**
+     * @param $exclude_conferences
+     * @return array
+     */
     public static function get_last_year_report_elector_conferences_count($exclude_conferences)
     {
 
@@ -570,6 +608,10 @@ class Statistics extends Model
         return $data;
     }
 
+    /**
+     * @param $exclude_conferences
+     * @return array
+     */
     public static function get_last_year_report_other_conferences_count($exclude_conferences)
     {
 
@@ -595,6 +637,10 @@ class Statistics extends Model
         return $data;
     }
 
+    /**
+     * @param $exclude_conferences
+     * @return array
+     */
     public static function get_last_year_report_postgraduate_conferences_count($exclude_conferences)
     {
 
@@ -628,6 +674,10 @@ class Statistics extends Model
         return $data;
     }
 
+    /**
+     * @param $data
+     * @return array
+     */
     public static function get_report_conferences_percentage($data)
     {
 
@@ -656,6 +706,10 @@ class Statistics extends Model
         return $result_data;
     }
 
+    /**
+     * @param $unique
+     * @return array
+     */
     public static function get_report_conferences_distinct($unique)
     {
 
@@ -692,6 +746,10 @@ class Statistics extends Model
         return $data;
     }
 
+    /**
+     * @param $device
+     * @return array
+     */
     public static function get_report_users_distinct($device)
     {
 

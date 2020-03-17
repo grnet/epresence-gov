@@ -604,7 +604,6 @@ class ConferencesController extends Controller
             $participant = Auth::user();
             $conference->participants()->save($participant);
             $zoom_api_response = $conference->assignParticipant($participant->id, "approve");
-
             $join_url = isset($zoom_api_response->join_url) ? $zoom_api_response->join_url : null;
             $registrant_id = isset($zoom_api_response->registrant_id) ? $zoom_api_response->registrant_id : null;
 
@@ -883,9 +882,7 @@ class ConferencesController extends Controller
                     //Try to find the next available named user to use
                     //if not found return error
                     //else recreate the conference using the new named user assigned
-
                     $result = $conference->assign_new_named_user($input);
-
                     if ($result == false) {
                         return redirect('conferences/' . $id . '/edit')->withErrors(['named_users' => 'Δεν υπάρχουν διαθέσιμοι πόροι για τις ημερομηνιές που διαλέξατε'])->withInput();
                     } else {
@@ -1106,9 +1103,7 @@ class ConferencesController extends Controller
      */
     public function join_conference_mobile($id)
     {
-
         $authenticated_user = Auth::user();
-
         $conference = Conference::findOrFail($id);
         $data = array();
         // $room_information = $conference->GetRoomInfo();
@@ -1135,13 +1130,8 @@ class ConferencesController extends Controller
         if (!empty($join_url)) {
             return redirect($join_url);
         } else {
-            $join_url = $authenticated_user->look_for_join_url($conference, $participant_values->registrant_id);
+            $join_url = $conference->look_for_join_urls($participant_values->registrant_id);
             if (!empty($join_url)) {
-                DB::table("conference_user")
-                    ->where("conference_id", $conference->id)
-                    ->where("user_id", $authenticated_user->id)
-                    ->update(["join_url" => $join_url]);
-
                 return redirect($join_url);
             } else {
                 return back();

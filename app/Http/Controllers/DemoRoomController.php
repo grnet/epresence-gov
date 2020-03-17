@@ -7,6 +7,9 @@ use App\ExtraEmail;
 use App\NamedUser;
 use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -33,6 +36,10 @@ class DemoRoomController extends Controller
     }
 
 
+    /**
+     * @return RedirectResponse|Redirector
+     * @throws GuzzleException
+     */
     public function join_demo_room()
     {
 
@@ -98,6 +105,7 @@ class DemoRoomController extends Controller
 
 
     //This end last demo room meeting and creates a new one
+
 
     public static function recreate_demo_room()
     {

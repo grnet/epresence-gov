@@ -155,16 +155,15 @@ class AccountController extends Controller
             $user->delete();
         }
 
-        $email = Email::where('name', 'userDeleted')->first();
-
-        $parameters = array('deletedEmail' => $deleted_email);
-
-        Mail::send('emails.user_deleted', $parameters, function ($message) use ($email) {
-            $message->from($email->sender_email, config('mail.from.name'))
-                ->to(env('SUPPORT_MAIL'))
-                ->returnPath(env('RETURN_PATH_MAIL'))
-                ->subject($email->title);
-        });
+//        $email = Email::where('name', 'userDeleted')->first();
+//        $parameters = array('deletedEmail' => $deleted_email);
+//
+//        Mail::send('emails.user_deleted', $parameters, function ($message) use ($email) {
+//            $message->from($email->sender_email, config('mail.from.name'))
+//                ->to(env('SUPPORT_MAIL'))
+//                ->returnPath(env('RETURN_PATH_MAIL'))
+//                ->subject($email->title);
+//        });
 
         return redirect('/');
     }

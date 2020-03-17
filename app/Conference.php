@@ -579,6 +579,9 @@ class Conference extends Model
         return $ExactTimeFromNow;
     }
 
+    /**
+     * @return string
+     */
     public function sendStartConferenceReminders()
     {
 
@@ -987,7 +990,7 @@ class Conference extends Model
                 "mute_upon_entry" => "false",
                 "watermark" => "false",
                 "use_pmi" => "false",
-                //0 -> participants are required to fill a form in order to join them meeting even if they are using their personal link
+                //0 -> participants are required to fill a form in order to join the meeting even if they are using their personal link
                 "approval_type" => "1",
                 "registration_type" => "2",
                 "audio" => "voip",
@@ -1479,5 +1482,41 @@ class Conference extends Model
     }
 
 
+    /**
+     * @param null $registrant_id
+     * @return |null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function look_for_join_urls($registrant_id = null){
+        $responseUrl = null;
+        $zoom_client = new ZoomClient();
+        $registrants_response = $zoom_client->get_registrants($this->zoom_meeting_id);
+        if(isset($registrants_response->registrants) && count($registrants_response->registrants) > 0){
+            foreach($registrants_response->registrants as $registrant){
+                if(isset($registrant->id) && !empty($registrant->id) &&
+                   isset($registrant->join_url) && !empty($registrant->join_url)
+                ){
+
+                //Try to match with registrant id
+                    $participantExists = Db::table("conference_user")
+                        ->where("registrant_id",$registrant->id)
+                        ->where("conference_id",$this->id)
+                        ->whereNull("join_url")
+                        ->exists();
+
+                    if($participantExists){
+                        DB::table("conference_user")
+                            ->where("conference_id", $this->id)
+                            ->where("registrant_id", $registrant->id)
+                            ->update(["join_url" => $registrant->join_url]);
+                    }
+                    if($registrant->id == $registrant_id){
+                        $responseUrl = $registrant->join_url;
+                    }
+                }
+            }
+        }
+        return $responseUrl;
+    }
 
 }

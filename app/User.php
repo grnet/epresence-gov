@@ -1054,13 +1054,10 @@ class User extends Model implements AuthenticatableContract,
      */
     public function participantValues($conference_id)
     {
-
-        $values = DB::table('conference_user')
+        return DB::table('conference_user')
             ->where('conference_id', $conference_id)
             ->where('user_id', $this->id)
             ->first();
-
-        return $values;
     }
 
 
@@ -1175,17 +1172,6 @@ class User extends Model implements AuthenticatableContract,
         }
     }
 
-    /**
-     * @param $conference
-     * @param null $registrant_id
-     * @return string|null
-     * @throws GuzzleException
-     */
-    public function look_for_join_url($conference,$registrant_id = null){
-        $zoom_client = new ZoomClient();
-        $registrants_response = $zoom_client->get_registrants($conference->zoom_meeting_id);
-        return $this->match_with_registrant($registrants_response,$registrant_id);
-    }
 
     /**
      * @param $registrants_response
