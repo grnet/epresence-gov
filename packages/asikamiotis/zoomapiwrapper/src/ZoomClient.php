@@ -166,7 +166,7 @@ class ZoomClient
      */
     public function get_participants($zoom_meeting_id)
     {
-
+        Log::info("Zoom client GET  request: /v2/metrics/meetings/" . $zoom_meeting_id . "/participants");
         try {
             //Make the api call to zoom
 
@@ -177,12 +177,10 @@ class ZoomClient
             $get_participants_response = json_decode($get_participants_response->getBody());
 
         } catch (ClientException $e) {
-
             $get_participants_response = $e->getResponse();
             $responseBodyAsString = $get_participants_response->getBody()->getContents();
-
+            Log::error($e->getMessage());
             Log::error($responseBodyAsString);
-
             $get_participants_response = false;
         }
 
