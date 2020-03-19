@@ -107,10 +107,10 @@ class GsisAuthenticationController extends Controller
                 Log::info("User details api response: " . $response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 $userInfo = $parsedResponse->userinfo;
-                $result = $this->validateParameters($userInfo);
+                $validationResult = $this->validateParameters($userInfo);
                 //If parameters are not valid logout from gsis and redirect to not-authorized page of our app
-                if (!$result) {
-                    return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+                if (!$validationResult) {
+                    return $this->logoutAsNotAuthorized();
                 }
                 // Tax id of the account
                 $taxId = trim($userInfo['taxid']);
@@ -130,7 +130,7 @@ class GsisAuthenticationController extends Controller
                 Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
-        return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+        return $this->logoutAsNotAuthorized();
     }
 
     /**
@@ -151,7 +151,7 @@ class GsisAuthenticationController extends Controller
     }
 
 
-    /**
+    /** Account tax id exists try to login
      * @param $user
      * @return RedirectResponse|Redirector
      */
@@ -244,18 +244,17 @@ class GsisAuthenticationController extends Controller
     }
 
 
-    /**
+    /** User is not registered checking if there is a valid activation token in the session, if so
+     match authenticated user with the invited account if not use the API to determine if this user is
+     civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
+     after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform  as an End User
      * @param $firstName
      * @param $lastName
      * @param $taxId
      * @return RedirectResponse|Redirector
      */
     private function registerUser($firstName,$lastName,$taxId){
-        // User is not registered checking if there is a valid activation token in the session, if so
-        // match authenticated user with the invited account if not use the API to determine if this user is
-        // civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
-        // after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform
-        // as an End User
+
         if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
             $activation_token = session()->pull("activation_token");
             $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
@@ -306,7 +305,7 @@ class GsisAuthenticationController extends Controller
                 //Invalid activation token
                 Log::error("Invalid activation token: " . $activation_token);
                 session()->flash('invalid-activation-token');
-                return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+                return $this->logoutAsNotAuthorized();
             }
         } else {
             $responseObject = getEmploymentInfo($taxId);
@@ -339,9 +338,17 @@ class GsisAuthenticationController extends Controller
                 return redirect()->route('account-activation');
             }  else {
                 Log::info("Not invited account with tax_id: " . $taxId . " is not a civil servant or an employee api exception occurred aborting!");
-                return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+                return $this->logoutAsNotAuthorized();
             }
         }
+    }
+
+
+    /**Logs user out of gsis and redirects back to not - authorized page of the app
+     * @return RedirectResponse|Redirector
+     */
+    private function logoutAsNotAuthorized(){
+        return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
     }
 
     /**
