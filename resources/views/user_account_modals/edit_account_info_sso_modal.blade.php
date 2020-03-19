@@ -90,37 +90,17 @@
                     <div class="col-sm-8 form-control-static">
                             {{ $institution->title }}
                     </div>
-                    <input type="hidden" name="institution_id" value="{{$institution->id}}">
                 </div>
 
                 {{--Institution section end--}}
 
                 {{--Department section start--}}
-
-                @if(!$user->hasRole('SuperAdmin') && !$user->hasRole('DepartmentAdministrator'))
-                    <div class="form-group" id="DepContainer">
-                        {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
-                        <div class="col-sm-8">
-                         {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id', $institution->id)->orderBy('title')->pluck('title', 'id')->toArray() + ['other' => trans('users.other')], $department->id , ['id' => 'FieldUserDepart', 'style' => 'width: 100%'])!!}
-                        </div>
-                    </div>
-                    <div class="form-group" id="NewDepContainer">
-                        {!! Form::label('FieldUserDepartNew', trans('users.newDepartment').':', ['class' => 'control-label col-sm-4']) !!}
-                        <div class="col-sm-8">
-                            {!! Form::text('new_department', null, ['class' => 'form-control', 'placeholder' => trans('users.enterDepartmentRequired'), 'id' => 'FieldUserDepartNew']) !!}
-                                <div id="newDepDiv" class="help-block with-errors newdep alert alert-warning"
-                                     style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
-                        </div>
-                    </div>
-                @else
-                    <div class="form-group">
+                <div class="form-group">
                         {!! Form::label('FieldUserDepart', trans('users.department').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8 form-control-static">
                             {{ $department->title }}
                         </div>
-                        <input type="hidden" value="{{$department->id}}" name="department_id">
-                    </div>
-                @endif
+                </div>
                 <div class="modal-footer" style="margin-top:0;">
                     {!! Form::submit(trans('site.save'), ['class' => 'btn btn-primary', 'id' => 'UserSubmitBtnNew', 'name' => 'add_new']) !!}
                     <button type="button" id="UserModalButtonClose"

@@ -7,6 +7,7 @@ use App\Email;
 use App\Http\Controllers\Controller;
 use App\Institution;
 use App\User;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
@@ -121,7 +122,7 @@ class GsisAuthenticationController extends Controller
                 $user = User::where("tax_id", $taxId)->first();
                 // User is already registered, checking if user is invited with a new email if so merge the two users, log him in and redirect him to homepage
                 if ($user) {
-                    return $this->logUserIn($user);
+                    return  $this->logUserIn($user);
                 } else {
                     return $this->registerUser($firstName,$lastName,$taxId);
                 }
@@ -227,11 +228,11 @@ class GsisAuthenticationController extends Controller
 
         if(!$user->confirmed){
             if(!in_array($currentRole->name,["InstitutionAdministrator", "DepartmentAdministrator"])){
-                $responseObject = $this->getEmploymentInfo($user->tax_id);
+                $responseObject = getEmploymentInfo($user->tax_id);
                 if($responseObject !== false){
                     $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                     $departmentToAttach = $institutionToAttach->departments()->first();
-                    $this->matchInstitutionsAndSetToSession($responseObject);
+                   matchInstitutionsAndSetToSession($responseObject);
                     $user->institutions()->sync([$institutionToAttach->id]);
                     $user->departments()->sync([$departmentToAttach->id]);
                 }
@@ -262,37 +263,58 @@ class GsisAuthenticationController extends Controller
                 $user->create_join_urls();
                 Auth::login($user);
                 $tokenUserRole = $user->roles()->first();
+                $responseObject = getEmploymentInfo($taxId);
                 if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
-                    $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
+                    $isCivilServant = false;
+                    if($responseObject !== false){
+                        $isCivilServant  = true;
+                    }
+                    $user->update([
+                        'firstname' => $firstName,
+                        'lastname' => $lastName,
+                        'tax_id' => $taxId,
+                        'confirmed' => true,
+                        'activation_token' => null,
+                        'email_verified_at'=>Carbon::now(),
+                        'civil_servant'=>$isCivilServant
+                    ]);
                     return redirect('/');
                 } else {
-                    $responseObject = $this->getEmploymentInfo($taxId);
                     if($responseObject !== false){
-                        $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => false, 'activation_token' => null]);
+                        $user->update([
+                             'firstname' => $firstName,
+                             'lastname' => $lastName,
+                             'tax_id' => $taxId,
+                             'confirmed' => false,
+                             'activation_token' => null,
+                             'civil_servant'=>true,
+                             'email_verified_at'=>Carbon::now()
+                        ]);
                         $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                         $departmentToAttach = $institutionToAttach->departments()->first();
-                        $this->matchInstitutionsAndSetToSession($responseObject);
+                        matchInstitutionsAndSetToSession($responseObject);
                         $user->institutions()->sync([$institutionToAttach->id]);
                         $user->departments()->sync([$departmentToAttach->id]);
                         return redirect()->route('account-activation');
                     }else{
                         Log::info("Could not find any employment info from api or api exception occurred! Not changing invited user's institution, confirming account and logging in");
-                        $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
-                        return redirect()->route('/');
+                        $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null,'civil_servant'=>false,'email_verified_at'=>Carbon::now()]);
+                        return redirect('/');
                     }
                 }
             } else {
                 //Invalid activation token
                 Log::error("Invalid activation token: " . $activation_token);
                 session()->flash('invalid-activation-token');
+                return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
             }
         } else {
-            $responseObject = $this->getEmploymentInfo($taxId);
+            $responseObject = getEmploymentInfo($taxId);
             if($responseObject !== false){
                 Log::info("Not invited account with tax_id: " . $taxId . " is a civil servant continuing...");
                 $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                 $departmentToAttach = $institutionToAttach->departments()->first();
-                $this->matchInstitutionsAndSetToSession($responseObject);
+                matchInstitutionsAndSetToSession($responseObject);
                 Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
                 $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
                 $user = User::create(
@@ -304,7 +326,9 @@ class GsisAuthenticationController extends Controller
                         'confirmed' => false,
                         'state' => 'sso',
                         'status' => 1,
-                        'password' => bcrypt(str_random(9))
+                        'password' => bcrypt(str_random(9)),
+                        'civil_servant'=>true,
+                        'email_verified_at'=>null
                     ]);
                 $user->institutions()->sync([$institutionToAttach->id]);
                 $user->departments()->sync([$departmentToAttach->id]);
@@ -315,6 +339,7 @@ class GsisAuthenticationController extends Controller
                 return redirect()->route('account-activation');
             }  else {
                 Log::info("Not invited account with tax_id: " . $taxId . " is not a civil servant or an employee api exception occurred aborting!");
+                return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
             }
         }
     }
@@ -368,47 +393,4 @@ class GsisAuthenticationController extends Controller
         return $institutionToAttach;
     }
 
-    /**Puts matched institutions in the session
-     * @param $responseObject
-     */
-    private function matchInstitutionsAndSetToSession($responseObject)
-    {
-        $matchedInstitutions = [];
-        foreach ($responseObject->data->employmentInfos as $employmentInfo) {
-            $institutionMatched = Institution::where("ws_id", $employmentInfo->organicOrganizationId)->first();
-            if ($institutionMatched) {
-                $matchedInstitutions[] = $institutionMatched->id;
-            }
-        }
-        if (count($matchedInstitutions) > 0) {
-            session()->put("matched_institution_ids", implode(",", $matchedInstitutions));
-        }
-    }
-
-    /**
-     * @param $taxId
-     * @return bool
-     */
-    private function getEmploymentInfo($taxId)
-    {
-        try {
-            $client = new Client();
-            $response = $client->get(config('services.gov-employees-api.endpoint') . $taxId, [
-                'auth' => [
-                    config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
-                ]
-            ]);
-            Log::info("Employee api response: " . $response->getBody());
-            $responseObject = json_decode($response->getBody());
-            //Check if user is civil servant
-            if (!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0) {
-                return $responseObject;
-            } else {
-                return false;
-            }
-        } catch (\Exception $e) {
-            Log::error("Employee api exception: " . $e->getMessage());
-            return false;
-        }
-    }
 }

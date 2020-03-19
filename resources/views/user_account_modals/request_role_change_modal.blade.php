@@ -44,11 +44,7 @@
                     <div class="form-group">
                         {!! Form::label('FieldCoordDepartPhone', trans('site.phone').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8">
-                            @if(!empty($user->telephone))
-                            {!! Form::text('application_telephone',$user->telephone, ['readonly'=>true,'class' => 'form-control', 'placeholder' => trans('site.phoneRequired'), 'id' => 'FieldPhone']) !!}
-                            @else
-                            {!! Form::text('application_telephone',null, ['class' => 'form-control', 'placeholder' => trans('site.phoneRequired'), 'id' => 'FieldPhone']) !!}
-                            @endif
+                            {!! Form::text('application_telephone',$user->telephone, ['readonly'=>!empty($user->telephone),'class' => 'form-control', 'placeholder' => trans('site.phoneRequired'), 'id' => 'FieldPhone']) !!}
                             <div class="help-block with-errors" style="margin:0px;"></div>
                         </div>
                     </div>
@@ -57,40 +53,61 @@
                         <div class="col-sm-8">
                             <div class="input-group">
                                 @if($user->hasRole('DepartmentAdministrator'))
-                                    {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator')], null, ['id' => 'FieldCoordDepartRole', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+                                    {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator')], null, ['id' => 'selectRoleField', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                                 @else
-                                    {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator'), 'DepartmentAdministrator' => trans('site.departmentModerator')], null, ['id' => 'FieldCoordDepartRole', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+                                    {!! Form::select('application_role', ['' => ''] + ['InstitutionAdministrator' => trans('site.institutionModerator'), 'DepartmentAdministrator' => trans('site.departmentModerator')], null, ['id' => 'selectRoleField', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                                 @endif
                                 <span id="helpBlockRole" class="help-block" style="text-align: left;">{{trans('site.selectRole')}}</span>
                             </div>
                         </div>
                     </div>
                     <h4 style=" padding-top:15px; padding-bottom:5px; border-bottom: 1px solid #bcbcbc"><span class="glyphicon glyphicon-wrench"></span>  {{trans('site.moderateConferencesFor')}}:</h4>
+                    <div id="selectInstitutionContainer">
                     <div class="form-group">
                         {!! Form::label('FieldCoordDepartOrg', trans('site.institution').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8 form-control-static">
-                            @if($user->hasRole('DepartmentAdministrator'))
+                            @if(!$user->hasRole('EndUser'))
                             {{ $institution->title }}
                             <input type="hidden" name="institution_id" value="{{$institution->id}}">
                             @else
-                             {!! Form::select('institution_id', ['' => ''] + App\Institution::pluck("title","id")->toArray(), $institution->id, ['id' => 'FieldRoleChangeInstitutionId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+                             {!! Form::select('institution_id',$institutionsOptions,null, ['id' => 'FieldRoleChangeInstitutionId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
                             @endif
                             <div class="help-block with-errors" style="margin:0;"></div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        {!! Form::label('FieldCoordDepartDepart', trans('site.department').':', ['class' => 'control-label col-sm-4 ']) !!}
-                        <div class="col-sm-8 form-control-static">
-                            {!! Form::select('department_id', ['' => ''] + App\Department::where('institution_id',old('institution_id',$institution->id))->pluck("title","id")->toArray(), $department->id, ['id' => 'FieldRoleChangeDepartmentId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+                    </div>
+                    @if($user->hasRole('EndUser'))
+                    <div id="selectDepartmentContainer">
+                        <div class="form-group">
+                            {!! Form::label('FieldCoordDepartDepart', trans('site.department').':', ['class' => 'control-label col-sm-4 ']) !!}
+
+                            <div class="col-sm-8 form-control-static">
+                                {!! Form::select('department_id',[''=>''] + App\Department::where("institution_id",old('institution_id',$institution->id))->pluck("title","id")->toArray() + ['other' => trans('users.other')], $department->id,
+                                [
+                                 'id' => 'selectDepartmentField',
+                                 'style' => 'width: 100%',
+                                 'aria-describedby' => 'helpBlockRole'
+                                 ])!!}
+                            </div>
+                        </div>
+                        <div class="form-group" id="newDepartmentContainer">
+                            {!! Form::label('DepartmentAdminDepNewField', trans('users.newDepartment').':', ['class' => 'control-label col-sm-4']) !!}
+                            <div class="col-sm-8">
+                                {!! Form::text('new_department', null, ['class' => 'form-control', 'placeholder' => trans('users.enterDepartment'), 'id' => 'DepartmentAdminDepNewField']) !!}
+                                <div class="help-block with-errors newdep alert alert-warning"
+                                     style="margin:0;">{{ trans('users.newDeptWarning') }}</div>
+                            </div>
                         </div>
                     </div>
+                    @else
+                    <input type="hidden" name="department_id" value="{{$department->id}}">
+                    @endif
                     <div class="form-group" id="FieldCoordDepartDepartFormGroup">
                         {!! Form::label('FieldCoordDepartComment', trans('site.description').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-8">
                             {!! Form::textarea('application_comment', null, ['class' => 'form-control', 'placeholder' => trans('site.justification'), 'id' => 'FieldCoordDepartComment', 'rows' => '3'])!!}
                         </div>
                     </div>
-
                     <div class="form-group">
                         {!! Form::label('FieldCoordDepartTerms', trans('site.termsAcceptance').':', ['class' => 'control-label col-sm-4 ']) !!}
                         <div class="col-sm-1">

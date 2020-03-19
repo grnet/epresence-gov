@@ -8,6 +8,7 @@ use App\Http\Requests;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
@@ -16,10 +17,11 @@ use App\Email;
 use App\Department;
 use Carbon\Carbon;
 use App\ExtraEmail;
-use App\Application;
 use App\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 
@@ -47,7 +49,24 @@ class AccountController extends Controller
         $department = $user->departments()->first();
         $role = $user->roles()->first();
         $canBeDeleted = $user->HasFutureAdminConferences();
-        $canRequestRoleChange = Application::where('user_id', $user->id)->where('app_state', 'new')->count() > 0 || (!$user->hasRole('DepartmentAdministrator') && !$user->hasRole('EndUser')) ? false : true;
+        $canRequestRoleChange = $user->canRequestRoleUpgrade();
+        $institutionsOptions = [];
+
+        if($canRequestRoleChange && $user->hasRole('EndUser')){
+            if(!session()->has('matched_institution_ids')){
+                $apiResponse = getEmploymentInfo($user->tax_id);
+                if($apiResponse !== false){
+                    $matchedInstitutionIds = matchInstitutionsAndSetToSession($apiResponse);
+                }else{
+                    $matchedInstitutionIds = [];
+                    $canRequestRoleChange = false;
+                    $user->update(['civil_servant'=>false]);
+                }
+            }else{
+                $matchedInstitutionIds = explode(",",session()->get("matched_institution_ids"));
+            }
+            $institutionsOptions = count($matchedInstitutionIds) > 0 ? Institution::whereIn("id", $matchedInstitutionIds)->pluck('title', 'id')->toArray() : [];
+        }
         if(session()->has("pop_role_change")){
             $pop_role_change = true;
             session()->forget("pop_role_change");
@@ -62,6 +81,7 @@ class AccountController extends Controller
                 'extra_emails' => $extra_emails,
                 'institution' => $institution,
                 'department' => $department,
+                'institutionsOptions'=>$institutionsOptions,
                 'role' => $role,
                 'canRequestRoleChange' => $canRequestRoleChange,
                 'pop_role_change'=>$pop_role_change,
@@ -223,7 +243,6 @@ class AccountController extends Controller
         // State input values
         $input = $request->all();
         $user = Auth::user();
-        $institution = $user->institutions()->first();
         // Handle user image (thumbnail)
         if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
@@ -236,16 +255,6 @@ class AccountController extends Controller
 
             $thumbnail->move(public_path() . '/images/user_images', $filename);
             $input['thumbnail'] = $filename;
-        }
-
-        //every sso user can change department except SuperAdmins
-
-        if (isset($input['department_id']) && $user->hasRole('InstitutionAdministrator')) {
-            if (!empty($input['new_department']) && $input['department_id'] == "other") {
-                $new_department = Department::create(['title' => $input['new_department'], 'institution_id' => $institution->id]);
-                $input['department_id'] = $new_department->id;
-            }
-            $user->departments()->sync([$input['department_id']]);
         }
         $user->update(array_except($input, ['password','fistname','lastname']));
         $message = trans('controllers.changesSaved');
@@ -267,48 +276,85 @@ class AccountController extends Controller
         }
         $institution = $user->institutions()->first();
         $department = $user->departments()->first();
+        $institutionsOptions = [];
 
         if(session()->has('matched_institution_ids')){
             $matchedInstitutionIds = explode(",",session()->get("matched_institution_ids"));
             $institutionsOptions = Institution::whereIn("id",$matchedInstitutionIds)->pluck('title', 'id')->toArray();
-
-
         }
-
-
-
         return view('account_activation',
             [
                 'user' => $user,
                 'role' => $user->roles()->first(),
                 'institution' => $institution,
-                'department' => $department
+                'department' => $department,
+                'institutionOptions' =>$institutionsOptions
             ]);
     }
 
     /**
-     * @param Requests\ActivateSsoAccountRequest $request
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function ssoAccountActivation(Requests\ActivateSsoAccountRequest $request)
+    public function ssoAccountActivation(Request $request)
     {
-        $input = $request->except(['accept_terms_input','privacy_policy_input']);
+        $input = $request->all();
         $user = Auth::user();
+        $rules = [
+            'accept_terms_input' => 'required',
+            'privacy_policy_input' => 'required',
+            'institution_id'=>'required',
+        ];
+        $messages = [
+            'accept_terms_input.required' => trans('site.mustAcceptTermsActivate'),
+            'privacy_policy_input.required' => trans('site.acceptPrivacyPolicyActivate'),
+            'institution_id.required' => trans('requests.institutionRequired'),
+        ];
+
+        if(empty($user->email_verified_at)){
+            $rules['email'] = 'required|email|unique:users,email,'.Auth::user()->id.',id|unique:users_extra_emails,email';
+            $messages['email.email'] = trans('requests.emailInvalid');
+            $messages['email.required'] = trans('requests.emailRequired');
+        }
+
+        $validator = Validator::make($input,$rules,$messages);
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
         $input['activation_token'] = null;
         $input['accepted_terms'] = Carbon::now()->toDateTimeString();
-        $confirmation_code = str_random(15);
-        $user->update(['email'=>$input['email'],'confirmation_code'=>$confirmation_code]);
-        $email = Email::where('name', 'ssoUserEmailConfirm')->first();
-        $login_url = URL::to("confirm_sso_email/" . $confirmation_code);
-        $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
-        Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user, $email) {
-            $message->from($email->sender_email, config('mail.from.name'))
-                ->to($user->email)
-                ->replyTo($email->sender_email, config('mail.from.name'))
-                ->returnPath(env('RETURN_PATH_MAIL'))
-                ->subject($email->title);
-        });
-        return back()->with('message', trans('account.confirmation_email_sent'));
+
+        if(session()->has('matched_institution_ids')){
+            $matchedInstitutionIds = explode(",",session()->get("matched_institution_ids"));
+            if(in_array($input['institution_id'],$matchedInstitutionIds)){
+                $institution = Institution::find($input['institution_id']);
+                if($institution){
+                    $user->institutions()->sync([$input['institution_id']]);
+                    $firstDepartment = $institution->departments()->first();
+                    $user->departments()->sync([$firstDepartment->id]);
+                }
+            }
+        }
+        if(empty($user->email_verified_at)){
+            $confirmation_code = str_random(15);
+            $user->update(['email'=>$input['email'],'confirmation_code'=>$confirmation_code]);
+            $email = Email::where('name', 'ssoUserEmailConfirm')->first();
+            $login_url = URL::to("confirm_sso_email/" . $confirmation_code);
+            $parameters = array('user' => $user,'login_url' => $login_url, 'account_url' => URL::to("account"));
+            Mail::send('emails.confirm_sso_email', $parameters, function ($message) use ($user, $email) {
+                $message->from($email->sender_email, config('mail.from.name'))
+                    ->to($user->email)
+                    ->replyTo($email->sender_email, config('mail.from.name'))
+                    ->returnPath(env('RETURN_PATH_MAIL'))
+                    ->subject($email->title);
+            });
+            return back()->with('message', trans('account.confirmation_email_sent'));
+        }else{
+            session()->forget('matched_institution_ids');
+            $user->update(['confirmed'=>true,'confirmation_code'=>null]);
+            return redirect('/');
+        }
     }
 
     /**
@@ -318,7 +364,7 @@ class AccountController extends Controller
     public function confirm_sso_email($confirmation_code){
         $user = User::where('confirmation_code',$confirmation_code)->first();
         if($user){
-            $user->update(['confirmation_code'=>null,'confirmed'=>true]);
+            $user->update(['email_verified_at'=>Carbon::now()]);
             Auth::login($user);
             return redirect()->route('account-activation')->with('message', trans('users.emailConfirmed'));
         }else{

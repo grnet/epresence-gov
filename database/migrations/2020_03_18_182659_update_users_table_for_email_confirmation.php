@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateUsersForEmailConfirmation extends Migration
+class UpdateUsersTableForEmailConfirmation extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,7 @@ class UpdateUsersForEmailConfirmation extends Migration
     {
         Schema::table('users', function ($table) {
             $table->dateTime('email_verified_at')->nullable();
+            $table->boolean('civil_servant')->default(false);
         });
     }
 
@@ -26,7 +27,7 @@ class UpdateUsersForEmailConfirmation extends Migration
     public function down()
     {
         Schema::table('users', function ($table) {
-            $table->dropColumn('email_verified_at');
+            $table->dropColumns(['email_verified_at','civil_servant']);
         });
     }
 }

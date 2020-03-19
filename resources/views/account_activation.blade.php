@@ -1,4 +1,19 @@
 @extends('app')
+@section('header-javascript')
+    <link href="select2/select2.css" rel="stylesheet">
+    <script type="text/javascript" src="select2/select2.js"></script>
+    <script type="text/javascript" src="select2/select2_locale_el.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            let selectInstitutionField = $("#FieldSelectInstitutionId");
+            selectInstitutionField.select2({
+                allowClear: true,
+                placeholder: "{!!trans('users.selectInstitutionRequired')!!}"
+            }).on("change", function () {
+            });
+         });
+    </script>
+@endsection
 @section('content')
     <section id="Users">
         <div class="container">
@@ -44,10 +59,11 @@
                                 class="glyphicon glyphicon-info-sign"
                                 title="{!!  trans('users.primaryEmailMessage') !!}"></span></label>
                     <div class="col-sm-8">
-                        <input type="email" name="email"
+                        <input type="email" name="email" @if(!empty($user->email_verified_at)) disabled @endif
                                value="{{old('email',$user->hasEmailAddress() ? $user->email : null)}}"
                                class="form-control" aria-describedby="helpBlockRole" id="emailInput"
                                placeholder="{{trans('users.primaryEmail')}}">
+                        @if(empty($user->email_verified_at))
                         @if(!$user->hasEmailAddress())
                             <div class="help-block with-errors" style="margin:0;">{{trans('account.please_add_email')}}
                             </div>
@@ -56,14 +72,20 @@
                                  style="margin:0;">{{trans('account.please_confirm_email')}}
                             </div>
                         @endif
+                        @else
+                            <div class="help-block with-errors"
+                                 style="margin:0;">{{trans('users.emailConfirmed')}}
+                            </div>
+                        @endif
                     </div>
                 </div>
                 {{--Basic info section end--}}
                 {{--Institution section start--}}
                 <div class="form-group">
-                    {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
+                    {!! Form::label('FieldCoordDepartOrg', trans('site.institution').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8 form-control-static">
-                        {{ $institution->title }}
+                            {!! Form::select('institution_id',$institutionOptions, $institution->id, ['id' => 'FieldSelectInstitutionId', 'style' => 'width: 100%', 'aria-describedby' => 'helpBlockRole'])!!}
+                        <div class="help-block with-errors" style="margin:0;"></div>
                     </div>
                 </div>
                 {{--Institution section end--}}
@@ -87,7 +109,11 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="btn-group pull-right" role="group" id="TeleInitialSaveGroupButtons">
-                            {!! Form::submit('Αποστολή email επιβεβαίωσης', ['class' => 'btn btn-primary']) !!}
+                            @if(empty($user->email_verified_at))
+                            {!! Form::submit(trans('site.confirmationEmail'), ['class' => 'btn btn-primary']) !!}
+                            @else
+                            {!! Form::submit(trans('site.accountActivation'), ['class' => 'btn btn-primary']) !!}
+                            @endif
                         </div>
                     </div>
                 </div>
