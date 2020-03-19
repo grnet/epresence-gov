@@ -272,6 +272,9 @@ class GsisAuthenticationController extends Controller
                 Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
+
+        $url = config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized');
+        Log::info("Redirecting to :".$url);
         return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
     }
 
