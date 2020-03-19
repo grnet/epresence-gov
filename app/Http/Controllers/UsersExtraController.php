@@ -31,7 +31,7 @@ class UsersExtraController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['confirm_sso_email','resend_local_user_activation_email_token','store_new_sso_user','send_email_confirmation_link_create_user']]);
+        $this->middleware('auth', ['except' => ['confirm_sso_email']]);
     }
 
 
@@ -158,20 +158,6 @@ class UsersExtraController extends Controller
         return back()->with('message', $message);
     }
 
-    /**
-     * @param $confirmation_code
-     * @return RedirectResponse
-     */
-    public function confirm_sso_email($confirmation_code){
-        $user = User::where('confirmation_code',$confirmation_code)->first();
-        if($user){
-            $user->update(['confirmation_code'=>null,'confirmed'=>true]);
-            Auth::login($user);
-            return redirect()->route('account-activation')->with('message', trans('users.emailConfirmed'));
-        }else{
-            abort(403);
-        }
-    }
 
 
     /**

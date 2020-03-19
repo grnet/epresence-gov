@@ -49,21 +49,15 @@ Route::get('join_demo_room','DemoRoomController@join_demo_room');
 Route::get('demo-room/manage','DemoRoomController@manage');
 Route::post('/demo_room/disconnectAll','DemoRoomController@disconnectAll');
 
-//Account Methods
-
-Route::post('store_new_sso_user', 'UsersExtraController@store_new_sso_user');
-Route::post('send_email_confirmation_link_create_user', 'UsersExtraController@send_email_confirmation_link_create_user');
-Route::post('send_email_confirmation_link', 'UsersExtraController@send_email_confirmation_link');
-Route::get('confirm_sso_email/{token}','UsersExtraController@confirm_sso_email')->name('confirm-sso-email');
-
-
-//My account static page
+//My account page
 
 Route::get('account','AccountController@showAccount');
 
 
-//Extra emails managed by user
 
+//Account Methods
+
+//Extra emails managed by user
 Route::get('account/emails','AccountController@showManageEmails');
 Route::post('account/emails/add_new','ExtraEmailsController@addExtraMail');
 Route::post('account/emails/deleteExtraEmail', 'ExtraEmailsController@deleteExtraMail');
@@ -74,6 +68,7 @@ Route::patch('account/update_sso','AccountController@UpdateSsoAccount');
 
 // Account activation
 
+Route::get('confirm_sso_email/{token}','AccountController@confirm_sso_email')->name('confirm-sso-email');
 Route::get('account-activation','AccountController@accountActivation')->name('account-activation');
 Route::post('account-activation', 'AccountController@ssoAccountActivation')->name('account-activation');
 Route::post('account/delete_anonymize','AccountController@delete_anonymize');
@@ -132,7 +127,6 @@ Route::patch('users/{id}/sso', 'UsersExtraController@updateSsoUser');
 Route::post('users/change_state_to_sso', 'UsersExtraController@changeStateToSso');
 Route::post('users/change_state_to_local', 'UsersExtraController@changeStateToLocal');
 Route::post('users/resend_activation_email', 'UsersExtraController@resend_activation_email');
-Route::get('get_activation_mail/{token}','UsersExtraController@resend_local_user_activation_email_token');
 Route::patch('users/{id}', 'UsersController@update');
 Route::post('users/{id}', 'UsersController@update');
 Route::get('users/delete/{id}', 'UsersController@delete');

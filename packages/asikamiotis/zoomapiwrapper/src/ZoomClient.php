@@ -175,11 +175,9 @@ class ZoomClient
             $get_participants_response = $this->client->request('GET', '/v2/metrics/meetings/' . $zoom_meeting_id . '/participants', [
                 'headers' => $this->headers
             ]);
-
             $get_participants_response = json_decode($get_participants_response->getBody());
 
         } catch (ClientException $e) {
-
             $get_participants_response = $e->getResponse();
             Log::error("Error status code: ".$get_participants_response->getStatusCode());
 
@@ -189,15 +187,10 @@ class ZoomClient
                 Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("X-RateLimit-Limit")));
                 Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("X-RateLimit-Remaining")));
                 Log::error("Rate limit headers: ".json_encode($get_participants_response->getHeader("Retry-After")));
-
-
             }
-
             Log::error($e->getMessage());
-
             $get_participants_response = false;
         }
-
         return $get_participants_response;
     }
 
@@ -228,6 +221,11 @@ class ZoomClient
     }
 
 
+    /**
+     * @param $add_registrant_parameters
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function add_participant($add_registrant_parameters,$zoom_meeting_id)
     {
         //Docs https://zoom.github.io/api/#add-a-meeting-registrant
@@ -258,6 +256,11 @@ class ZoomClient
     }
 
 
+    /**
+     * @param $parameters
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|string|null
+     */
     public function update_participant_status($parameters,$zoom_meeting_id){
 
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingregistrantstatus
@@ -287,44 +290,39 @@ class ZoomClient
     }
 
 
-
-    //Zoom users
-
+    /**
+     * Zoom users
+     * @param $parameters
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function get_users($parameters){
-
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/users/users
-
         try{
             //Make the api call to zoom
-
             $request_url = '/v2/users';
-
             if(count($parameters)>0){
                 $request_url .= "?".http_build_query($parameters);
             }
-
             $response = $this->client->request('GET', $request_url, [
                 'headers' => $this->headers,
                 'json' => $parameters
             ]);
-
             $response = json_decode($response->getBody());
         }
         catch (ClientException $e) {
-
             $response = $e->getResponse();
             $responseBodyAsString = $response->getBody()->getContents();
-
             Log::error($responseBodyAsString);
-
             $response = false;
         }
-
-
         return $response;
     }
 
 
+    /**
+     * @param $parameters
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function create_user($parameters){
 
         //Docs https://zoom.github.io/api/#create-a-user
@@ -353,6 +351,11 @@ class ZoomClient
     }
 
 
+    /**
+     * @param $parameters
+     * @param $user_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function update_user_settings($parameters,$user_id){
 
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/users/usersettingsupdate
@@ -382,11 +385,13 @@ class ZoomClient
     }
 
 
-
+    /**
+     * @param $parameters
+     * @param $user_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function delete_user($parameters,$user_id){
-
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/users/userdelete
-
         try{
             //Make the api call to zoom
 
@@ -406,41 +411,40 @@ class ZoomClient
 
             $response = false;
         }
-
-
         return $response;
     }
 
 
+    /**
+     * @param $parameters
+     * @param $user_id
+     * @param $group_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function delete_user_from_group($parameters,$user_id,$group_id){
-
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/groups/groupmembersdelete
-
         try {
-
             //Make the api call to zoom
-
             $remove_user_from_group_response = $this->client->request('DELETE', '/v2/groups/' . $group_id. '/members/'.$user_id, [
                 'headers' => $this->headers,
                 'json' => $parameters
             ]);
-
             $remove_user_from_group_response = json_decode($remove_user_from_group_response->getBody());
-
         } catch (ClientException $e) {
-
             $remove_user_from_group_response = $e->getResponse();
             $responseBodyAsString = $remove_user_from_group_response->getBody()->getContents();
-
             Log::error($responseBodyAsString);
-
             $remove_user_from_group_response = false;
         }
-
         return $remove_user_from_group_response;
     }
 
 
+    /**
+     * @param $parameters
+     * @param $group_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function add_user_to_group($parameters,$group_id){
 
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/groups/groupmemberscreate

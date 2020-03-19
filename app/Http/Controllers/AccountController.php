@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Institution;
 use App\Role;
 use App\Http\Requests;
 use Illuminate\Contracts\View\Factory;
@@ -266,6 +267,16 @@ class AccountController extends Controller
         }
         $institution = $user->institutions()->first();
         $department = $user->departments()->first();
+
+        if(session()->has('matched_institution_ids')){
+            $matchedInstitutionIds = explode(",",session()->get("matched_institution_ids"));
+            $institutionsOptions = Institution::whereIn("id",$matchedInstitutionIds)->pluck('title', 'id')->toArray();
+
+
+        }
+
+
+
         return view('account_activation',
             [
                 'user' => $user,
@@ -298,6 +309,21 @@ class AccountController extends Controller
                 ->subject($email->title);
         });
         return back()->with('message', trans('account.confirmation_email_sent'));
+    }
+
+    /**
+     * @param $confirmation_code
+     * @return RedirectResponse
+     */
+    public function confirm_sso_email($confirmation_code){
+        $user = User::where('confirmation_code',$confirmation_code)->first();
+        if($user){
+            $user->update(['confirmation_code'=>null,'confirmed'=>true]);
+            Auth::login($user);
+            return redirect()->route('account-activation')->with('message', trans('users.emailConfirmed'));
+        }else{
+            abort(403);
+        }
     }
 
     /**
