@@ -3,13 +3,14 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class RequestRoleChangeRequest extends Request
 {
 
     public function authorize()
     {
+        Log::info(json_encode(request()->all()));
         return true;
     }
 
@@ -26,7 +27,8 @@ class RequestRoleChangeRequest extends Request
                     'application_comment' => 'required',
                     'application_role' => 'required',
                     'institution_id'=>'required',
-                    'department_id'=>'required',
+                    'department_id'=>'required_if:application_role,DepartmentAdministrator',
+                    'new_department'=>'required_if:department_id,other'
                 ];
     }
 
@@ -39,7 +41,8 @@ class RequestRoleChangeRequest extends Request
             'application_role.required' => trans('requests.roleRequired'),
             'institution_id.required' => trans('requests.institutionRequired'),
             'department_id.required' => trans('requests.departmentRequired'),
-
+            'department_id.required_if' => trans('requests.departmentRequired'),
+            'new_department.required_if' => trans('requests.newDepartmentRequired'),
         ];
     }
 }

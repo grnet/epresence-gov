@@ -91,24 +91,12 @@
 
                 {{--Institution section start--}}
 
-                @if($user->hasRole('EndUser'))
-                    <div class="form-group">
-                        {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
-                        <div class="col-sm-8">
-                                {!! Form::select('institution_id', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), $institution->id, ['id' => 'FieldUserOrg', 'style' => 'width: 100%'])!!}
-                        </div>
-                    </div>
-                @else
-                    <div class="form-group">
+                <div class="form-group">
                         {!! Form::label('FieldUserOrg', trans('users.institution').':', ['class' => 'control-label col-sm-4']) !!}
                         <div class="col-sm-8 form-control-static">
                                 {{ $institution->title }}
                         </div>
-                    </div>
-                @endif
-
-                {{--Institution section end--}}
-
+                </div>{{--Institution section end--}}
                 {{--Department section start--}}
 
                 @if($user->hasRole('EndUser'))

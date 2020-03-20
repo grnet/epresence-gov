@@ -49,8 +49,8 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['email', 'password', 'firstname', 'lastname', 'telephone', 'tax_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'application', 'apply_for', 'custom_values', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms',
-    'confirmation_code'
+    protected $fillable = ['email', 'password', 'firstname', 'lastname', 'telephone', 'tax_id', 'thumbnail', 'state', 'status', 'creator_id', 'comment', 'email_verified_at', 'admin_comment', 'confirmed', 'activation_token', 'accepted_terms',
+    'confirmation_code','civil_servant'
     ];
 
     /**
@@ -60,18 +60,19 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+
     /**
-     * A user may have a creator
+     * @param string $token
      */
-
-
     public function sendPasswordResetNotification($token)
     {
 
         $this->notify(new MailResetPasswordNotification($token));
     }
 
-
+    /**
+     * A user may have a creator
+     */
     public function creator()
     {
         return $this->belongsTo('App\User', 'creator_id');
@@ -86,6 +87,16 @@ class User extends Model implements AuthenticatableContract,
         $emails[] = $this->email;
         return $emails;
     }
+
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeConfirmed($query){
+        return $query->where("confirmed",true);
+    }
+
 
 
     /**
@@ -1290,5 +1301,13 @@ class User extends Model implements AuthenticatableContract,
      */
     public function hasEmailAddress(){
         return strpos($this->email,'@') !== false && !empty($this->email);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function canRequestRoleUpgrade(){
+      return  $this->civil_servant && Application::where('user_id', $this->id)->where('app_state', 'new')->count() == 0 && ($this->hasRole('DepartmentAdministrator') || $this->hasRole('EndUser'));
     }
 }

@@ -7,6 +7,7 @@ use App\Email;
 use App\Http\Controllers\Controller;
 use App\Institution;
 use App\User;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +53,7 @@ class GsisAuthenticationController extends Controller
      */
     public function login()
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             return redirect('/');
         }
         return $this->redirectToLoginForm();
@@ -65,7 +66,7 @@ class GsisAuthenticationController extends Controller
      */
     public function register(Request $request, $activation_token)
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             return redirect('/');
         }
         $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
@@ -106,13 +107,11 @@ class GsisAuthenticationController extends Controller
                 Log::info("User details api response: " . $response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 $userInfo = $parsedResponse->userinfo;
-                $result = $this->validateParameters($userInfo);
-
+                $validationResult = $this->validateParameters($userInfo);
                 //If parameters are not valid logout from gsis and redirect to not-authorized page of our app
-                if (!$result) {
-                    return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+                if (!$validationResult) {
+                    return $this->logoutAsNotAuthorized();
                 }
-
                 // Tax id of the account
                 $taxId = trim($userInfo['taxid']);
 
@@ -120,164 +119,19 @@ class GsisAuthenticationController extends Controller
                 //use the app
                 $firstName = trim($userInfo['firstname']);
                 $lastName = trim($userInfo['lastname']);
-
-
                 $user = User::where("tax_id", $taxId)->first();
                 // User is already registered, checking if user is invited with a new email if so merge the two users, log him in and redirect him to homepage
                 if ($user) {
-                    if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
-                        $activation_token = session()->pull("activation_token");
-                        $userOfToken = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
-                        if ($userOfToken) {
-                            $currentRole = $user->roles()->first();
-                            $currentInstitution = $user->institutions()->first();
-                            $currentDepartment = $user->departments()->first();
-
-                            $tokenUserRole = $userOfToken->roles()->first();
-                            $tokenUserInstitution = $userOfToken->institutions()->first();
-                            $tokenUserDepartment = $userOfToken->departments()->first();
-                            if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
-                                //Invited user is Administrator
-                                if(in_array($currentRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
-                                    //Current user is Administrator && invited user is Administrator
-                                    $isSame = $currentRole->id == $tokenUserRole->id &&
-                                        $currentInstitution->id == $tokenUserInstitution->id &&
-                                        $currentDepartment->id == $tokenUserDepartment->id;
-                                    if (!$isSame) {
-                                        //Notify invited user creator & support that the request could not be completed
-                                        $recipients[] = $userOfToken->creator->email;
-                                        $recipients[] = env('RETURN_PATH_MAIL');
-                                        $parameters = [
-                                            'role'=>$tokenUserRole->label,
-                                            'email' =>$userOfToken->email
-                                        ];
-                                        $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
-                                        Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
-                                            $message->from($email->sender_email, config('mail.from.name'))
-                                                ->to($recipients)
-                                                ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
-                                                ->returnPath(env('RETURN_PATH_MAIL'))
-                                                ->subject($email->title);
-                                        });
-                                    }
-                                   $user->merge_user($userOfToken->id, true);
-                                } else {
-                                    //Current user is end user && invited user is Administrator
-                                    $user->roles()->sync([$tokenUserRole->id]);
-                                    $user->institutions()->sync([$tokenUserInstitution->id]);
-                                    $user->departments()->sync([$tokenUserDepartment->id]);
-                                    if(!$user->confirmed){
-                                        $invitedEmail = $userOfToken->email;
-                                        $user->merge_user($userOfToken->id, false);
-                                        $user->update(['email'=>$invitedEmail,'confirmed'=>true]);
-                                    } else{
-                                        $user->merge_user($userOfToken->id, true);
-                                    }
-                                    $recipients[] = $user->email;
-                                    $parameters = ['role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
-                                    $email = Email::where('name', 'accountDetailsUpdated')->first();
-                                    Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
-                                        $message->from($email->sender_email, config('mail.from.name'))
-                                            ->to($recipients)
-                                            ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
-                                            ->returnPath(env('RETURN_PATH_MAIL'))
-                                            ->subject($email->title);
-                                    });
-                                }
-                            }else{
-                                $user->merge_user($userOfToken->id, true);
-                            }
-
-                        }
-                    }
-                    Auth::login($user);
-                    return redirect('/');
+                    return  $this->logUserIn($user);
                 } else {
-                    // User is not registered checking if there is a valid activation token in the session, if so
-                    // match authenticated user with the invited account if not use the API to determine if this user is
-                    // civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
-                    // after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform
-                    // as an End User
-                    if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
-                        $activation_token = session()->pull("activation_token");
-                        $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
-                        if ($user) {
-                            $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null]);
-                            $user->create_join_urls();
-                            Auth::login($user);
-                            return redirect('/');
-                        }else{
-                            //Invalid activation token
-                            Log::error("Invalid activation token: ".$activation_token);
-                            session()->flash('invalid-activation-token');
-                        }
-                    } else {
-                        try {
-                            $client = new Client();
-                            $response = $client->get(config('services.gov-employees-api.endpoint') . $taxId, [
-                                'auth' => [
-                                    config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
-                                ]
-                            ]);
-                            Log::info("Employee api response: " . $response->getBody());
-                            $responseObject = json_decode($response->getBody());
-                            Log::info("Response object" . json_encode($responseObject));
-                            $userIsCivilServant = false;
-                            $institutionToAttach = Institution::first();
-                            $departmentToAttach = Department::first();
-                            if (!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0) {
-                                //User is a civil servant
-                                $userIsCivilServant = true;
-                                $employmentInfo = collect($responseObject->data->employmentInfos);
-                                $primaryOrganization = $employmentInfo->where("primary", true)->first();
-                                $organizationToMatch = isset($primaryOrganization->organicOrganizationId) ? $primaryOrganization : $employmentInfo->first();
-                                $institution = Institution::where("ws_id", $organizationToMatch->organicOrganizationId)->first();
-                                if (isset($institution->id)) {
-                                    $institutionToAttach = $institution;
-                                    $departmentToAttach = $institution->departments()->first();
-                                }
-                            }
-                            if ($userIsCivilServant) {
-                                Log::info("User with tax_id: " . $taxId . " is a civil servant continuing...");
-                                Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
-                                $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
-                                $user = User::create(
-                                    [
-                                        'firstname' => $firstName,
-                                        'lastname' => $lastName,
-                                        'email' => 'not-retrieved-' . $nextUserId,
-                                        'tax_id' => $taxId,
-                                        'confirmed' => false,
-                                        'state' => 'sso',
-                                        'status' => 1,
-                                        'password' => bcrypt(str_random(9))
-                                    ]);
-                                $user->institutions()->attach($institutionToAttach->id);
-                                $user->departments()->attach($departmentToAttach->id);
-
-                                // Assign role to user
-                                $user->assignRole('EndUser');
-                                Auth::login($user);
-                                return redirect()->route('account-activation');
-                            } else {
-                                Log::info("User with tax_id: " . $taxId . " is not a civil servant aborting!");
-                            }
-                        } catch (\Exception $e) {
-                            Log::error("Employee api exception: " . $e->getMessage());
-                        }
-                    }
+                    return $this->registerUser($firstName,$lastName,$taxId);
                 }
-            } catch
-            (IdentityProviderException $e) {
+            } catch (IdentityProviderException $e) {
                 Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
-
-        $url = config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized');
-        Log::info("Redirecting to :".$url);
-        return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+        return $this->logoutAsNotAuthorized();
     }
-
 
     /**
      * @return Factory|View
@@ -296,22 +150,223 @@ class GsisAuthenticationController extends Controller
         return view('errors.not-logged-in');
     }
 
+
+    /** Account tax id exists try to login
+     * @param $user
+     * @return RedirectResponse|Redirector
+     */
+    private function logUserIn($user){
+        $currentRole = $user->roles()->first();
+        $currentInstitution = $user->institutions()->first();
+        $currentDepartment = $user->departments()->first();
+
+        //Handle invited users for the first time
+        if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
+            $activation_token = session()->pull("activation_token");
+            $userOfToken = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+            if ($userOfToken) {
+                $tokenUserRole = $userOfToken->roles()->first();
+                $tokenUserInstitution = $userOfToken->institutions()->first();
+                $tokenUserDepartment = $userOfToken->departments()->first();
+                if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
+                    //Invited user is Administrator
+                    if (in_array($currentRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
+                        //Current user is Administrator && invited user is Administrator
+                        $isSame = $currentRole->id == $tokenUserRole->id &&
+                            $currentInstitution->id == $tokenUserInstitution->id &&
+                            $currentDepartment->id == $tokenUserDepartment->id;
+                        if (!$isSame) {
+                            //Notify invited user creator & support that the request could not be completed
+                            $recipients[] = $userOfToken->creator->email;
+                            $recipients[] = env('RETURN_PATH_MAIL');
+                            $parameters = [
+                                'role' => $tokenUserRole->label,
+                                'email' => $userOfToken->email
+                            ];
+                            $email = Email::where('name', 'invitationRoleChangeRequestNotCompleted')->first();
+                            Mail::send('emails.auth.invitationRequestNotCompleted', $parameters, function ($message) use ($email, $recipients) {
+                                $message->from($email->sender_email, config('mail.from.name'))
+                                    ->to($recipients)
+                                    ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
+                                    ->returnPath(env('RETURN_PATH_MAIL'))
+                                    ->subject($email->title);
+                            });
+                        }
+                        $user->merge_user($userOfToken->id, true);
+                    } else {
+                        //Current user is end user && invited user is Administrator
+                        $user->roles()->sync([$tokenUserRole->id]);
+                        $user->institutions()->sync([$tokenUserInstitution->id]);
+                        $user->departments()->sync([$tokenUserDepartment->id]);
+                        if (!$user->confirmed) {
+                            $invitedEmail = $userOfToken->email;
+                            $user->merge_user($userOfToken->id, false);
+                            $user->update(['email' => $invitedEmail, 'confirmed' => true]);
+                        } else {
+                            $user->merge_user($userOfToken->id, true);
+                        }
+                        $recipients[] = $user->email;
+                        $parameters = ['role' => $tokenUserRole->label, 'institution' => $tokenUserInstitution->title, 'department' => $tokenUserDepartment->title];
+                        $email = Email::where('name', 'accountDetailsUpdated')->first();
+                        Mail::send('emails.accountDetailsUpdated', $parameters, function ($message) use ($email, $recipients) {
+                            $message->from($email->sender_email, config('mail.from.name'))
+                                ->to($recipients)
+                                ->replyTo(env('RETURN_PATH_MAIL'), env('MAIL_FROM_NAME'))
+                                ->returnPath(env('RETURN_PATH_MAIL'))
+                                ->subject($email->title);
+                        });
+                    }
+                } else {
+                    $user->merge_user($userOfToken->id, true);
+                }
+
+            }
+        }
+
+        //Login user
+        Auth::login($user);
+
+        if(!$user->confirmed){
+            if(!in_array($currentRole->name,["InstitutionAdministrator", "DepartmentAdministrator"])){
+                $responseObject = getEmploymentInfo($user->tax_id);
+                if($responseObject !== false){
+                    $institutionToAttach = $this->getPrimaryInstitution($responseObject);
+                    $departmentToAttach = $institutionToAttach->departments()->first();
+                   matchInstitutionsAndSetToSession($responseObject);
+                    $user->institutions()->sync([$institutionToAttach->id]);
+                    $user->departments()->sync([$departmentToAttach->id]);
+                }
+            }
+            return redirect()->route('account-activation');
+        }else{
+            return redirect('/');
+        }
+    }
+
+
+    /** User is not registered checking if there is a valid activation token in the session, if so
+     match authenticated user with the invited account if not use the API to determine if this user is
+     civil servant if he is create an unconfirmed account for him and redirect him to account activation to enter his email address
+     after that user receives a confirmation email on the address he entered when the user clicks the activation link, the account gets confirmed and the user gets access to the platform  as an End User
+     * @param $firstName
+     * @param $lastName
+     * @param $taxId
+     * @return RedirectResponse|Redirector
+     */
+    private function registerUser($firstName,$lastName,$taxId){
+
+        if (session()->has("activation_token") && !empty(session()->get("activation_token"))) {
+            $activation_token = session()->pull("activation_token");
+            $user = User::where("confirmed", false)->where("activation_token", $activation_token)->first();
+            if ($user) {
+                $user->create_join_urls();
+                Auth::login($user);
+                $tokenUserRole = $user->roles()->first();
+                $responseObject = getEmploymentInfo($taxId);
+                if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
+                    $isCivilServant = false;
+                    if($responseObject !== false){
+                        $isCivilServant  = true;
+                    }
+                    $user->update([
+                        'firstname' => $firstName,
+                        'lastname' => $lastName,
+                        'tax_id' => $taxId,
+                        'confirmed' => true,
+                        'activation_token' => null,
+                        'email_verified_at'=>Carbon::now(),
+                        'civil_servant'=>$isCivilServant
+                    ]);
+                    return redirect('/');
+                } else {
+                    if($responseObject !== false){
+                        $user->update([
+                             'firstname' => $firstName,
+                             'lastname' => $lastName,
+                             'tax_id' => $taxId,
+                             'confirmed' => false,
+                             'activation_token' => null,
+                             'civil_servant'=>true,
+                             'email_verified_at'=>Carbon::now()
+                        ]);
+                        $institutionToAttach = $this->getPrimaryInstitution($responseObject);
+                        $departmentToAttach = $institutionToAttach->departments()->first();
+                        matchInstitutionsAndSetToSession($responseObject);
+                        $user->institutions()->sync([$institutionToAttach->id]);
+                        $user->departments()->sync([$departmentToAttach->id]);
+                        return redirect()->route('account-activation');
+                    }else{
+                        Log::info("Could not find any employment info from api or api exception occurred! Not changing invited user's institution, confirming account and logging in");
+                        $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null,'civil_servant'=>false,'email_verified_at'=>Carbon::now()]);
+                        return redirect('/');
+                    }
+                }
+            } else {
+                //Invalid activation token
+                Log::error("Invalid activation token: " . $activation_token);
+                session()->flash('invalid-activation-token');
+                return $this->logoutAsNotAuthorized();
+            }
+        } else {
+            $responseObject = getEmploymentInfo($taxId);
+            if($responseObject !== false){
+                Log::info("Not invited account with tax_id: " . $taxId . " is a civil servant continuing...");
+                $institutionToAttach = $this->getPrimaryInstitution($responseObject);
+                $departmentToAttach = $institutionToAttach->departments()->first();
+                matchInstitutionsAndSetToSession($responseObject);
+                Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
+                $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
+                $user = User::create(
+                    [
+                        'firstname' => $firstName,
+                        'lastname' => $lastName,
+                        'email' => 'not-retrieved-' . $nextUserId,
+                        'tax_id' => $taxId,
+                        'confirmed' => false,
+                        'state' => 'sso',
+                        'status' => 1,
+                        'password' => bcrypt(str_random(9)),
+                        'civil_servant'=>true,
+                        'email_verified_at'=>null
+                    ]);
+                $user->institutions()->sync([$institutionToAttach->id]);
+                $user->departments()->sync([$departmentToAttach->id]);
+
+                // Assign role to user
+                $user->assignRole('EndUser');
+                Auth::login($user);
+                return redirect()->route('account-activation');
+            }  else {
+                Log::info("Not invited account with tax_id: " . $taxId . " is not a civil servant or an employee api exception occurred aborting!");
+                return $this->logoutAsNotAuthorized();
+            }
+        }
+    }
+
+
+    /**Logs user out of gsis and redirects back to not - authorized page of the app
+     * @return RedirectResponse|Redirector
+     */
+    private function logoutAsNotAuthorized(){
+        return redirect(config('services.gsis.urlLogout') . config('services.gsis.clientId') . '/?url=' . route('not-authorized'));
+    }
+
     /**
      * @param $userInfo
      * @return bool|RedirectResponse|Redirector
      */
     private function validateParameters($userInfo)
     {
-        Log::info("Validating parameters: ".json_encode($userInfo));
+        Log::info("Validating parameters: " . json_encode($userInfo));
         //Check that all parameters are there and are not empty
-        if(!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
+        if (!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
             return false;
         }
-        if(!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
+        if (!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
             Log::error("Gsis account was found with empty firstname aborted since this account is not a physical person's account");
             return false;
         }
-        if(!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
+        if (!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
             return false;
         }
         return true;
@@ -324,10 +379,25 @@ class GsisAuthenticationController extends Controller
      */
     private function checkIfEmptyParameter($parameter)
     {
-        Log::info("Checking parameter: " . $parameter);
-        $result = empty($parameter) || is_null($parameter) || $parameter == 'null';
-        Log::info("Is empty Parameter Result: ");
-        Log::info($result ? "TRUE" : "FALSE");
-        return $result;
+        return empty($parameter) || is_null($parameter) || $parameter == 'null';
     }
+
+
+    /**Try to matches the primary institution with one in our db else returns default institution (id:1)
+     * @param $responseObject
+     * @return mixed
+     */
+    private function getPrimaryInstitution($responseObject)
+    {
+        $institutionToAttach = Institution::first();
+        $employmentInfoCollection = collect($responseObject->data->employmentInfos);
+        $primaryOrganization = $employmentInfoCollection->where("primary", true)->first();
+        $organizationToMatch = $primaryOrganization ? $primaryOrganization : $employmentInfoCollection->first();
+        $institutionMatched = Institution::where("ws_id", $organizationToMatch->organicOrganizationId)->first();
+        if ($institutionMatched) {
+            $institutionToAttach = $institutionMatched;
+        }
+        return $institutionToAttach;
+    }
+
 }

@@ -21,18 +21,8 @@
     <script type="text/javascript" src="datatables/date-eu.js"></script>
     <link href="datatables/dataTables.bootstrap.css" rel="stylesheet">
 
-
-
     <script type="text/javascript">
         $(document).ready(function () {
-
-            var new_org_container = $("#NewOrgContainer");
-            var new_dep_container = $("#NewDepContainer");
-            var dep_container = $("#DepContainer");
-            var department_select_field = $("#FieldUserDepart");
-            var new_custom_department_field = $("#FieldUserDepartNew");
-            var organization_select_field = $("#FieldUserOrg");
-            // var new_custom_department_field = $("#FieldUserOrgNew");
 
 // ΕΝΕΡΓΟΠΟΙΗΣΗ TOOLTIP
             $('[data-toggle="tooltip"]').tooltip();
@@ -50,23 +40,6 @@
                         }
                     });
             });
-            department_select_field.select2({placeholder: "{!!trans('site.selectInstitutionFirst')!!}"});
-
-            // UserDepart On change
-            department_select_field.on("change", function () {
-
-                if (department_select_field.val() === "other") {
-                    new_dep_container.show();
-                    new_custom_department_field.show();
-                } else if (department_select_field.val() !== "other" && department_select_field.val() > 0) {
-                    new_dep_container.hide();
-                    new_custom_department_field.hide();
-                }
-                else if (department_select_field.val() === "") {
-                    new_dep_container.hide();
-                    new_custom_department_field.hide();
-                }
-            }).trigger("change");
 
             //Application methods
 
@@ -78,7 +51,6 @@
 
             // ΣΥΝΑΡΤΗΣΕΙΣ ΣΧΕΤΙΚΕΣ ΜΕ ΤΟΝ ΣΥΝΤΟΝΙΣΤΗ ΤΜΗΜΑΤΟΣ
 
-            $("#FieldCoordDepartRole").select2({placeholder: "{!!trans('site.selectRoleRequired')!!}"});
             $( "#FieldCoordDepartTerms" ).on("change", function() {
                 if ($("#FieldCoordDepartTerms").val()==0) {
                     $( "#CoordDepartSubmitBtnNew" ).addClass("disabled");
@@ -90,8 +62,6 @@
             $("#CoordDepartModalButtonClose").click(function() {
                 $("#CoordDepart").modal("hide");
             });
-
-
 
             //  Ορισμός Πίνακα DataTable
 
@@ -172,51 +142,77 @@
             $("#UserModal").modal("show");
             @endif
             @endif
+
             @if($canRequestRoleChange)
-
-            let RoleChangeDepartmentSelect = $("#FieldRoleChangeDepartmentId");
-
-            RoleChangeDepartmentSelect.select2({
+            let selectRoleField = $("#selectRoleField");
+            selectRoleField.select2({placeholder: "{!!trans('site.selectRoleRequired')!!}"});
+            let selectDepartmentContainer = $("#selectDepartmentContainer");
+            selectDepartmentContainer.hide();
+            let selectInstitutionContainer = $("#selectInstitutionContainer");
+            selectInstitutionContainer.hide();
+            let newDepartmentContainer = $("#newDepartmentContainer");
+            let selectDepartmentField = $("#selectDepartmentField");
+            selectRoleField.on("change", function () {
+                let value = $(this).val();
+                if (value === "DepartmentAdministrator") {
+                    selectDepartmentContainer.show();
+                    selectInstitutionContainer.show();
+                    update_ia_inst_selection_ui(true);
+                } else if(value === "InstitutionAdministrator"){
+                    selectDepartmentContainer.hide();
+                    selectInstitutionContainer.show();
+                }else{
+                    selectDepartmentContainer.hide();
+                    selectInstitutionContainer.hide();
+                }
+            }).trigger("change");
+            selectDepartmentField.select2({
                 allowClear: true,
-                placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
+                placeholder: "{!!trans('users.selectDepartment')!!}"
+            }).on("change", function () {
+                let value = $(this).val();
+                if (value=== "other") {
+                    newDepartmentContainer.show();
+                } else if (value !== "other" && value > 0) {
+                    newDepartmentContainer.hide();
+                }
+                else if (value === "" || value === null) {
+                    newDepartmentContainer.hide();
+                }
             });
+
+            @if(old('department_id'))
+            selectDepartmentField.val('{{old('department_id')}}').trigger("change");
+            @else
+            selectDepartmentField.trigger("change");
+            @endif
 
             @if(!$user->hasRole('DepartmentAdministrator'))
             let RoleChangeInstitutionSelect = $("#FieldRoleChangeInstitutionId");
-
             RoleChangeInstitutionSelect.select2({
                 allowClear: true,
                 placeholder: "{!!trans('users.selectInstitutionRequired')!!}"
             }).on("change", function () {
+                @if(!old('department_id'))
                 update_ia_inst_selection_ui(true);
+                @endif
             });
             @endif
 
-            update_ia_inst_selection_ui(false);
             function update_ia_inst_selection_ui(load_departments){
-                if(RoleChangeInstitutionSelect.val() > 0) {
-                    if(load_departments){
-                        RoleChangeDepartmentSelect.select2("data", null, {allowClear: true}).load("/institutions/departments/" + RoleChangeInstitutionSelect.val()+"?include_other=0");
+                if(selectRoleField.val() === "DepartmentAdministrator") {
+                    let institutionValue = $("#FieldRoleChangeInstitutionId").val();
+                    if (institutionValue > 0) {
+                        if (load_departments) {
+                            selectDepartmentField.select2("data", null, {allowClear: true}).load("/institutions/departments/" + institutionValue + "?include_other=1");
+                        }
                     }
                 }
-                else {
-                    function_clear_inst_admin_selections();
-                }
             }
 
-            function function_clear_inst_admin_selections(){
-                RoleChangeInstitutionSelect.select2("data", null, {allowClear: true});
-                RoleChangeDepartmentSelect.html('<option value=""></option>');
-                RoleChangeDepartmentSelect.select2("data", null, {allowClear: true});
-                RoleChangeDepartmentSelect.select2({
-                    allowClear: true,
-                    placeholder: "{!!trans('users.selectInstitutionFirst')!!}",
-                });
-            }
-
-             @if($pop_role_change)
-             $("#RequestRoleChangeModal").modal("show");
-             @endif
+            @if($pop_role_change)
+            $("#RequestRoleChangeModal").modal("show");
+            @endif
 
             @else
             @if($pop_role_change)
