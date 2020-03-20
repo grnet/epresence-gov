@@ -504,16 +504,15 @@ class User extends Model implements AuthenticatableContract,
 
 
     /** Emails to be send
-     * @param $password
      */
-    public function email_for_new_account($password)
+    public function email_for_new_account()
     {
         $user = User::findOrFail($this->id);
         $email = Email::where('name', 'userAccountEnableSso')->first();
         $login_url = URL::to("register/" . $user->activation_token);
         $email_view = 'emails.enable_account_sso';
         $creator = User::findOrFail($this->creator_id);
-        $parameters = array('body' => $email->body, 'user' => $user, 'password' => $password, 'login_url' => $login_url, 'account_url' => URL::to("account"));
+        $parameters = array('body' => $email->body, 'user' => $user, 'login_url' => $login_url, 'account_url' => URL::to("account"));
         Mail::send($email_view, $parameters, function ($message) use ($user, $email, $creator) {
             $message->from($email->sender_email, config('mail.from.name'))
                 ->to($user->email)
@@ -551,14 +550,11 @@ class User extends Model implements AuthenticatableContract,
     public function pastConferences()
     {
         $now = Carbon::now();
-
         $conferences = $this->conferences()->where('start', '<=', $now)
             ->where('room_enabled', 0)
             ->withPivot('joined_once')
 //            ->whereIn('institution_id', $this->institutions()->pluck('id'))
-
             ->get();
-
         return $conferences;
     }
 
@@ -756,23 +752,17 @@ class User extends Model implements AuthenticatableContract,
      */
     public static function advancedSearch($users, $input)
     {
-        $user_advanced_search = ['firstname', 'lastname', 'state', 'status', 'multi_mails', 'confirmed', 'accepted_terms', 'telephone'];
-        if (Auth::user()->hasRole('SuperAdmin') || Auth::user()->hasRole('InstitutionAdministrator')) {
-            $user_advanced_search = ['firstname', 'lastname', 'email', 'state', 'status', 'application', 'multi_mails', 'confirmed', 'accepted_terms', 'telephone'];
-        }
+        $user_advanced_search = ['firstname', 'lastname', 'email', 'state', 'status', 'application', 'multi_mails', 'confirmed', 'accepted_terms', 'telephone'];
         $relation_advanced_search = ['institution', 'department', 'role'];
         $sorting = 0;
         foreach ($input as $k => $v) {
-
             if ($v === null || $v === "")
                 unset($input[$k]);
 
         }
         //Ignore institution id since department is filled
-
         if (isset($input['department']) && isset($input['institution']))
             unset($input['institution']);
-
 
         foreach ($input as $k => $v) {
             if (in_array($k, $user_advanced_search)) {
@@ -1082,6 +1072,9 @@ class User extends Model implements AuthenticatableContract,
     }
 
 
+    /**
+     * @return bool
+     */
     public function is_mobile()
     {
         $agent = new Agent();
@@ -1090,6 +1083,9 @@ class User extends Model implements AuthenticatableContract,
     }
 
 
+    /**
+     * @return string
+     */
     public static function getUserOS()
     {
         $os = '';
@@ -1308,6 +1304,62 @@ class User extends Model implements AuthenticatableContract,
      * @return bool
      */
     public function canRequestRoleUpgrade(){
-      return  $this->civil_servant && Application::where('user_id', $this->id)->where('app_state', 'new')->count() == 0 && ($this->hasRole('DepartmentAdministrator') || $this->hasRole('EndUser'));
+      return  $this->civil_servant && Application::where('user_id', $this->id)->where('app_state', 'new')->count() == 0 &&
+          ($this->hasRole('DepartmentAdministrator') || $this->hasRole('EndUser'));
     }
+
+
+    /** Determines whether a user can create an end user
+     * @return bool
+     */
+    public function canCreateEndUser(){
+        //Only super admins, Institution admins & Department admins can update a user
+        if(!$this->hasRole("SuperAdmin") && !$this->hasRole("InstitutionAdministrator") && !$this->hasRole("DepartmentAdministrator")){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canCreateDepartmentAdmin(){
+        //Only super admins  can view end users
+        if(!$this->hasRole("SuperAdmin") && !$this->hasRole("InstitutionAdministrator")){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canCreateInstitutionAdmin(){
+        //Only super admins  can view end users
+        if(!$this->hasRole("SuperAdmin")){
+            return false;
+        }
+        return true;
+    }
+
+
+    /** Determines whether a user can update another user
+     * @param $userToUpdate
+     * @return bool
+     */
+    public function canUpdateUser($userToUpdate){
+
+        //Only super admins  can update a users
+        if(!$this->hasRole("SuperAdmin")){
+            return false;
+        }
+
+        //Super-admins or unconfirmed user can not be updated by anyone
+        if($userToUpdate->hasRole("SuperAdmin") || !$userToUpdate->confirmed){
+            return false;
+        }
+
+        return true;
+    }
+
 }

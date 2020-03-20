@@ -38,45 +38,6 @@
 
     <script src="/js/scripts.js"></script>
     <script type="text/javascript">
-
-        function changeStatetoSso(user_id) {
-            var r = confirm("Ειστε σίγουρος ότι θέλετε να μετατρέψετε αυτον τον χρήστη σε SSO ;");
-
-            if (r === true) {
-                $.post("/users/change_state_to_sso",
-                    {
-                        _token: '{{csrf_token()}}',
-                        user_id: user_id,
-                    })
-                    .done(function (data) {
-                        if (data.status === 'success') {
-                            alert(data.message);
-                            window.location.replace("");
-                        }
-                        else
-                            console.log(data);
-                    });
-            }
-        }
-        function changeStatetoLocal(user_id) {
-
-            var r = confirm("Ειστε σίγουρος ότι θέλετε να μετατρέψετε αυτον τον χρήστη σε Local ;");
-            if (r === true) {
-                $.post("/users/change_state_to_local",
-                    {
-                        _token: '{{csrf_token()}}',
-                        user_id: user_id,
-                    })
-                    .done(function (data) {
-                        if (data.status === 'success') {
-                            alert(data.message);
-                            window.location.replace("");
-                        }
-                        else
-                            console.log(data);
-                    });
-            }
-        }
         function sendConfirmationEmail(user_id) {
             var r = confirm("Ειστε σίγουρος ότι θέλετε να στείλετε email ενεργοποίησης σε αυτον τον χρήστη ;");
             if (r === true) {
@@ -401,7 +362,6 @@
             $("#SendCoordinatorsEmailButtonClose").click(function () {
                 $("#CoordMail").modal("hide");
             });
-
           });
 
          </script>
@@ -415,24 +375,6 @@
 @endsection
 @section('extra-css')
     <style>
-
-        #matched_error_container_dept{
-            display:none;
-        }
-
-        #not_matched_error_container_dept{
-            display:none;
-        }
-
-        #matched_error_container_inst{
-            display:none;
-        }
-
-        #not_matched_error_container_inst{
-            display:none;
-        }
-
-
         .container {
             min-width: 400px !important;
             text-align: left;

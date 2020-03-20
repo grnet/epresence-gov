@@ -190,7 +190,6 @@
                     var params = [{name: "sort_"+col, value: "asc"}];
                     window.location.assign(url_pathname + "?" + current_param + $.param(params));
                 }
-
                 else if(url.search("sort_" + col) > 0){
                     var variable = $.urlParam("sort_" + col);
                     var new_var = "desc";

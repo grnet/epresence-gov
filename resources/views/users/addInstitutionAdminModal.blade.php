@@ -8,14 +8,7 @@
                 <h4 class="modal-title" id="InstitutionAdminLabel">{{trans('users.addInstitutionModerator')}}</h4>
             </div> <!-- .modal-header -->
             <div class="modal-body">
-                <div class="alert alert-danger" id="matched_error_container_inst">
-                    <strong>{{trans('users.email_matched_to_organisation')}} </strong>
-                </div>
-                <div class="alert alert-danger" id="not_matched_error_container_inst">
-                    <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
-                </div>
                 {!! Form::open(array('url' => 'store_institution_admin', 'method' => 'post', 'class' => 'form-horizontal', 'id' => 'addNewInstitutionAdminForm', 'role' => 'form')) !!}
-
                 <div class="form-group">
                     {!! Form::label('FieldInstitutionAdminSurname', trans('users.surname').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">

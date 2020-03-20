@@ -9,15 +9,7 @@
 
             </div> <!-- .modal-header -->
             <div class="modal-body">
-
-                <div class="alert alert-danger" id="matched_error_container_dept">
-                    <strong>{{trans('users.email_matched_to_organisation')}} </strong>
-                </div>
-                <div class="alert alert-danger" id="not_matched_error_container_dept">
-                    <strong>{{trans('users.email_not_matched_to_organisation')}} </strong>
-                </div>
                 {!! Form::open(array('url' => 'store_department_admin', 'method' => 'post', 'class' => 'form-horizontal', 'role' => 'form','id'=>'addNewDepartmentAdminForm')) !!}
-
                 <div class="form-group">
                     {!! Form::label('FieldDepartmentAdminSurname', trans('users.surname').':', ['class' => 'control-label col-sm-4 ']) !!}
                     <div class="col-sm-8">

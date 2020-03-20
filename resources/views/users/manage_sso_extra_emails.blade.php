@@ -56,7 +56,7 @@
                         @foreach($extra_emails['sso'] as $mail)
                             <div class="col-sm-12">
                                 <div style="color:green;" class="col-sm-2">
-                                    (sso {{trans('users.emailConfirmedShort')}})
+                                    ({{trans('users.emailConfirmedShort')}})
                                 </div>
                                 <div class="col-sm-6">
                                     {!! Form::text('primary_email', $mail['email'], ['class' => 'form-control','readonly'=>'true','style'=>'border-color:green; margin-bottom:5px;']) !!}

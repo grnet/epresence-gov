@@ -63,37 +63,30 @@ class UsersController extends Controller
             Session::forget('previous_url');
         }
 
-        // Limit
-        $limit = Input::get('limit') ?: 10;
-
-        $users_default = User::where('deleted', false)
-            ->whereHas(
-                'roles', function ($query) {
-                $query->where('name', '!=', 'SuperAdmin');
-            }
-            );
-
-        $input = $request->all();
-
-        if (Gate::denies('view_users_menu')) {
+        if (Gate::denies('view_users')) {
             abort(403);
-        } elseif (Gate::allows('view_users_menu') && Gate::denies('view_users') && Gate::allows('view_admins_menu')) {
-            return redirect('/administrators');
         }
 
-
-        $users_default = User::advancedSearch($users_default, $input);
-
-        if (!isset($input['export'])) {
-
-            $users = $users_default->paginate($limit);
-
-            return view('users.index', compact('users'));
-
-        } else {
-            //Handle export
-
-            return Excel::download(new UsersExport($users_default), 'users-export-' . Carbon::now()->toDateString() . '.xlsx', 'Xlsx');
+        if(Auth::user()->hasRole("SuperAdmin")){
+            // Limit
+            $limit = Input::get('limit') ?: 10;
+            $users_default = User::where('deleted', false)
+                ->whereHas(
+                    'roles', function ($query) {
+                    $query->where('name', 'EndUser');
+                }
+             );
+            $input = $request->all();
+            $users_default = User::advancedSearch($users_default, $input);
+            if (!isset($input['export'])) {
+                $users = $users_default->paginate($limit);
+                return view('users.index', compact('users'));
+            } else {
+                //Handle export
+                return Excel::download(new UsersExport($users_default), 'users-export-' . Carbon::now()->toDateString() . '.xlsx', 'Xlsx');
+            }
+        }else{
+            return view('users.index');
         }
     }
 
@@ -115,39 +108,25 @@ class UsersController extends Controller
             abort(403);
         }
 
-        $roles = array();
-
-        if (Gate::allows('view_admins')) {
+        if (Auth::user()->hasRole('SuperAdmin')) {
             $roles [] = 'SuperAdmin';
-        }
-
-        if (Gate::allows('view_org_admins')) {
             $roles [] = 'InstitutionAdministrator';
-        }
-
-        if (Gate::allows('view_dep_admins')) {
+            $roles [] = 'DepartmentAdministrator';
+        }else{
+            $roles [] = 'InstitutionAdministrator';
             $roles [] = 'DepartmentAdministrator';
         }
 
-        if (Auth::user()->hasRole('InstitutionAdministrator') && (Gate::allows('view_org_admins') || Gate::allows('view_dep_admins'))) {
-            $users_default = User::where('deleted', false)->whereHas(
-                'roles', function ($query) use ($roles) {
-                $query->whereIn('name', $roles);
-            }
-            )
-                ->whereHas(
+        $users_default = User::where('deleted', false)->whereHas(
+            'roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles);
+        });
+        if (Auth::user()->hasRole('InstitutionAdministrator')) {
+            $users_default->whereHas(
                     'institutions', function ($query) {
                     $query->where('id', Auth::user()->institutions()->first()->id);
                 }
-                );
-
-        } else {
-            $users_default = User::where('deleted', false)->whereHas(
-                'roles', function ($query) use ($roles) {
-                $query->whereIn('name', $roles);
-            }
-            );
-
+             );
         }
 
         $input = $request->all();
@@ -169,16 +148,6 @@ class UsersController extends Controller
     }
 
 
-    /**
-     * @return Factory|View
-     */
-    public function create()
-    {
-        if (Gate::denies('view_users')) {
-            abort(403);
-        }
-        return view('users.create');
-    }
 
     /**
      * @param Requests\CreateUserRequest $request
@@ -186,23 +155,29 @@ class UsersController extends Controller
      */
     public function store(Requests\CreateUserRequest $request)
     {
+
+        $authenticatedUser = request()->user();
+        if (!$authenticatedUser->canCreateEndUser()) {
+            abort(403);
+        }
+
         $password = str_random(9);
         $input = $request->all();
         $input['password'] = bcrypt($password);
         $input['status'] = 1;
         $input['state'] = 'sso';
-        $input['creator_id'] = request()->user()->id;
+        $input['creator_id'] = $authenticatedUser->id;
         $input['activation_token'] = str_random(15);
         $user = User::create($input);
 
-        $user->institutions()->attach(1);
-        $user->departments()->attach(1);
+        $user->institutions()->attach($authenticatedUser->institutions()->first()->id);
+        $user->departments()->attach($authenticatedUser->departments()->first()->id);
 
         // Assign role to user
         $user->assignRole('EndUser');
 
         // Send email to user for the new account
-        $user->email_for_new_account($password);
+        $user->email_for_new_account();
 
         // Assign conferenceUser to conference
 
@@ -221,6 +196,11 @@ class UsersController extends Controller
     public function store_new_department_admin(Request $request)
     {
         //Validation logic
+
+        $authenticatedUser = request()->user();
+        if (!$authenticatedUser->canCreateDepartmentAdmin()) {
+            abort(403);
+        }
 
         $input = $request->all();
         $validator = Validator::make($input, [
@@ -325,7 +305,7 @@ class UsersController extends Controller
 
         //Handle institution as InstitutionAdministrator
 
-        if (Auth::user()->hasRole('InstitutionAdministrator')) {
+        if ($authenticatedUser->hasRole('InstitutionAdministrator')) {
             //Only department administrations are created here
             $input['institution_id'] = Auth::user()->institutions()->first()->id;
         }
@@ -340,7 +320,7 @@ class UsersController extends Controller
 
         // Send email to user for the new account
 
-        $user->email_for_new_account($password);
+        $user->email_for_new_account();
 
         // Send email to the Super Admins if an InstitutionAdministrator create a DepartmentAdministrator
 //        if ($user->hasRole('DepartmentAdministrator') && isset($input['creator_id']) && $user->creator->hasRole('InstitutionAdministrator') && $user->status == 1) {
@@ -365,28 +345,25 @@ class UsersController extends Controller
     public function store_new_institution_admin(Request $request)
     {
         //Validation logic
+        $authenticatedUser = request()->user();
+        if (!$authenticatedUser->canCreateInstitutionAdmin()) {
+            abort(403);
+        }
 
         $input = $request->all();
 
         $validator = Validator::make($input, [
-//            'inst_admin_lastname' => 'required',
-//            'inst_admin_firstname' => 'required',
             'inst_admin_email' => 'required|email',
             'inst_admin_telephone' => 'required',
             'inst_admin_institution_id' => 'required',
-            'inst_admin_new_institution' => 'required_if:inst_admin_institution_id,other',
-            'inst_admin_department_id' => 'required_unless:inst_admin_institution_id,other',
+            'inst_admin_department_id' => 'required',
             'inst_admin_new_department' => 'required_if:inst_admin_department_id,other',
         ], [
-//            'inst_admin_lastname.required' => trans('requests.lastnameRequired'),
-//            'inst_admin_firstname.required' => trans('requests.firstnameRequired'),
-            'inst_admin_state.required' => trans('requests.localSelectRequired'),
             'inst_admin_email.required' => trans('requests.emailRequired'),
             'inst_admin_email.email' => trans('requests.emailInvalid'),
             'inst_admin_telephone.required' => trans('requests.phoneRequired'),
             'inst_admin_institution_id.required' => trans('requests.institutionRequired'),
-            'inst_admin_new_institution.required_if' => trans('requests.newInstitutionRequired'),
-            'inst_admin_department_id.required_unless' => trans('requests.departmentRequired'),
+            'inst_admin_department_id.required' => trans('requests.departmentRequired'),
             'inst_admin_new_department.required_if' => trans('requests.newDepartmentRequired'),
         ]);
 
@@ -413,61 +390,50 @@ class UsersController extends Controller
 
         //Validation end
 
-        $password = str_random(15);
+        $createUserParameters['password'] = Hash::make(str_random(15));
+        $createUserParameters['name'] = $input['inst_admin_email'];
+        $createUserParameters['firstname'] = $input['inst_admin_firstname'];
+        $createUserParameters['lastname'] = $input['inst_admin_lastname'];
+        $createUserParameters['email'] = $input['inst_admin_email'];
+        $createUserParameters['telephone'] = $input['inst_admin_telephone'];
+        $createUserParameters['state'] = "sso";
+        $createUserParameters['status'] = 1;
+        $createUserParameters['creator_id'] = $authenticatedUser->id;
+        $createUserParameters['activation_token'] = null;
+        $user = User::create($input);
 
-        $input['created_at'] = Carbon::now();
-        $input['updated_at'] = Carbon::now();
-        $input['password'] = Hash::make($password);
-        $input['name'] = $input['inst_admin_email'];
-        $input['firstname'] = $input['inst_admin_firstname'];
-        $input['lastname'] = $input['inst_admin_lastname'];
-        $input['email'] = $input['inst_admin_email'];
-        $input['telephone'] = $input['inst_admin_telephone'];
-        $input['state'] = "sso";
         $input['institution_id'] = $input['inst_admin_institution_id'];
         $input['department_id'] = $input['inst_admin_department_id'];
         $input['new_department'] = $input['inst_admin_new_department'];
-        $input['status'] = 1;
-        $input['creator_id'] = Auth::user()->id;
-        $input['activation_token'] = str_random(15);
-        $user = User::create($input);
 
         // Assign role to user
 
         $user->assignRole("InstitutionAdministrator");
 
-        //Institution administrators created here
-
-          if(!empty($input['new_institution']) && $input['institution_id'] == "other") {
-
-                $input['department_id'] = "other";
-
-                $new_institution = Institution::create(['title' => $input['new_institution'], 'slug' => 'noID']);
-                $input['institution_id'] = $new_institution->id;
-
-                // Create admin department
-                Department::create(['title' => 'Διοίκηση', 'slug' => 'admin', 'institution_id' => $new_institution->id]);
-                // Create other department
-                Department::create(['title' => 'Άλλο', 'slug' => 'other', 'institution_id' => $new_institution->id]);
-         }
-
-        if (!empty($input['new_department'])) {
+        if ($input['department_id'] == "other" && !empty($input['new_department'])) {
             $new_department = Department::create(['title' => $input['new_department'],'institution_id' => $input['institution_id']]);
             $input['department_id'] = $new_department->id;
         }
 
-        $user->institutions()->attach($input['institution_id']);
-        $user->departments()->attach($input['department_id']);
+        $institution = Institution::findOrFail($input['institution_id']);
+        $department = Department::findOrFail($input['department_id']);
+
+        $user->institutions()->attach($institution->id);
+        $user->departments()->attach($department->id);
 
         // Send email to user for the new account
 
-        $user->email_for_new_account($password);
+        $user->email_for_new_account();
 
         return back()->with('message', trans('controllers.userAddedActivationEmailSent'));
     }
 
     //This executes on clicking the link shown in the error / when trying to add a department admin with an email that already exists in your institution
 
+    /**
+     * @param $user_id
+     * @return RedirectResponse
+     */
     public function invite_user_to_become_department_admin($user_id)
     {
 
@@ -505,6 +471,9 @@ class UsersController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     */
     public function sendConfirmationEmailSSO(Request $request)
     {
 
@@ -543,43 +512,11 @@ class UsersController extends Controller
         echo "Email sent!";
     }
 
-    public function edit($id)
-    {
-        $user = User::findOrFail($id);
 
-        $authenticated_user = Auth::user();
-
-        $extra_emails['sso'] = $user->extra_emails_sso()->toArray();
-        $extra_emails['custom'] = $user->extra_emails_custom()->toArray();
-
-        $institution = $user->institutions()->first();
-        $department = $user->departments()->first();
-        $role = $user->roles()->first();
-
-
-        if (($user->hasRole('SuperAdmin')) && Gate::denies('edit_admin_account') && $authenticated_user->is_user($user) == false) {
-            abort(403);
-        } elseif ($user->hasRole('InstitutionAdministrator') && Gate::denies('edit_org_admin') && $authenticated_user->is_user($user) == false) {
-            abort(403);
-        } elseif ($user->hasRole('DepartmentAdministrator') && $user->hasRole('DepartmentAdministrator') && $authenticated_user->is_user($user) == false && Gate::denies('edit_dep_admin')) {
-            abort(403);
-        } elseif ($user->hasRole('EndUser') && Gate::denies('edit_user') && Auth::user()->is_user($user) == false) {
-            abort(403);
-        }
-
-        $user['from_page'] = class_basename(URL::previous());
-
-        return view('users.edit', [
-            'user' => $user,
-            'auth_user' => $authenticated_user,
-            'extra_emails' => $extra_emails,
-            'institution' => $institution,
-            'department' => $department,
-            'role' => $role
-        ]);
-
-    }
-
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
     public function delete($id)
     {
         if (Gate::denies('view_users')) {
@@ -620,6 +557,9 @@ class UsersController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     */
     public function delete_user(Request $request)
     {
         if (Gate::denies('view_users')) {
@@ -734,6 +674,9 @@ class UsersController extends Controller
         echo json_encode($results);
     }
 
+    /**
+     * @param Request $request
+     */
     public function disable_user(Request $request)
     {
         if (Gate::denies('view_admins')) {
@@ -805,12 +748,18 @@ class UsersController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     */
     public function set_cookie(Request $request)
     {
         $input = $request->all();
         Cookie::queue($input['cookie_name'], $input['cookie_value'], 2628000);
     }
 
+    /**
+     * @param Request $request
+     */
     public function delete_user_image(Request $request)
     {
         $input = $request->all();

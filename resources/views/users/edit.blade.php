@@ -235,7 +235,7 @@
 				</div>
 			@endif
 				{!! Form::model($user, array('url' => ['users/' . $user->id.'/'.$user->state], 'method' => 'PATCH', 'class' => 'form-horizontal', 'id' => 'OrgForm', 'role' => 'form', 'files' => true)) !!}
-				@include('users.edit_sso_user_form')
+				@include('users.editForm')
 				{!! Form::close() !!}
 			</div>                        
 		</div><!--/.box-->

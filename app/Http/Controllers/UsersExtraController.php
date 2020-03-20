@@ -46,15 +46,7 @@ class UsersExtraController extends Controller
 
         //Check if user has correct role to edit a user
 
-        if (!$auth_user->hasRole('SuperAdmin')  && !$auth_user->hasRole('InstitutionAdministrator')) {
-            abort(403);
-        }
-
-        if ($auth_user->hasRole('InstitutionAdministrator') && $user->institutions()->first()->id != $auth_user->institutions()->first()->id) {
-            abort(403);
-        }
-
-        if (!$user->confirmed) {
+        if (!$auth_user->canUpdateUser($user)) {
             abort(403);
         }
 
@@ -89,11 +81,7 @@ class UsersExtraController extends Controller
 
         //Check if user that is editing has the correct permissions to do that
 
-        if (!$auth_user->hasRole('SuperAdmin') && !$auth_user->hasRole('InstitutionAdministrator')) {
-            abort(403);
-        }
-
-        if ($auth_user->hasRole('InstitutionAdministrator') && $user->institutions()->first()->id != $auth_user->institutions()->first()->id) {
+        if (!$auth_user->canUpdateUser($user)) {
             abort(403);
         }
 
@@ -203,8 +191,6 @@ class UsersExtraController extends Controller
 
         $message = trans('controllers.connectionEmailSent');
         $status = "success";
-
-
         return response()->json(['status' => $status, 'message' => $message]);
     }
 }

@@ -36,11 +36,11 @@
                     </td>
                 <td class="cellCreationDate hidden-xs sorting main_table">{{ $user->getDate($user->created_at) }}</td>
                 <td class="cellButton center main_table">
-                    <a @if($user->confirmed) href="/users/{{ $user->id }}/edit" @else href="#" @endif>
+                    <a @if(Auth::user()->canUpdateUser($user)) href="/users/{{ $user->id }}/edit" @else href="#" @endif>
                         <button id="RowBtnEdit-{{ $user->id }}" type="button" title="{!! trans('users.edit') !!}"
-                                @if(!$user->confirmed) disabled
-                                @endif class="btn btn-default btn-sm m-right btn-border"><span
-                                    class="glyphicon glyphicon-pencil"></span></button>
+                        @if(!Auth::user()->canUpdateUser($user)) disabled  @endif
+                        class="btn btn-default btn-sm m-right btn-border"><span class="glyphicon glyphicon-pencil"></span>
+                        </button>
                     </a>
                         <button id="RowBtnDelete-{{ $user->id }}" type="button"
                                 class="btn {{ json_decode($user->statusUsersTableButton())->btn_bg }} btn-sm"
@@ -107,9 +107,9 @@
                                     <strong>{{trans('users.telephone')}}:</strong> {{ $user->telephone }}<br/>
                                     <strong>{{trans('users.role')}}:</strong> {{ trans($user->roles->first()->label) }}
                                     <br/>
-                                        <strong>{{trans('users.institution')}}:</strong> {{ $user->institutions->first()->title or trans('users.notDefinedYet') }}
+                                        <strong>{{trans('users.institution')}}:</strong> {{ $user->institutions->first()->title }}
                                         <br/>
-                                        <strong>{{trans('users.department')}}:</strong> {{ $user->departments->first()->title or trans('users.notDefinedYet') }}
+                                        <strong>{{trans('users.department')}}:</strong> {{ $user->departments->first()->title}}
                                         <br/>
                                         <strong>{{trans('site.termsAcceptanceAdmin')}}:</strong>@if(!empty($user->accepted_terms)) {{ Carbon\Carbon::parse($user->accepted_terms)->toDateTimeString()}} @else {!! trans('users.no') !!} @endif
                                 </td>

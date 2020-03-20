@@ -67,7 +67,7 @@ class PersistentIdImport implements ToCollection
                     $new_extra_email->user_id = $user_to_update->id;
                     $new_extra_email->email = $new_email;
                     $new_extra_email->confirmed = true;
-                    $new_extra_email->type = 'sso';
+                    $new_extra_email->type = 'custom';
                     $new_extra_email->save();
                 }
 

@@ -80,7 +80,6 @@ Route::post('users/request_role_change', 'ApplicationController@requestRoleChang
 Route::post('applications/decline_application','ApplicationController@decline_application');
 Route::post('applications/accept_application','ApplicationController@accept_application');
 Route::get('administrators/applications', 'ApplicationController@index');
-//Route::post('store_admin_application', 'ApplicationController@store_admin_application');
 Route::get('/email_activation/{token}', 'ExtraEmailsController@ConfirmExtraEmail');
 
 // Change Language
@@ -142,7 +141,6 @@ Route::post('users/{id}/emails/add_new','ExtraEmailsController@addExtraMailFromA
 Route::post('users/{id}/emails/deleteExtraEmail', 'ExtraEmailsController@deleteExtraMail');
 Route::post('users/{id}/emails/makePrimary', 'ExtraEmailsController@makePrimary');
 Route::post('users/{id}/emails/resend_extra_email_confirmation', 'ExtraEmailsController@resend_extra_email_confirmation');
-Route::get('users/{id}', 'UsersController@edit');
 Route::post('users/delete_user_image', 'UsersController@delete_user_image');
 Route::get('administrators', 'UsersController@administrators');
 Route::post('administrators/sendEmailToCoordinators', 'EmailsController@sendEmailToCoordinators');
@@ -273,7 +271,6 @@ Route::get('settings/notifyParticipants', 'SettingsController@notifyParticipants
 
 
 Route::get('/access_sso_login', 'ApplicationController@redirect_sso_login_to_account_application');
-Route::get('/access_local_login', 'ApplicationController@redirect_local_login_to_account_application');
 
 
 //Calendar

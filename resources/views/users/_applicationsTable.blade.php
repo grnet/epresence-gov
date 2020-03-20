@@ -15,8 +15,6 @@
     </thead>
     <tbody>
     @foreach ($applications as $application)
-        @if(isset($application->user))
-
             <tr @if($application->app_state == "new")class="warning" @endif>
                 <td class="cellDetails main_table" id="openUserDetails-{{ $application->id }}"><span
                             data-toggle="tooltip" data-placement="bottom" title="{{trans('users.details')}}"
@@ -109,7 +107,6 @@
                     </div>
                 </td>
             </tr>
-        @endif
     @endforeach
     </tbody>
 </table>

@@ -153,7 +153,6 @@ class ExtraEmailsController extends Controller
             $user->email = $mail->email;
             $user->update();
             $mail->email = $current_primary;
-            $mail->type = 'sso';
             $mail->update();
             $response->status = 'success';
             $response->message = 'email converted to primary';

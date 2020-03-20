@@ -257,7 +257,7 @@
                 // the value axis
                 yAxis: {
                     min: 0,
-                    max: 250,
+                    max: 1000,
                     minorTickInterval: 'auto',
                     minorTickWidth: 1,
                     minorTickLength: 10,
@@ -277,15 +277,15 @@
                     },
                     plotBands: [{
                         from: 0,
-                        to: 120,
+                        to: 500,
                         color: '#55BF3B' // green
                     }, {
-                        from: 120,
-                        to: 200,
+                        from: 500,
+                        to: 800,
                         color: '#DDDF0D' // yellow
                     }, {
-                        from: 200,
-                        to: 250,
+                        from: 800,
+                        to: 1000,
                         color: '#DF5353' // red
                     }]
                 },

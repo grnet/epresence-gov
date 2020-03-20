@@ -628,6 +628,7 @@
             @endif
 
             <!-- DATATABLES START -->
+                @if(Auth::user()->hasRole("SuperAdmin"))
 
                 <div class="row"> <!-- Row with search field and add button - START -->
                     <div class="col-md-5 col-sm-12 col-xs-12">
@@ -664,13 +665,25 @@
                         </div>
                     </div>
                 </div> <!-- Row with search field and add button - END -->
-
             @include('users._advancedSearch', [])
-
             @include('users._userTable', [])
-
+            @else
+            <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12 text-right">
+                        <div>
+                            <button type="button" class="btn btn-success" style="padding-right:6px; padding-left:6px"
+                                    data-toggle="modal" id="NewUser">
+                                <small><span class="glyphicon glyphicon-plus-sign"></span> {{trans('users.addUser')}}
+                                </small>
+                            </button>
+                        </div>
+                    </div>
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center" style="padding:30px;">
+                    <p>{{trans('users.no_users_displayed')}}</p>
+                </div>
+            </div>
+            @endif
             <!-- DATATABLES END -->
-
             </div><!--/.box-->
         </div><!--/.container-->
 

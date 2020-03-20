@@ -10,28 +10,19 @@
             <div class="col-sm-3">
                 {!! Form::text('firstname', Input::get('firstname'), ['class' => 'form-control c_val', 'placeholder' => trans('users.name'), 'id' => 'searchFirstname']) !!}
             </div>
-
             <div class="col-sm-3">
                 {!! Form::text('lastname', Input::get('lastname'), ['class' => 'form-control c_val', 'placeholder' => trans('users.surname'), 'id' => 'searchLastname']) !!}
             </div>
-
-            @if(Auth::user()->hasRole('SuperAdmin') || Auth::user()->hasRole('InstitutionAdministrator'))
-                <div class="col-sm-3">
-                    {!! Form::text('email', Input::get('email') , ['class' => 'form-control c_val', 'placeholder' => 'Email', 'id' => 'searchEmail']) !!}
-                </div>
-            @endif
+           <div class="col-sm-3">
+                {!! Form::text('email', Input::get('email') , ['class' => 'form-control c_val', 'placeholder' => 'Email', 'id' => 'searchEmail']) !!}
+            </div>
             <div class="col-sm-3">
                 {!! Form::text('telephone', Input::get('telephone'), ['class' => 'form-control c_val', 'placeholder' => trans('users.telephone'), 'id' => 'searchPhone']) !!}
             </div>
-
         </div>
-
-
         <div class="small-gap"></div>
-
         <div class="row">
-
-            @if(Auth::user()->hasRole('InstitutionAdministrator')&& !Auth::user()->hasRole('SuperAdmin') || Auth::user()->hasRole('DepartmentAdministrator'))
+            @if(Auth::user()->hasRole('InstitutionAdministrator'))
                 <div class="col-sm-3">
                     {!! Form::select('institution', ['' => ''] + App\Institution::orderBy('title')->pluck('title', 'id')->toArray(), Auth::user()->institutions()->first()->id, ['id' => 'searchInstitution', 'style' => 'width: 100%','disabled'=>'disabled'])!!}
                 </div>
