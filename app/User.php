@@ -60,18 +60,19 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+
     /**
-     * A user may have a creator
+     * @param string $token
      */
-
-
     public function sendPasswordResetNotification($token)
     {
 
         $this->notify(new MailResetPasswordNotification($token));
     }
 
-
+    /**
+     * A user may have a creator
+     */
     public function creator()
     {
         return $this->belongsTo('App\User', 'creator_id');
@@ -86,6 +87,16 @@ class User extends Model implements AuthenticatableContract,
         $emails[] = $this->email;
         return $emails;
     }
+
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeConfirmed($query){
+        return $query->where("confirmed",true);
+    }
+
 
 
     /**
