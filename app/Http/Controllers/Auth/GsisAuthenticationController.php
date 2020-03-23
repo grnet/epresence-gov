@@ -85,7 +85,9 @@ class GsisAuthenticationController extends Controller
     public function redirectToLoginForm()
     {
         $authorizationUrl = $this->server->getAuthorizationUrl();
-        session()->put("oauth2state", $this->server->getState());
+        $state = $this->server->getState();
+        session()->put("oauth2state", $state);
+        $this->logMessage("Info", "Setting state: ".$state." to session and redirecting to authorization url");
         return redirect($authorizationUrl);
     }
 
