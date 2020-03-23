@@ -12,6 +12,6 @@ trait writesToGsisLogs
     private function logMessage($type,$message){
         $date = Carbon::now();
         $ipAddress = request()->ip();
-        Storage::disk('logs')->append('gsis'.Carbon::today()->toDateString().'.log',$type." ".$date.": (".$ipAddress.") ".$message);
+        Storage::disk('logs')->append('gsis-'.Carbon::today()->toDateString().'.log',$type." ".$date.": (".$ipAddress.") ".$message);
     }
 }
