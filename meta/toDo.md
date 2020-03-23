@@ -1,14 +1,13 @@
-1. Add users tab on users menu for institution Administrator * & Review permissions
-2. Gauss speedometer statistics (index_chart_scripts.blade.php) change max 205 to 1000 and intervals bellow (both epresence)
-3. Sorting on applications table (both epresence)
-4. Remove 'sso' επιβεβαιωμένο from edit user -> extra emails * update all extra emails's type to custom -> sso value is no longer valid
-5. Jirra Integration
-
+1. New Applications Not shown
+2. Jirra Integration (email vs rest integration)
+3. Test Conferences must use a simple Zoom user not Pro
+4. We should not keep statistics for test conferences
+5. Admin elegxos mhtrwou page me update institution
 Δικαιώματα Διαχειριστών
 
 O Σούπερ Διαχειριστής :
 
-Βλέπει τον πίνακα με τους users και τον πίνακα με όλους τους διαχειριστές ανεξάρτητως ρόλου ή φορέα
+Βλέπει τον πίνακα με τους users (μενού χρήστες -> καρτέλα χρήστες) και τον πίνακα με όλους τους διαχειριστές  (μενού χρήστες -> καρτέλα διαχειριστές) ανεξάρτητως ρόλου ή φορέα
 Έχει την δυνατότητα να κάνει επεξεργασία οποιοδήποτε χρήστη εκτός άλλων Super Admins πατώντας το κουμπί επεξεργασία (μολυβάκι) στους πίνακες που αναφέρθηκαν παραπάνω
 Έχει την δυνατότητα να δημιουργεί οποιοδήποτε χρήστη εκτός άλλων Super Admins είτε απο τα κουμπιά που βρίσκονται στους πίνακες που αναφέρθηκαν παραπάνω
 

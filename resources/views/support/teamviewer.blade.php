@@ -106,7 +106,7 @@
                                 {!! trans('support.teamviewer') !!}
                             </div>
                             <div class="center" style="margin-top:20px">
-                                <a href="https://get.teamviewer.com/newepresence" target="_blank"><button class="btn btn-primary">e:Presence Quick Support</button></a>
+                                <a href="https://get.teamviewer.com/epresencegov" target="_blank"><button class="btn btn-primary">e:Presence Quick Support</button></a>
                             </div>
                         </div>
                         <!--/.col-md-4-->

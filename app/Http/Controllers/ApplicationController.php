@@ -44,11 +44,9 @@ class ApplicationController extends Controller
         if (!is_null(Session::get('previous_url'))) {
             Session::forget('previous_url');
         }
-
         if (Gate::denies('view_applications')) {
             abort(403);
         } else {
-
             $applications = Application::selectRaw("applications.*")->whereIn('app_state', ['notVerified', 'new'])
                 ->with('user')
                 ->join('users','users.id','=','applications.user_id');
@@ -85,11 +83,9 @@ class ApplicationController extends Controller
      */
     public function accept_application(Request $request)
     {
-
         if (Gate::denies('view_applications')) {
             abort(403);
         }
-
         $application = Application::find($request->application_id);
         //Check if the application is already processed by another admin
         if ($application->app_state == "new") {
@@ -267,9 +263,7 @@ class ApplicationController extends Controller
         });
 
         if (count($admins_to_notify) > 0) {
-
             $email_for_admins = Email::where('name', 'adminApplicationForAdmins')->first();
-
             Mail::send('emails.admin_application_for_other_admins', $parameters, function ($message) use ($email_for_admins, $user, $admins_to_notify) {
                 $message->from($email_for_admins->sender_email, config('mail.from.name'))
                     ->to($admins_to_notify)
@@ -294,7 +288,4 @@ class ApplicationController extends Controller
             return redirect('/account');
         }
     }
-
-
-
 }
