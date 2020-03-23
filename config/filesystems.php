@@ -47,10 +47,15 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
+        'logs' => [
+            'driver' => 'local',
+            'root' => storage_path('logs'),
+        ],
         'language_files' => [
             'driver' => 'local',
             'root' => resource_path('lang'),
         ],
+
 
         'public' => [
             'driver' => 'local',

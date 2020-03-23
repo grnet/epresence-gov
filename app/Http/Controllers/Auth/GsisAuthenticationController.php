@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Institution;
 use App\User;
 use Carbon\Carbon;
+use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
@@ -106,7 +108,7 @@ class GsisAuthenticationController extends Controller
                 ]);
                 $client = new Client(['headers' => ['Authorization' => 'Bearer ' . $accessToken]]);
                 $response = $client->request('GET', config('services.gsis.urlResourceOwnerDetails'));
-                Log::info("User details api response: " . $response->getBody());
+                $this->logMessage("Info","User details api response: " . $response->getBody());
                 $parsedResponse = simplexml_load_string($response->getBody());
                 $userInfo = $parsedResponse->userinfo;
                 $validationResult = $this->validateParameters($userInfo);
@@ -128,8 +130,8 @@ class GsisAuthenticationController extends Controller
                 } else {
                     return $this->registerUser($firstName,$lastName,$taxId);
                 }
-            } catch (IdentityProviderException $e) {
-                Log::error("GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
+            } catch (Exception $e) {
+                $this->logMessage("Error","GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
             }
         }
         return $this->logoutAsNotAuthorized();
@@ -304,25 +306,25 @@ class GsisAuthenticationController extends Controller
                         $user->departments()->sync([$departmentToAttach->id]);
                         return redirect()->route('account-activation');
                     }else{
-                        Log::info("Could not find any employment info from api or api exception occurred! Not changing invited user's institution, confirming account and logging in");
+                        $this->logMessage("Info","Could not find any employment info from api or api exception occurred! Not changing invited user's institution, confirming account and logging in");
                         $user->update(['firstname' => $firstName, 'lastname' => $lastName, 'tax_id' => $taxId, 'confirmed' => true, 'activation_token' => null,'civil_servant'=>false,'email_verified_at'=>Carbon::now()]);
                         return redirect('/');
                     }
                 }
             } else {
                 //Invalid activation token
-                Log::error("Invalid activation token: " . $activation_token);
+                $this->logMessage("Error","Invalid activation token: " . $activation_token);
                 session()->flash('invalid-activation-token');
                 return $this->logoutAsNotAuthorized();
             }
         } else {
             $responseObject = $this->getEmploymentInfo($taxId);
             if($responseObject !== false){
-                Log::info("Not invited account with tax_id: " . $taxId . " is a civil servant continuing...");
+                $this->logMessage("Info","Not invited account with tax_id: " . $taxId . " is a civil servant continuing...");
                 $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                 $departmentToAttach = $institutionToAttach->departments()->first();
                 $this->matchInstitutionsAndSetToSession($responseObject);
-                Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
+                $this->logMessage("Info","Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
                 $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
                 $user = User::create(
                     [
@@ -345,7 +347,7 @@ class GsisAuthenticationController extends Controller
                 Auth::login($user);
                 return redirect()->route('account-activation');
             }  else {
-                Log::info("Not invited account with tax_id: " . $taxId . " is not a civil servant or an employee api exception occurred aborting!");
+                $this->logMessage("Info","Not invited account with tax_id: " . $taxId . " is not a civil servant or an employee api exception occurred aborting!");
                 return $this->logoutAsNotAuthorized();
             }
         }
@@ -365,13 +367,13 @@ class GsisAuthenticationController extends Controller
      */
     private function validateParameters($userInfo)
     {
-        Log::info("Validating parameters: " . json_encode($userInfo));
+        $this->logMessage("Info","Validating parameters: " . json_encode($userInfo));
         //Check that all parameters are there and are not empty
         if (!isset($userInfo['taxid']) || $this->checkIfEmptyParameter($userInfo['taxid'])) {
             return false;
         }
         if (!isset($userInfo['firstname']) || $this->checkIfEmptyParameter($userInfo['firstname'])) {
-            Log::error("Gsis account was found with empty firstname aborted since this account is not a physical person's account");
+            $this->logMessage("Info","Gsis account was found with empty firstname aborting since this account is not a physical person's account");
             return false;
         }
         if (!isset($userInfo['lastname']) || $this->checkIfEmptyParameter($userInfo['lastname'])) {
@@ -406,6 +408,17 @@ class GsisAuthenticationController extends Controller
             $institutionToAttach = $institutionMatched;
         }
         return $institutionToAttach;
+    }
+
+
+    /**
+     * @param $type
+     * @param $message
+     */
+    private function logMessage($type,$message){
+        $date = Carbon::now();
+        $ipAddress = request()->ip();
+        Storage::disk('logs')->append('gsis.log',$type." ".$date.": (".$ipAddress.") ".$message);
     }
 
 }

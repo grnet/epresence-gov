@@ -23,12 +23,7 @@ class ZoomHooksController extends Controller
     {
         $event_object = $request->all();
         $event_type = $event_object['event'];
-        $logFile = "webhooks.logs";
-
-        Log::info("Zoom web-hook: " . json_encode($event_object));
-
-        Storage::append($logFile,Carbon::now().': '.json_encode($event_object));
-
+        $this->logMessage("Info","Zoom web-hook: " . json_encode($event_object));
         if (in_array($event_type, ['meeting.participant_joined', 'meeting.participant_left'])) {
 
             $zoom_meeting_id = $event_object['payload']['object']['id'];
@@ -49,18 +44,12 @@ class ZoomHooksController extends Controller
             $meeting_type = null;
             $current_demo_room_zoom_id = null;
 
-
             if(!isset($conference->id)){
-                Log::info("Not matched with conference");
-
                 //Check if this zoom meeting id is the demo-room
 
                 $redis = Redis::connection();
-
                 $demo_room_key = 'demo_room_active';
                 $current_demo_room_zoom_id = $redis->get($demo_room_key);
-
-                Log::info("Current demo room id: ".$current_demo_room_zoom_id);
 
                 if($current_demo_room_zoom_id == $zoom_meeting_id){
                     $meeting_type = "demo_room";
@@ -78,8 +67,6 @@ class ZoomHooksController extends Controller
             }else{
                 $meeting_type = "conference";
             }
-
-            Log::info("Meeting type resolved: ".$meeting_type);
 
             if(!is_null($meeting_type)){
 
@@ -115,7 +102,6 @@ class ZoomHooksController extends Controller
                                 }
 
                             } else {
-
                                 //The event is about the demo room
 
                                 DB::table('demo_room_cdrs')->insert(
@@ -239,4 +225,14 @@ class ZoomHooksController extends Controller
             }
         }
     }
+
+    /**
+     * @param $type
+     * @param $message
+     */
+    private function logMessage($type,$message){
+        $date = Carbon::now();
+        Storage::disk('logs')->append('webhooks.log',$type." ".$date.": ".$message);
+    }
+
 }
