@@ -4,7 +4,7 @@ namespace App\Jobs\Conferences;
 
 use App\Conference;
 use App\NamedUser;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -47,7 +47,7 @@ class EndH323IpRetrievalMeeting implements ShouldQueue
 
             Log::info("Ending h323 ip retrieval meeting with id :".$zoom_meeting_id);
 
-            $zoom_client = new ZoomClient();
+            $zoom_client = new JiraClient();
 
             //End current meeting
 

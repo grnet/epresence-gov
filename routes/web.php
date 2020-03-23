@@ -11,7 +11,17 @@
 |
 */
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+
 Route::get('/', function () {
+
+    Storage::append("logs/webhooks.log","TEST");
+
+    $client = new \Asikamiotis\JiraClient\JiraClient();
+    $client->test_api();
+
+
     return view('epresence');
 });
 

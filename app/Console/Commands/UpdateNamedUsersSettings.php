@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\NamedUser;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use Illuminate\Console\Command;
 
 class UpdateNamedUsersSettings extends Command
@@ -43,7 +43,7 @@ class UpdateNamedUsersSettings extends Command
 
         foreach($named_users as $named_user){
 
-            $zoom_client = new ZoomClient();
+            $zoom_client = new JiraClient();
             $parameters = [
                 "in_meeting"=>[
                     "e2e_encryption"=>false

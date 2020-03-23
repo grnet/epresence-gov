@@ -5,9 +5,11 @@ namespace App\Console\Commands;
 use App\Institution;
 use App\User;
 use Illuminate\Console\Command;
+use App\Traits\interactsWithEmploymentApi;
 
 class GetInvalidAdmins extends Command
 {
+    use interactsWithEmploymentApi;
     /**
      * The name and signature of the console command.
      *
@@ -47,7 +49,7 @@ class GetInvalidAdmins extends Command
         foreach($admins as $admin){
             $attachedInstitution = $admin->institutions()->first();
             $attachedDepartment = $admin->departments()->first();
-            $responseObject = getEmploymentInfo($admin->tax_id);
+            $responseObject = $this->getEmploymentInfo($admin->tax_id);
             if($responseObject !== false){
                 $matchedInstitutions = [];
                 foreach ($responseObject->data->employmentInfos as $employmentInfo) {

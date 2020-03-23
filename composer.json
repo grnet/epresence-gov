@@ -41,7 +41,7 @@
         "psr-4": {
             "App\\": "app/",
             "Asikamiotis\\ZoomApiWrapper\\": "packages/asikamiotis/zoomapiwrapper/",
-            "Asikamiotis\\Gsis\\": "packages/asikamiotis/gsis/"
+            "Asikamiotis\\JiraClient\\": "packages/asikamiotis/jiraclient/"
         },
         "files": ["app/Http/helpers.php"]
     },

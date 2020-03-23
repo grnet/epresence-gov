@@ -5,7 +5,7 @@ namespace App\Jobs\Conferences;
 
 use App\Cdr;
 use App\Events\ParticipantLeft;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -45,7 +45,7 @@ class CheckIfH323Left implements ShouldQueue
             $conference = $this->conference;
             $zoom_meeting_id = $conference->zoom_meeting_id;
 
-            $zoom_client = new ZoomClient();
+            $zoom_client = new JiraClient();
             $get_participants_response = $zoom_client->get_participants($zoom_meeting_id);
 
 //            Log::info("Check if H323 left:");

@@ -19,10 +19,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
+use App\Traits\interactsWithEmploymentApi;
 
 
 class GsisAuthenticationController extends Controller
 {
+    use interactsWithEmploymentApi;
     /*
     |--------------------------------------------------------------------------
     | Gsis Authentication Controller
@@ -217,7 +219,13 @@ class GsisAuthenticationController extends Controller
                         });
                     }
                 } else {
-                    $user->merge_user($userOfToken->id, true);
+                    if (empty($user->email_verified_at)) {
+                        $invitedEmail = $userOfToken->email;
+                        $user->merge_user($userOfToken->id, false);
+                        $user->update(['email' => $invitedEmail, 'email_verified_at' => Carbon::now()]);
+                    } else {
+                        $user->merge_user($userOfToken->id, true);
+                    }
                 }
 
             }
@@ -228,11 +236,11 @@ class GsisAuthenticationController extends Controller
 
         if(!$user->confirmed){
             if(!in_array($currentRole->name,["InstitutionAdministrator", "DepartmentAdministrator"])){
-                $responseObject = getEmploymentInfo($user->tax_id);
+                $responseObject = $this->getEmploymentInfo($user->tax_id);
                 if($responseObject !== false){
                     $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                     $departmentToAttach = $institutionToAttach->departments()->first();
-                   matchInstitutionsAndSetToSession($responseObject);
+                    $this->matchInstitutionsAndSetToSession($responseObject);
                     $user->institutions()->sync([$institutionToAttach->id]);
                     $user->departments()->sync([$departmentToAttach->id]);
                 }
@@ -262,7 +270,7 @@ class GsisAuthenticationController extends Controller
                 $user->create_join_urls();
                 Auth::login($user);
                 $tokenUserRole = $user->roles()->first();
-                $responseObject = getEmploymentInfo($taxId);
+                $responseObject = $this->getEmploymentInfo($taxId);
                 if (in_array($tokenUserRole->name, ["InstitutionAdministrator", "DepartmentAdministrator"])) {
                     $isCivilServant = false;
                     if($responseObject !== false){
@@ -291,7 +299,7 @@ class GsisAuthenticationController extends Controller
                         ]);
                         $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                         $departmentToAttach = $institutionToAttach->departments()->first();
-                        matchInstitutionsAndSetToSession($responseObject);
+                        $this->matchInstitutionsAndSetToSession($responseObject);
                         $user->institutions()->sync([$institutionToAttach->id]);
                         $user->departments()->sync([$departmentToAttach->id]);
                         return redirect()->route('account-activation');
@@ -308,12 +316,12 @@ class GsisAuthenticationController extends Controller
                 return $this->logoutAsNotAuthorized();
             }
         } else {
-            $responseObject = getEmploymentInfo($taxId);
+            $responseObject = $this->getEmploymentInfo($taxId);
             if($responseObject !== false){
                 Log::info("Not invited account with tax_id: " . $taxId . " is a civil servant continuing...");
                 $institutionToAttach = $this->getPrimaryInstitution($responseObject);
                 $departmentToAttach = $institutionToAttach->departments()->first();
-                matchInstitutionsAndSetToSession($responseObject);
+                $this->matchInstitutionsAndSetToSession($responseObject);
                 Log::info("Creating new user with tax_id: " . $taxId . " First name: " . $firstName . " Last name: " . $lastName);
                 $nextUserId = User::count() > 0 ? User::orderBy("id", "desc")->first()->id : 0;
                 $user = User::create(

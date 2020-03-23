@@ -7,10 +7,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-
+use App\Traits\interactsWithEmploymentApi;
 class UpdateCivilServantField implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels,interactsWithEmploymentApi;
 
     /**
      * Create a new job instance.
@@ -30,7 +30,7 @@ class UpdateCivilServantField implements ShouldQueue
      */
     public function handle()
     {
-        $responseObject = getEmploymentInfo($this->user->tax_id);
+        $responseObject = $this->getEmploymentInfo($this->user->tax_id);
         if($responseObject !== false){
             $this->user->update(['civil_servant'=>true]);
         }

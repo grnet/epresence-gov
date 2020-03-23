@@ -14,6 +14,9 @@ class ZoomClient
     protected $client;
     protected $headers;
 
+    /**
+     * ZoomClient constructor.
+     */
     public function __construct() {
 
         $this->client = new GuzzleHttpClient([
@@ -29,9 +32,6 @@ class ZoomClient
         );
 
         $jwt = JWT::encode($token, $secret);
-
-        Log::info($jwt);
-
         $this->headers = [
             'Authorization' => 'Bearer ' . $jwt,
             'Accept' => 'application/json',
@@ -42,7 +42,11 @@ class ZoomClient
 
     //Meetings
 
-
+    /**
+     * @param $parameters
+     * @param $zoom_user_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function create_meeting($parameters,$zoom_user_id)
     {
 
@@ -61,20 +65,20 @@ class ZoomClient
             $response = json_decode($api_response->getBody());
 
         } catch (ClientException $e) {
-
             $response = $e->getResponse();
             $responseBodyAsString = $response->getBody()->getContents();
-
             Log::error($responseBodyAsString);
-
             $response = false;
         }
-
         return $response;
     }
 
 
-
+    /**
+     * @param $parameters
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function update_meeting($parameters,$zoom_meeting_id){
 
         //Docs https://zoom.github.io/api/#update-a-meeting
@@ -102,7 +106,11 @@ class ZoomClient
     }
 
 
-
+    /**
+     * @param $parameters
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function update_meeting_status($parameters,$zoom_meeting_id){
 
         //Docs https://zoom.github.io/api/#update-a-meetings-status
@@ -130,6 +138,10 @@ class ZoomClient
     }
 
 
+    /**
+     * @param $zoom_meeting_id
+     * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
+     */
     public function delete_meeting($zoom_meeting_id){
 
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingdelete
@@ -446,31 +458,22 @@ class ZoomClient
      * @return bool|mixed|\Psr\Http\Message\ResponseInterface|null
      */
     public function add_user_to_group($parameters,$group_id){
-
         //Docs https://marketplace.zoom.us/docs/api-reference/zoom-api/groups/groupmemberscreate
-
         try {
-
             //Make the api call to zoom
-
             $add_user_to_group_response = $this->client->request('POST', '/v2/groups/' . $group_id . '/members/', [
                 'headers' => $this->headers,
                 'json' => $parameters
             ]);
-
             $add_user_to_group_response = json_decode($add_user_to_group_response->getBody());
-
         } catch (ClientException $e) {
 
             $add_user_to_group_response = $e->getResponse();
             $responseBodyAsString = $add_user_to_group_response->getBody()->getContents();
-
             Log::error($responseBodyAsString);
-            Log::error("Soap error: Could not add named user to blocking group.");
-
+            Log::error("Zoom api exception: Could not add named user to blocking group.");
             $add_user_to_group_response = false;
         }
-
         return $add_user_to_group_response;
     }
 

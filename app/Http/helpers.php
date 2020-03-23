@@ -71,60 +71,11 @@ if (!function_exists('replace_body_parameters')) {
                 $string = str_replace(':' . $key, $value, $string);
             }
         }
-
         return $string;
     }
 }
 
 
-
-if (!function_exists('getEmploymentInfo')) {
-    function getEmploymentInfo($taxId)
-    {
-        try {
-            $client = new GuzzleHttp\Client();
-            $response = $client->get(config('services.gov-employees-api.endpoint') . $taxId, [
-                'auth' => [
-                    config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
-                ]
-            ]);
-            Illuminate\Support\Facades\Log::info("Employee api response: " . $response->getBody());
-            $responseObject = json_decode($response->getBody());
-            //Check if user is civil servant
-            if (!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0) {
-                return $responseObject;
-            } else {
-                return false;
-            }
-        } catch (\Exception $e) {
-            Illuminate\Support\Facades\Log::error("Employee api exception: " . $e->getMessage());
-            return false;
-        }
-    }
-}
-
-
-/**Puts matched institutions in the session
- * @param $responseObject
- * @return array
- */
-if (!function_exists('matchInstitutionsAndSetToSession')) {
-    function matchInstitutionsAndSetToSession($responseObject)
-    {
-        $matchedInstitutions = [];
-        foreach ($responseObject->data->employmentInfos as $employmentInfo) {
-            $institutionMatched = App\Institution::where("ws_id", $employmentInfo->organicOrganizationId)->first();
-            if ($institutionMatched) {
-                $matchedInstitutions[] = $institutionMatched->id;
-            }
-        }
-        if (count($matchedInstitutions) > 0) {
-            session()->put("matched_institution_ids", implode(",", $matchedInstitutions));
-        }
-
-        return $matchedInstitutions;
-    }
-}
 
 
 

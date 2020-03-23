@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Installation\Models;
 
 use App\NamedUser;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -43,7 +43,7 @@ class NamedUsers extends Command
     {
         Schema::disableForeignKeyConstraints();
         Db::table('named_users')->truncate();
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
         $named_users_to_create = $this->argument('number');
         $offset_number = $this->argument('offset');
         $upperLimit = $named_users_to_create+$offset_number;

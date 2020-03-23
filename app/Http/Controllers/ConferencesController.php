@@ -14,7 +14,7 @@ use App\Events\ParticipantStatusChanged;
 use App\ExtraEmail;
 use App\Jobs\Conferences\EndH323IpRetrievalMeeting;
 use App\NamedUser;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use Firebase\JWT\JWT;
 use App\Email;
 use GuzzleHttp\Exception\ClientException;
@@ -428,7 +428,7 @@ class ConferencesController extends Controller
         //end of handle for named users rotation
         // Create Scheduled Room ZOOM api calls start
         $create_parameters = Conference::get_zoom_create_parameters($input);
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
         $create_meeting_info = $zoom_client->create_meeting($create_parameters, $next_named_user_in_line->zoom_id);
         $input['join_url'] = $create_meeting_info->join_url;
         $input['start_url'] = $create_meeting_info->start_url;
@@ -584,7 +584,7 @@ class ConferencesController extends Controller
         // Create Scheduled Room ZOOM api calls start
 
         $create_parameters = Conference::get_zoom_create_parameters($input);
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
 
         $create_meeting_info = $zoom_client->create_meeting($create_parameters, $next_named_user_in_line->zoom_id);
 
@@ -900,7 +900,7 @@ class ConferencesController extends Controller
 
         $update_parameters = $conference->get_zoom_update_parameters();
 
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
         $zoom_client->update_meeting($update_parameters, $conference->zoom_meeting_id);
 
         if (isset($fields_updated) && count($fields_updated) > 0 && $notify)
@@ -927,7 +927,7 @@ class ConferencesController extends Controller
         }
         $conference->update($input);
         $update_parameters = $conference->get_zoom_update_parameters();
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
         $zoom_client->update_meeting($update_parameters, $conference->zoom_meeting_id);
         if (isset($fields_updated) && count($fields_updated) > 0 && $notify)
             event(new ConferenceDetailsChanged($conference, $fields_updated));
@@ -998,7 +998,7 @@ class ConferencesController extends Controller
                 ]
             ];
 
-            $zoom_client = new ZoomClient();
+            $zoom_client = new JiraClient();
             $zoom_client->update_participant_status($registrant_parameters, $conference->zoom_meeting_id);
             event(new ParticipantStatusChanged($conference->id, $status_requested, $user->id));
         }
@@ -1033,7 +1033,7 @@ class ConferencesController extends Controller
             $participants_ids = $conference->participants()->pluck("id")->toArray();
             $admin_ids = $conference->getAdminsIds();
             event(new ConferenceEnded($conference->id, "deleted", $type, $participants_ids, $admin_ids));
-            $zoom_client = new ZoomClient();
+            $zoom_client = new JiraClient();
             $zoom_client->delete_meeting($conference->zoom_meeting_id);
             $conference->delete();
             $results = array(
@@ -1722,7 +1722,7 @@ class ConferencesController extends Controller
             $redis = Redis::connection();
             if (isset($named_user_responsible_for_h323_ip_retrieval->id)) {
                 //Create room for ip retrieval and keep meeting id in redis
-                $zoom_client = new ZoomClient();
+                $zoom_client = new JiraClient();
                 //Create new meeting
                 $h323_ip_retrieval_named_user_zoom_id = $named_user_responsible_for_h323_ip_retrieval->zoom_id;
                 $start_time = Carbon::now()->format("Y-m-d\TH:i:s");

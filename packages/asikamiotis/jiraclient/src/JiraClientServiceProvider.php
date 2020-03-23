@@ -5,7 +5,7 @@ namespace Asikamiotis\ZoomApiWrapper;
 use Illuminate\Support\ServiceProvider;
 
 
-class ZoomApiWrapperServiceProvider extends ServiceProvider
+class JiraClientServiceProvider extends ServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.
@@ -35,6 +35,6 @@ class ZoomApiWrapperServiceProvider extends ServiceProvider
             return new JiraClient();
         });
 
-        $this->app->alias(JiraClient::class, 'zoom-client');
+        $this->app->alias(JiraClient::class, 'jira-client');
     }
 }

@@ -18,13 +18,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-
-        Queue::after(function (JobProcessed $event) {
-
-         $job_payload = $event->job->payload();
-         Log::info("Processed job: ".$job_payload['displayName']);
-        });
-
+//        Queue::after(function (JobProcessed $event) {
+//         $job_payload = $event->job->payload();
+//        });
     }
 
     /**

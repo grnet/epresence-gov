@@ -57,6 +57,11 @@ return [
         'endpoint'=>env('GOV_EMPLOYEES_API_ENDPOINT'),
         'username'=>env('GOV_EMPLOYEES_API_USERNAME'),
         'password'=>env('GOV_EMPLOYEES_API_PASSWORD')
+    ],
+    'jira'=>[
+        'endpoint'=>env('JIRA_ENDPOINT'),
+        'username'=>env('JIRA_USERNAME'),
+        'password'=>env('JIRA_PASSWORD')
     ]
 
 ];

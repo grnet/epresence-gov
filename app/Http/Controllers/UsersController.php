@@ -277,27 +277,23 @@ class UsersController extends Controller
 
         //Validation end
 
-        $password = str_random(15);
-        $input['created_at'] = Carbon::now();
-        $input['updated_at'] = Carbon::now();
-        $input['password'] = bcrypt($password);
-        $input['name'] = $input['dept_admin_email'];
-        $input['firstname'] = $input['dept_admin_firstname'];
-        $input['lastname'] = $input['dept_admin_lastname'];
-        $input['email'] = $input['dept_admin_email'];
-        $input['telephone'] = $input['dept_admin_telephone'];
-        $input['state'] = 'sso';
+        $createUserParameters['password'] = Hash::make(str_random(15));
+        $createUserParameters['firstname'] = $input['dept_admin_firstname'];
+        $createUserParameters['lastname'] = $input['dept_admin_lastname'];
+        $createUserParameters['email'] = $input['dept_admin_email'];
+        $createUserParameters['telephone'] = $input['dept_admin_telephone'];
+        $createUserParameters['state'] = 'sso';
+        $createUserParameters['status'] = 1;
+        $createUserParameters['creator_id'] = $authenticatedUser->id;
+        $createUserParameters['activation_token'] = str_random(15);
+        $user = User::create($createUserParameters);
+
         $input['institution_id'] = $input['dept_admin_institution_id'];
         $input['new_institution'] = isset($input['dept_admin_new_institution']) ? $input['dept_admin_new_institution'] : null ;
         $input['department_id'] = $input['dept_admin_department_id'];
         $input['new_department'] = isset($input['dept_admin_new_department']) ? $input['dept_admin_new_department'] : null ;
-        $input['status'] = 1;
-        $input['creator_id'] = Auth::user()->id;
-        if ($input['state'] == 'sso') {
-            $input['activation_token'] = str_random(15);
-        }
 
-        $user = User::create($input);
+
 
         // Assign role to user
 
@@ -315,8 +311,8 @@ class UsersController extends Controller
             $input['department_id'] = $new_department->id;
         }
 
-        $user->institutions()->attach($input['institution_id']);
-        $user->departments()->attach($input['department_id']);
+        $user->institutions()->sync($input['institution_id']);
+        $user->departments()->sync($input['department_id']);
 
         // Send email to user for the new account
 
@@ -374,24 +370,23 @@ class UsersController extends Controller
             $user_using_this_email = User::where('email', $input['inst_admin_email'])->first();
             $user_using_this_email_as_confirmed_extra = ExtraEmail::where('email', $input['inst_admin_email'])->where('confirmed', 1)->first();
             if (isset($user_using_this_email) || isset($user_using_this_email_as_confirmed_extra)) {
-                    $validator->errors()->add('email', trans('controllers.emailInUse'));
+                    $validator->errors()->add('inst_admin_email', trans('controllers.emailInUse'));
               } else {
                 $user_using_this_email_as_unconfirmed_extra = ExtraEmail::where('email', $input['inst_admin_email'])->where('confirmed', 0)->first();
                 if ($user_using_this_email_as_unconfirmed_extra) {
-                    $validator->errors()->add('email', trans('requests.emailInUseByUnconfirmedExtra'));
+                    $validator->errors()->add('inst_admin_email', trans('requests.emailInUseByUnconfirmedExtra'));
                 }
             }
         });
 
 
         if ($validator->fails()) {
-            return back()->withErrors($validator,'new_inst_admin')->withInput();
+            return redirect('/administrators')->withErrors($validator,'new_inst_admin')->withInput();
         }
 
         //Validation end
 
         $createUserParameters['password'] = Hash::make(str_random(15));
-        $createUserParameters['name'] = $input['inst_admin_email'];
         $createUserParameters['firstname'] = $input['inst_admin_firstname'];
         $createUserParameters['lastname'] = $input['inst_admin_lastname'];
         $createUserParameters['email'] = $input['inst_admin_email'];
@@ -399,8 +394,8 @@ class UsersController extends Controller
         $createUserParameters['state'] = "sso";
         $createUserParameters['status'] = 1;
         $createUserParameters['creator_id'] = $authenticatedUser->id;
-        $createUserParameters['activation_token'] = null;
-        $user = User::create($input);
+        $createUserParameters['activation_token'] = str_random(15);
+        $user = User::create($createUserParameters);
 
         $input['institution_id'] = $input['inst_admin_institution_id'];
         $input['department_id'] = $input['inst_admin_department_id'];
@@ -415,17 +410,17 @@ class UsersController extends Controller
             $input['department_id'] = $new_department->id;
         }
 
-        $institution = Institution::findOrFail($input['institution_id']);
-        $department = Department::findOrFail($input['department_id']);
+        $institution = Institution::find($input['institution_id']);
+        $department = Department::find($input['department_id']);
 
         $user->institutions()->attach($institution->id);
         $user->departments()->attach($department->id);
 
         // Send email to user for the new account
 
-        $user->email_for_new_account();
+       $user->email_for_new_account();
 
-        return back()->with('message', trans('controllers.userAddedActivationEmailSent'));
+        return redirect('/administrators')->with('message', trans('controllers.userAddedActivationEmailSent'));
     }
 
     //This executes on clicking the link shown in the error / when trying to add a department admin with an email that already exists in your institution

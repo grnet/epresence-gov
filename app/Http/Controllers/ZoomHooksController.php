@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
 
 class ZoomHooksController extends Controller
 {
@@ -22,8 +23,11 @@ class ZoomHooksController extends Controller
     {
         $event_object = $request->all();
         $event_type = $event_object['event'];
+        $logFile = "webhooks.logs";
 
         Log::info("Zoom web-hook: " . json_encode($event_object));
+
+        Storage::append($logFile,Carbon::now().': '.json_encode($event_object));
 
         if (in_array($event_type, ['meeting.participant_joined', 'meeting.participant_left'])) {
 

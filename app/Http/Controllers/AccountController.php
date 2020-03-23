@@ -23,10 +23,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use App\Traits\interactsWithEmploymentApi;
 
 
 class AccountController extends Controller
 {
+    use interactsWithEmploymentApi;
 
     /**
      * AccountController constructor.
@@ -54,9 +56,9 @@ class AccountController extends Controller
 
         if($canRequestRoleChange && $user->hasRole('EndUser')){
             if(!session()->has('matched_institution_ids')){
-                $apiResponse = getEmploymentInfo($user->tax_id);
+                $apiResponse = $this->getEmploymentInfo($user->tax_id);
                 if($apiResponse !== false){
-                    $matchedInstitutionIds = matchInstitutionsAndSetToSession($apiResponse);
+                    $matchedInstitutionIds = $this->matchInstitutionsAndSetToSession($apiResponse);
                 }else{
                     $matchedInstitutionIds = [];
                     $canRequestRoleChange = false;

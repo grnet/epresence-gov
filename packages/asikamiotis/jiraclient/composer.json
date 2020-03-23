@@ -1,0 +1,40 @@
+{
+    "name": "asikamiotis/jiraclient",
+    "description": "A wrapper around jira restful api for laravel based on guzzle",
+    "keywords": [
+        "laravel",
+        "php",
+        "jira-api",
+        "jira",
+        "api",
+        "restful",
+        "guzzle"
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3@dev",
+        "laravel/framework": "5.5.*"
+    },
+    "authors": [
+        {
+            "name": "Alex Sikamiotis",
+            "email": "asikamiotis@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Asikamiotis\\JiraClient\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Asikamiotis\\JiraClient\\JiraClientServiceProvider"
+            ],
+            "aliases": {
+                "JiraClient": "Asikamiotis\\JiraClient\\Facade\\JiraClientFacade"
+            }
+        }
+    },
+
+    "minimum-stability": "dev"
+}

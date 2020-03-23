@@ -4,7 +4,7 @@ namespace App;
 
 use App\Jobs\Conferences\AddRegistrant;
 use App\Notifications\MailResetPasswordNotification;
-use Asikamiotis\ZoomApiWrapper\ZoomClient;
+use Asikamiotis\ZoomApiWrapper\JiraClient;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Auth\Authenticatable;
@@ -1261,7 +1261,7 @@ class User extends Model implements AuthenticatableContract,
      * @param $userToDelete
      */
     private function merge_conference_user_records($userToDelete){
-        $zoom_client = new ZoomClient();
+        $zoom_client = new JiraClient();
         $conferences_invited = Db::table('conference_user')->where('user_id', $userToDelete->id)->get();
         foreach ($conferences_invited as $row) {
             $conference = Conference::find($row->conference_id);
