@@ -87,7 +87,7 @@ class GsisAuthenticationController extends Controller
         $authorizationUrl = $this->server->getAuthorizationUrl();
         $state = $this->server->getState();
         session()->put("oauth2state", $state);
-        $this->logMessage("Info", "Setting state: ".$state." to session and redirecting to authorization url");
+        $this->logMessage("Info", "Setting state: ".$state." to session and redirecting to authorization url: ".$authorizationUrl);
         return redirect($authorizationUrl);
     }
 
