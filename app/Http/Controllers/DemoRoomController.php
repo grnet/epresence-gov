@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\DemoRoomCdr;
 use App\ExtraEmail;
 use App\NamedUser;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\RedirectResponse;
@@ -55,7 +55,7 @@ class DemoRoomController extends Controller
 
             //If not create personalised url for the demo room for this user
 
-            $zoom_client = new JiraClient();
+            $zoom_client = new ZoomClient();
 
             $redis = Redis::connection();
             $key = 'demo_room_active';
@@ -87,7 +87,7 @@ class DemoRoomController extends Controller
 
                 //Work around for empty join_url
                 if(empty($join_url)){
-                    $zoom_client = new JiraClient();
+                    $zoom_client = new ZoomClient();
                     $registrants_response = $zoom_client->get_registrants($current_demo_room_zoom_id);
                     $join_url =  $user->match_with_registrant($registrants_response,$registrant_id);
                 }
@@ -112,7 +112,7 @@ class DemoRoomController extends Controller
         $redis = Redis::connection();
         $key = 'demo_room_active';
         $current_demo_room_zoom_id = $redis->get($key);
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
 
         DB::table('demo_room_join_urls')->where('active',true)->update(["active"=>false]);
         if (!empty($current_demo_room_zoom_id)) {

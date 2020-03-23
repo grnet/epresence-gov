@@ -1,6 +1,6 @@
 <?php
 
-namespace Asikamiotis\ZoomApiWrapper;
+namespace Asikamiotis\JiraClient;
 
 use Illuminate\Support\ServiceProvider;
 

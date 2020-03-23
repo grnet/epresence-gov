@@ -4,7 +4,7 @@ namespace App\Jobs\Conferences;
 
 use App\Events\H323IpNotRetrieved;
 use App\Events\H323IpRetrieved;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -43,7 +43,7 @@ class CheckH323IpRetrieval implements ShouldQueue
 
         Redis::throttle('zoom_metrics')->allow(1)->every(1)->then(function () {
 
-            $zoom_client = new JiraClient();
+            $zoom_client = new ZoomClient();
 
             $zoom_meeting_id = $this->meeting_id;
             $get_participants_response = $zoom_client->get_participants($zoom_meeting_id);

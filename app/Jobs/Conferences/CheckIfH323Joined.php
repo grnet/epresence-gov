@@ -4,7 +4,7 @@ namespace App\Jobs\Conferences;
 
 use App\Cdr;
 use App\Events\ParticipantJoined;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -45,7 +45,7 @@ class CheckIfH323Joined implements ShouldQueue
             $conference = $this->conference;
             $zoom_meeting_id = $conference->zoom_meeting_id;
 
-            $zoom_client = new JiraClient();
+            $zoom_client = new ZoomClient();
             $get_participants_response = $zoom_client->get_participants($zoom_meeting_id);
 
 //            Log::info("Check if H323 joined:");

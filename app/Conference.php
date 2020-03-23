@@ -7,7 +7,7 @@ use App\Jobs\Conferences\AddNamedUserToBlockingGroup;
 use App\Jobs\Conferences\AddRegistrant;
 use App\Jobs\Conferences\CloseIpAddressForH323;
 use App\Jobs\Conferences\OpenIpAddressForH323;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
@@ -843,7 +843,7 @@ class Conference extends Model
         }
 
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->update_participant_status($registrant_parameters,$this->zoom_meeting_id);
     }
 
@@ -868,7 +868,7 @@ class Conference extends Model
             $registrant_parameters['registrants'][] = ["id"=>$participant->participantValues($this->id)->registrant_id, "email"=>"user".$participant->id."@".env("APP_ALIAS")];
         }
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->update_participant_status($registrant_parameters,$this->zoom_meeting_id);
 
     }
@@ -1072,7 +1072,7 @@ class Conference extends Model
                 ]
             ];
 
-            $zoom_client = new JiraClient();
+            $zoom_client = new ZoomClient();
             $zoom_client->update_meeting($parameters,$this->zoom_meeting_id);
 
             $this->update(['room_enabled' => 1]);
@@ -1102,7 +1102,7 @@ class Conference extends Model
 
         //Disable join before host on this meeting
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->update_meeting($update_parameters,$this->zoom_meeting_id);
 
         $update_status_parameters = [
@@ -1146,7 +1146,7 @@ class Conference extends Model
         $user = User::findOrFail($user_id);
         $registrant_id = $user->participantValues($this->id)->registrant_id;
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
 
         $deny_registrant_parameters = [
             "action" => "cancel",
@@ -1174,7 +1174,7 @@ class Conference extends Model
         Log::info("Adding ".$user_id." as participant in conference: ".$this->id." api call:");
 
         $participant = User::findOrFail($user_id);
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
 
         //Adds registrant
 
@@ -1234,7 +1234,7 @@ class Conference extends Model
 
         $named_user = $this->named_user;
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->delete_user_from_group([],$named_user->zoom_id,config('services.zoom.h323_disabled_group_id'));
 
         $delay_in_seconds = config('firewall.open_for');
@@ -1405,7 +1405,7 @@ class Conference extends Model
             ]
         ];
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->add_user_to_group($add_user_to_group_params,config('services.zoom.h323_disabled_group_id'));
     }
 
@@ -1419,7 +1419,7 @@ class Conference extends Model
 
         //Delete old meeting
 
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $zoom_client->delete_meeting($this->zoom_meeting_id);
 
         //Get the next available named user in line
@@ -1489,7 +1489,7 @@ class Conference extends Model
      */
     public function look_for_join_urls($registrant_id = null){
         $responseUrl = null;
-        $zoom_client = new JiraClient();
+        $zoom_client = new ZoomClient();
         $registrants_response = $zoom_client->get_registrants($this->zoom_meeting_id);
         if(isset($registrants_response->registrants) && count($registrants_response->registrants) > 0){
             foreach($registrants_response->registrants as $registrant){

@@ -4,7 +4,7 @@ namespace App\Jobs\Conferences;
 
 use App\Conference;
 use App\DemoRoomCdr;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -42,7 +42,7 @@ class TrackClientParticipantAddress implements ShouldQueue
     {
         Redis::throttle('zoom_metrics')->allow(1)->every(1)->then(function () {
 
-            $zoom_client = new JiraClient();
+            $zoom_client = new ZoomClient();
             $get_participants_response = $zoom_client->get_participants($this->zoom_meeting_id);
             Log::info("get participant response: ".json_encode($get_participants_response));
 

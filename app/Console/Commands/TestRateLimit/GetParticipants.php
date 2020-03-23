@@ -4,7 +4,7 @@ namespace App\Console\Commands\TestRateLimit;
 
 use App\Conference;
 use App\Jobs\Conferences\TrackClientParticipantAddress;
-use Asikamiotis\ZoomApiWrapper\JiraClient;
+use Asikamiotis\ZoomApiWrapper\ZoomClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 

@@ -31,10 +31,10 @@ class ZoomApiWrapperServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(JiraClient::class, function () {
-            return new JiraClient();
+        $this->app->singleton(ZoomClient::class, function () {
+            return new ZoomClient();
         });
 
-        $this->app->alias(JiraClient::class, 'zoom-client');
+        $this->app->alias(ZoomClient::class, 'zoom-client');
     }
 }
