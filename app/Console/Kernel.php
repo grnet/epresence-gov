@@ -16,10 +16,12 @@ use App\Jobs\Statistics\UpdateTotalDeviceServiceUsageStatistics;
 use App\Jobs\Users\AnonymizeConfirmedInactiveUsers;
 use App\Jobs\Users\ClearIpAddresses;
 use App\Jobs\Users\DeleteInactiveUnconfirmedUsers;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DemoRoomController;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -103,6 +105,10 @@ class Kernel extends ConsoleKernel
             //Delete demo-room and recreate it
 
             DemoRoomController::recreate_demo_room();
+
+
+            //Delete 4 days old gsis logs
+            Storage::disk('logs')->delete('gsis-'.Carbon::today()->subDays(4)->toDateString().'.log');
 
         })->daily();
 
