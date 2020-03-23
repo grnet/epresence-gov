@@ -97,6 +97,8 @@ class GsisAuthenticationController extends Controller
      */
     public function callback(Request $request)
     {
+        $this->logMessage("Info", "Callback request: ".json_encode($request->all()));
+
         if ($request->has('code') && $request->has('state') && session()->has("oauth2state") && session()->get("oauth2state") == $request->input('state')) {
             try {
                 $accessToken = $this->server->getAccessToken('authorization_code', [
@@ -128,6 +130,21 @@ class GsisAuthenticationController extends Controller
                 }
             } catch (Exception $e) {
                 $this->logMessage("Error","GsisAuthenticationController callback IdentityProviderException:" . $e->getMessage());
+            }
+        }else{
+            if(!$request->has('code')) {
+                $this->logMessage("Error", "Code parameter missing from request");
+            }
+            if(!$request->has('code')) {
+                $this->logMessage("Error", "State parameter missing from request");
+            }
+            if(!session()->has("oauth2state")) {
+                $this->logMessage("Error", "Missing oauth2state from session");
+            }
+            if(session()->get("oauth2state") !== $request->input('state')) {
+                $this->logMessage("Error", "Session state and request state does not match:");
+                $this->logMessage("Error", "Session state: ".session()->get("oauth2state"));
+                $this->logMessage("Error", "Request state: ".$request->input('state'));
             }
         }
         return $this->logoutAsNotAuthorized();
