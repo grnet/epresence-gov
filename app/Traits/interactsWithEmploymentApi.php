@@ -2,16 +2,16 @@
 
 use App\Institution;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 
 trait interactsWithEmploymentApi
 {
+    use writesToGsisLogs;
 
     /**
      * @param $taxId
      * @return bool|mixed
      */
-  public function getEmploymentInfo($taxId)
+    public function getEmploymentInfo($taxId)
     {
         try {
             $client = new Client();
@@ -20,7 +20,7 @@ trait interactsWithEmploymentApi
                     config('services.gov-employees-api.username'), config('services.gov-employees-api.password')
                 ]
             ]);
-            Log::info("Employee api response: " . $response->getBody());
+            $this->logMessage("Info", "Employee api response: " . $response->getBody());
             $responseObject = json_decode($response->getBody());
             //Check if user is civil servant
             if (!isset($responseObject->errorCode) && isset($responseObject->data->employmentInfos) && count($responseObject->data->employmentInfos) > 0) {
@@ -29,7 +29,7 @@ trait interactsWithEmploymentApi
                 return false;
             }
         } catch (\Exception $e) {
-            Log::error("Employee api exception: " . $e->getMessage());
+            $this->logMessage("Error", "Employee api exception: " . $e->getMessage());
             return false;
         }
     }
@@ -50,7 +50,6 @@ trait interactsWithEmploymentApi
         if (count($matchedInstitutions) > 0) {
             session()->put("matched_institution_ids", implode(",", $matchedInstitutions));
         }
-
         return $matchedInstitutions;
     }
 }

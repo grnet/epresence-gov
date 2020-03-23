@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Department;
 use App\Email;
 use App\Http\Controllers\Controller;
 use App\Institution;
@@ -15,11 +14,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
 use App\Traits\interactsWithEmploymentApi;
 
@@ -409,16 +405,4 @@ class GsisAuthenticationController extends Controller
         }
         return $institutionToAttach;
     }
-
-
-    /**
-     * @param $type
-     * @param $message
-     */
-    private function logMessage($type,$message){
-        $date = Carbon::now();
-        $ipAddress = request()->ip();
-        Storage::disk('logs')->append('gsis.log',$type." ".$date.": (".$ipAddress.") ".$message);
-    }
-
 }
